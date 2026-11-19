@@ -10,7 +10,7 @@ import { rhythm, RhythmPlayer } from "./rhythms";
 import { playDub, playExtra, playLub, playMurmur, playVentricularFibrillationTick, startAsystoleTone, stopAsystoleTone } from "./heartSound";
 import { HEART_TRACE } from "./EcgStrip";
 import { BREATH_NOW } from "./BreathDriver";
-import { breathSoundTick, stopBreathSound } from "./breathing";
+import { BREATH_PATTERNS, breathFill, breathingIn, stopBreathSound, updateBreathSoundFrame } from "./breathing";
 
 function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) {
   const heartEnabled = useHeartStore((s) => s.enabled);
@@ -65,11 +65,11 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
       breathPhaseRef.current = (breathPhaseRef.current + dt * 0.28) % 1;
       const p = breathPhaseRef.current;
       const expansion = p < 0.42 ? Math.sin((p / 0.42) * Math.PI * 0.5) : Math.cos(((p - 0.42) / 0.58) * Math.PI * 0.5);
-      BREATH_NOW.expansion = Math.max(0, expansion);
+      BREATH_NOW.fill = Math.max(0, expansion);
       BREATH_NOW.inhaling = p < 0.42;
-      if (breathSound && typeof breathSoundTick === "function") {
+      if (breathSound && true) {
         try {
-          breathSoundTick(breathPattern, p, dt);
+          const pat = BREATH_PATTERNS[breathPattern] ?? BREATH_PATTERNS.quiet; updateBreathSoundFrame(p * 4, pat, breathSound);
         } catch {}
       }
     }
@@ -89,8 +89,8 @@ function SpecimenMesh({ url, mode }: { url: string; mode: "heart" | "breath" }) 
       const pulse = 1 + Math.sin(state.clock.elapsedTime * 7.5) * 0.025;
       groupRef.current.scale.setScalar(pulse);
     } else {
-      const exp = 1 + (BREATH_NOW.expansion || 0) * 0.055;
-      groupRef.current.scale.set(exp, 1 + (BREATH_NOW.expansion || 0) * 0.025, exp);
+      const exp = 1 + (BREATH_NOW.fill || 0) * 0.055;
+      groupRef.current.scale.set(exp, 1 + (BREATH_NOW.fill || 0) * 0.025, exp);
     }
   });
 
@@ -110,7 +110,7 @@ function ProceduralOrganFallback({ mode }: { mode: "heart" | "breath" }) {
       const s = 1 + Math.pow(Math.max(0, Math.sin(state.clock.elapsedTime * 4.2)), 6) * 0.08;
       ref.current.scale.setScalar(s);
     } else {
-      const b = 1 + (BREATH_NOW.expansion || (Math.sin(state.clock.elapsedTime * 1.4) * 0.5 + 0.5)) * 0.09;
+      const b = 1 + (BREATH_NOW.fill || (Math.sin(state.clock.elapsedTime * 1.4) * 0.5 + 0.5)) * 0.09;
       ref.current.scale.set(b, 1 + (b - 1) * 0.45, b);
     }
   });
@@ -174,7 +174,7 @@ export function SoundsSpecimenCanvas({ mode }: { mode: "heart" | "breath" }) {
     <div className="relative w-full h-full min-h-[420px]">
       {!glbAvailable && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-slate-900/85 border border-cyan-500/30 text-[11px] text-cyan-200 backdrop-blur">
-          3D Preview Mode — Run <code className="font-mono text-cyan-400">.\COPY_GLB_ASSETS.ps1</code> to load real {mode === "heart" ? "heart.glb" : "lungs.glb"}
+          3D Preview Mode â€” Run <code className="font-mono text-cyan-400">.\COPY_GLB_ASSETS.ps1</code> to load real {mode === "heart" ? "heart.glb" : "lungs.glb"}
         </div>
       )}
       <Canvas camera={{ position: [0, 0.3, 4.2], fov: 42 }} dpr={[1, 2]}>
@@ -193,3 +193,4 @@ export function SoundsSpecimenCanvas({ mode }: { mode: "heart" | "breath" }) {
     </div>
   );
 }
+
