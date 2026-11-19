@@ -1,0 +1,612 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+/* ═══════════════════════════════════════════════════════
+   1) استدعاء Tailwind
+   ═══════════════════════════════════════════════════════ */
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════
+   2) Cairo كخط افتراضي للموقع بالكامل (إنجليزي وعربي)
+   ═══════════════════════════════════════════════════════ */
+:root {
+  /* ✅ خط Cairo في المقدمة ليعطي نفس شكل الخط الطبي في الأسئلة والواجهة بالإنجليزي والعربي */
+  --font-default: 'Plus Jakarta Sans', 'DM Sans', 'IBM Plex Sans Arabic', var(--font-inter), 'Inter', var(--font-cairo), 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans:    'Plus Jakarta Sans', 'DM Sans', 'IBM Plex Sans Arabic', var(--font-inter), 'Inter', var(--font-cairo), 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-exam:    'Arial', 'Helvetica', sans-serif;
+  --font-mono:    'IBM Plex Mono', 'JetBrains Mono', ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+}
+
+html {
+  font-family: var(--font-default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+body,
+.font-sans,
+div,
+span,
+p,
+a,
+button,
+input,
+textarea,
+select,
+label,
+li,
+td,
+th {
+  font-family: var(--font-default);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-default);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+code, pre, kbd, samp {
+  font-family: var(--font-mono);
+}
+
+/* ═══════════════════════════════════════════════════════
+   3) 🎯 Realistic Exam Mode (Pearson VUE simulation)
+   يُطبّق فقط على <html data-exam-font="true">
+   ═══════════════════════════════════════════════════════ */
+html[data-exam-font="true"],
+html[data-exam-font="true"] body,
+html[data-exam-font="true"] div,
+html[data-exam-font="true"] span,
+html[data-exam-font="true"] p,
+html[data-exam-font="true"] a,
+html[data-exam-font="true"] button,
+html[data-exam-font="true"] input,
+html[data-exam-font="true"] textarea,
+html[data-exam-font="true"] select,
+html[data-exam-font="true"] label,
+html[data-exam-font="true"] li,
+html[data-exam-font="true"] td,
+html[data-exam-font="true"] th,
+html[data-exam-font="true"] h1,
+html[data-exam-font="true"] h2,
+html[data-exam-font="true"] h3,
+html[data-exam-font="true"] h4,
+html[data-exam-font="true"] h5,
+html[data-exam-font="true"] h6 {
+  font-family: var(--font-exam) !important;
+  letter-spacing: 0 !important;
+  font-feature-settings: normal !important;
+}
+
+html[data-exam-font="true"] {
+  font-size: 16px;
+}
+
+/* نص عادي بدون font smoothing محسّن (أقرب لواقع شاشات VUE) */
+html[data-exam-font="true"] body {
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+html[data-exam-font="true"] p,
+html[data-exam-font="true"] li,
+html[data-exam-font="true"] span,
+html[data-exam-font="true"] label {
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+html[data-exam-font="true"] button {
+  font-size: 15px;
+  letter-spacing: 0.01em;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Smooth Theme Transition
+   ═══════════════════════════════════════════════════════ */
+html {
+  color-scheme: light dark;
+}
+
+html,
+body {
+  transition: background-color 400ms ease-in-out;
+}
+
+*,
+*::before,
+*::after {
+  transition:
+    background-color 400ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 400ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 400ms cubic-bezier(0.4, 0, 0.2, 1),
+    fill 400ms cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  transition:
+    background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[class*="animate-"],
+[class*="transition-none"] {
+  transition: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ✅ Caduceus Logo Animations
+   ═══════════════════════════════════════════════════════ */
+@keyframes caduceusSwing {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(10deg); }
+  30%  { transform: rotate(-8deg); }
+  45%  { transform: rotate(6deg); }
+  60%  { transform: rotate(-4deg); }
+  75%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes caduceusFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes blobDark {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  33% { transform: translate(30px, -30px) scale(1.1); opacity: 0.3; }
+  66% { transform: translate(-20px, 20px) scale(0.95); opacity: 0.25; }
+}
+
+@keyframes blobLight {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  33% { transform: translate(30px, -30px) scale(1.1); opacity: 0.35; }
+  66% { transform: translate(-20px, 20px) scale(0.95); opacity: 0.25; }
+}
+
+.animate-blob-dark {
+  animation: blobDark 8s ease-in-out infinite;
+}
+
+.animate-blob-light {
+  animation: blobLight 8s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Fade In Animation
+   ═══════════════════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Custom Scrollbar
+   ═══════════════════════════════════════════════════════ */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Line Clamp Utilities
+   ═══════════════════════════════════════════════════════ */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ✅ إخفاء أيقونة العين بتاعة المتصفح */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none !important;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-strong-password-auto-fill-button {
+  visibility: hidden !important;
+  display: none !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  right: 0 !important;
+}
+
+input[type="password"]::-webkit-textfield-decoration-container {
+  visibility: hidden;
+  display: none;
+  pointer-events: none;
+}
+
+input[type="password"]::-moz-reveal {
+  display: none !important;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 12px var(--glow), 0 0 24px var(--glow); }
+  50% { box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow-opacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-glow-opacity {
+  animation: pulse-glow-opacity 2s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎨 Color System — Unified Palette
+   ═══════════════════════════════════════════════════════ */
+:root {
+  --brand-primary: #0ea5e9;
+  --brand-secondary: #14b8a6;
+  --brand-accent: #8b5cf6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --mrcs: #0ea5e9;
+  --undergrad: #8b5cf6;
+  --courses: #10b981;
+  --study-room: #f59e0b;
+  --exam: #ef4444;
+  --badges: #eab308;
+  --bg-primary-dark: #0a0e1a;
+  --bg-secondary-dark: #0f172a;
+  --bg-elevated-dark: #1a2332;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎬 Animations
+   ═══════════════════════════════════════════════════════ */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: pageEnter 0.35s ease-out;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-40px) scale(1.2); }
+}
+.animate-float-up {
+  animation: floatUp 1s ease-out forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎨 Utility Classes
+   ═══════════════════════════════════════════════════════ */
+.glass-panel {
+  backdrop-filter: blur(20px) saturate(1.5);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.grain-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.02) 0%, transparent 50%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.gradient-border {
+  position: relative;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  margin: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, currentColor, transparent 60%);
+  opacity: 0.5;
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🌙 Dark Mode Improvements
+   ═══════════════════════════════════════════════════════ */
+.dark body {
+  background: linear-gradient(135deg, #0a0e1a 0%, #0f172a 100%);
+  color: #e2e8f0;
+}
+
+.dark .card-elevated {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════
+   ✨ Focus States
+   ═══════════════════════════════════════════════════════ */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎯 Smooth Transitions Global
+   ═══════════════════════════════════════════════════════ */
+.no-transition,
+img,
+svg {
+  transition: none !important;
+}
+
+@keyframes caduceusGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1.2); }
+  50% { opacity: 1; transform: scale(1.35); }
+}
+
+/* Force dark glass on Settings when <html class="dark"> */
+html.dark .sx-root,
+html.dark .sx-root[data-theme="light"]{
+  --bg:#060914; --glass:rgba(255,255,255,.055); --line:rgba(160,175,255,.16);
+  --field:rgba(5,8,22,.6); --inner:rgba(8,11,28,.55);
+  --text:#FFFFFF; --mute:rgba(255,255,255,.84); --faint:rgba(255,255,255,.55);
+  --ion:#7C6CFF; --ice:#58E1D0; --amber:#FFB454; --red:#FF5C7F; --rose:#FF6FA3; --violet:#B58BFF; --cyan:#4CC9FF;
+  --shadow:0 30px 60px -30px rgba(0,0,0,.7); --hi:rgba(255,255,255,.08); --gridop:.55;
+  color:#fff;
+}
+
+html.dark .sx-root .sx-wrap::before{display:none!important}
+
+html.dark .sx-root .sx-grid{
+  background:
+    radial-gradient(60% 40% at 80% -5%, color-mix(in srgb,var(--ion) 30%,transparent), transparent 70%),
+    radial-gradient(50% 40% at 0% 30%, color-mix(in srgb,var(--ice) 14%,transparent), transparent 70%),
+    linear-gradient(var(--line) 1px, transparent 1px) 0 0/44px 44px,
+    linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0/44px 44px;
+}
+
+html.dark .sx-root .sx-card:not(.push),
+html.dark .sx-root .sx-tabs{background:rgba(255,255,255,.055); border-color:rgba(160,175,255,.16)}
+html.dark .sx-root .push{background:linear-gradient(135deg,rgba(124,108,255,.22),rgba(255,255,255,.04))}
+html.dark .sx-root .sx-head h1{color:#fff}
+html.dark .sx-root .sx-tabs button{color:rgba(255,255,255,.84)}
+html.dark .sx-root .sx-tabs button.on{color:#fff}
+
+html.dark .sx-root .sx-time,
+html.dark .sx-root .sx-field input{color-scheme:dark; color:#fff}
+html.dark .sx-root .sx-time::-webkit-calendar-picker-indicator,
+html.dark .sx-root .sx-field input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1)}
+
+html.dark .sx-root .sx-menu{background:#0E1330}
+html.dark .sx-root .sx-modal .box{background:#0D1124}
+
+/* ═══ Lesson content prose ═══ */
+.lesson-prose h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-top: 1.5rem;
+  margin-bottom: 0.6rem;
+  padding-left: 0.75rem;
+  border-left: 3px solid #059669;
+  line-height: 1.35;
+  color: #059669;
+}
+.dark .lesson-prose h3 {
+  color: #34d399;
+  border-left-color: #34d399;
+}
+
+.lesson-prose h1,
+.lesson-prose h2 {
+  font-weight: 800;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.lesson-prose p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.75;
+}
+
+.lesson-prose ul,
+.lesson-prose ol {
+  padding-left: 1.35rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.lesson-prose li {
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.65;
+}
+
+/* ═══════════════════════════════════════════════════════
+   إخفاء شريط وأزرار السكرول داون/أب مع بقاء التمرير شغال
+   ═══════════════════════════════════════════════════════ */
+html,
+body,
+#__next,
+main,
+div,
+section,
+aside,
+[class*=overflow-] {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE & Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Edge, Opera */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+*::-webkit-scrollbar-button {
+  display: none !important; /* إخفاء زرار السكرول داون والسكرول أب */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
+*::-webkit-scrollbar-track {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Editorial Medical Typography & Branched Dropdown Choice Chain Styling
+   ═══════════════════════════════════════════════════════════════════════════ */
+html:not([data-exam-font="true"]) body {
+  letter-spacing: -0.012em;
+  font-synthesis: none;
+}
+
+html:not([data-exam-font="true"]) .font-black,
+html:not([data-exam-font="true"]) .font-extrabold {
+  font-weight: 600 !important;
+  letter-spacing: -0.015em;
+}
+
+html:not([data-exam-font="true"]) .font-mono {
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.06em;
+}
+
+html:not([data-exam-font="true"]) select,
+html:not([data-exam-font="true"]) [role="listbox"],
+html:not([data-exam-font="true"]) [role="menu"] {
+  border-inline-start-width: 3.5px !important;
+  border-inline-start-color: #d98a96 !important;
+  border-radius: 0.75rem !important;
+  font-weight: 500 !important;
+}
