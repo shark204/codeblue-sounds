@@ -113,8 +113,8 @@ export default function SoundsLabPage() {
 
       <main className="relative flex-1 w-full overflow-hidden">
         <SoundsSpecimenCanvas mode={mode} />
-        <div className="pointer-events-none absolute inset-0 flex items-end justify-center p-4 z-20">
-          <div className="pointer-events-auto w-full max-w-4xl">
+        <div className="pointer-events-none fixed inset-x-0 top-16 bottom-3 z-20 flex items-start justify-start px-3">
+          <div className="pointer-events-none w-full max-w-[340px]">
             {mounted ? (mode === "heart" ? <HeartControls /> : <BreathControls />) : null}
           </div>
         </div>

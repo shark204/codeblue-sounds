@@ -27,6 +27,13 @@ import {
   updateBreathSoundFrame,
 } from "./breathing";
 
+const LIVE_HEART_MOTION = {
+  atria: 0,
+  ventricles: 0,
+  rhythmId: "sinus_normal",
+  enabled: true,
+};
+
 function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) {
   const heartEnabled = useHeartStore((s) => s.enabled);
   const heartSound = useHeartStore((s) => s.sound);
@@ -86,6 +93,10 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
       HEART_TRACE.player = playerRef.current;
       HEART_TRACE.now = now;
       HEART_TRACE.clock.push(now, after);
+      LIVE_HEART_MOTION.atria = beat.atria;
+      LIVE_HEART_MOTION.ventricles = beat.ventricles;
+      LIVE_HEART_MOTION.rhythmId = heartRhythmId;
+      LIVE_HEART_MOTION.enabled = true;
 
       if (heartSound && before > 0.02) {
         if (heartRhythmId === "ventricular_fibrillation") {
@@ -108,6 +119,9 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
       }
     } else {
       stopAsystoleTone();
+      LIVE_HEART_MOTION.atria = 0;
+      LIVE_HEART_MOTION.ventricles = 0;
+      LIVE_HEART_MOTION.enabled = false;
     }
 
     if (mode === "breath" && breathEnabled) {
@@ -139,21 +153,35 @@ function SpecimenMesh({ url, mode }: { url: string; mode: "heart" | "breath" }) 
     box.getCenter(center);
     c.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z, 0.001);
-    const target = mode === "heart" ? 2.55 : 2.85;
+    const target = mode === "heart" ? 2.0 : 2.2;
     return { normalized: c, baseScale: target / maxDim };
   }, [scene, mode]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
     if (mode === "heart") {
-      const pulse = baseScale * (1 + Math.sin(state.clock.elapsedTime * 7.5) * 0.028);
-      groupRef.current.scale.setScalar(pulse);
+      if (!LIVE_HEART_MOTION.enabled || LIVE_HEART_MOTION.rhythmId === "asystole") {
+        groupRef.current.scale.setScalar(baseScale);
+      } else if (LIVE_HEART_MOTION.rhythmId === "ventricular_fibrillation") {
+        const t = state.clock.elapsedTime;
+        const qx = 1 + Math.sin(t * 47) * 0.016;
+        const qy = 1 + Math.cos(t * 53) * 0.014;
+        const qz = 1 + Math.sin(t * 61) * 0.016;
+        groupRef.current.scale.set(baseScale * qx, baseScale * qy, baseScale * qz);
+      } else {
+        const vSqueeze = Math.min(1, Math.max(0, LIVE_HEART_MOTION.ventricles * 1.4));
+        const aSqueeze = Math.min(1, Math.max(0, LIVE_HEART_MOTION.atria * 1.2));
+        const sx = baseScale * (1 - vSqueeze * 0.065 + aSqueeze * 0.022);
+        const sy = baseScale * (1 - vSqueeze * 0.045 - aSqueeze * 0.015);
+        const sz = baseScale * (1 - vSqueeze * 0.065 + aSqueeze * 0.022);
+        groupRef.current.scale.set(sx, sy, sz);
+      }
     } else {
-      const f = BREATH_NOW.fill || 0;
+      const f = BREATH_NOW.running ? (BREATH_NOW.fill || 0) : 0;
       groupRef.current.scale.set(
-        baseScale * (1 + f * 0.065),
-        baseScale * (1 + f * 0.03),
-        baseScale * (1 + f * 0.065),
+        baseScale * (1 + f * 0.085),
+        baseScale * (1 + f * 0.045),
+        baseScale * (1 + f * 0.085),
       );
     }
   });
