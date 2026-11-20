@@ -130,22 +130,37 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
 function SpecimenMesh({ url, mode }: { url: string; mode: "heart" | "breath" }) {
   const { scene } = useGLTF(url);
   const groupRef = useRef<THREE.Group>(null);
-  const cloned = useMemo(() => scene.clone(true), [scene]);
+  const { normalized, baseScale } = useMemo(() => {
+    const c = scene.clone(true);
+    const box = new THREE.Box3().setFromObject(c);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+    c.position.sub(center);
+    const maxDim = Math.max(size.x, size.y, size.z, 0.001);
+    const target = mode === "heart" ? 2.55 : 2.85;
+    return { normalized: c, baseScale: target / maxDim };
+  }, [scene, mode]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
     if (mode === "heart") {
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 7.5) * 0.025;
+      const pulse = baseScale * (1 + Math.sin(state.clock.elapsedTime * 7.5) * 0.028);
       groupRef.current.scale.setScalar(pulse);
     } else {
-      const exp = 1 + (BREATH_NOW.fill || 0) * 0.055;
-      groupRef.current.scale.set(exp, 1 + (BREATH_NOW.fill || 0) * 0.025, exp);
+      const f = BREATH_NOW.fill || 0;
+      groupRef.current.scale.set(
+        baseScale * (1 + f * 0.065),
+        baseScale * (1 + f * 0.03),
+        baseScale * (1 + f * 0.065),
+      );
     }
   });
 
   return (
-    <group ref={groupRef}>
-      <primitive object={cloned} />
+    <group ref={groupRef} position={[0, 0.05, 0]}>
+      <primitive object={normalized} />
     </group>
   );
 }
@@ -226,8 +241,7 @@ export function SoundsSpecimenCanvas({ mode }: { mode: "heart" | "breath" }) {
           3D Preview Mode — Copy <code className="font-mono text-cyan-400">{mode === "heart" ? "heart.glb" : "lungs.glb"}</code> into <code className="font-mono text-cyan-400">public/anatomy/</code>
         </div>
       )}
-      <Canvas camera={{ position: [0, 0.3, 4.2], fov: 42 }} dpr={[1, 2]}>
-        <color attach="background" args={["#060913"]} />
+      <Canvas camera={{ position: [0, 0.08, 3.55], fov: 40 }} dpr={[1, 2]} gl={{ alpha: true, antialias: true }} style={{ background: "transparent" }}>
         <ambientLight intensity={0.65} />
         <directionalLight position={[4, 6, 5]} intensity={1.35} />
         <directionalLight position={[-4, -2, -4]} intensity={0.45} color="#38bdf8" />

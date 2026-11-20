@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft, Box, Heart, ScanLine, Stethoscope, Wind } from "lucide-react";
 import { SoundsSpecimenCanvas } from "@/features/viewer/SoundsSpecimenCanvas";
 import { HeartControls } from "@/features/viewer/HeartControls";
@@ -17,6 +17,8 @@ const ATLAS_URL = process.env.NEXT_PUBLIC_ATLAS_URL || "http://localhost:3003";
 
 export default function SoundsLabPage() {
   const [mode, setMode] = useState<"heart" | "breath">("heart");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const heartEnabled = useHeartStore((s) => s.enabled);
   const toggleHeart = useHeartStore((s) => s.toggle);
   const breathEnabled = useBreathStore((s) => s.enabled);
@@ -38,7 +40,7 @@ export default function SoundsLabPage() {
   };
 
   return (
-    <div className="h-screen w-screen bg-[#060913] text-slate-100 flex flex-col overflow-hidden">
+    <div className="h-screen w-screen bg-transparent text-slate-100 flex flex-col overflow-hidden">
       <header className="h-13 shrink-0 px-4 border-b border-slate-800/80 bg-[#070b16]/95 backdrop-blur-md flex items-center justify-between gap-3 z-30">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
@@ -113,7 +115,7 @@ export default function SoundsLabPage() {
         <SoundsSpecimenCanvas mode={mode} />
         <div className="pointer-events-none absolute inset-0 flex items-end justify-center p-4 z-20">
           <div className="pointer-events-auto w-full max-w-4xl">
-            {mode === "heart" ? <HeartControls /> : <BreathControls />}
+            {mounted ? (mode === "heart" ? <HeartControls /> : <BreathControls />) : null}
           </div>
         </div>
       </main>

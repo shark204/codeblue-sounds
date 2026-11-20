@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import "./glass-theme.css";
+import SkyBackground from "@/components/SkyBackground";
 
 export const metadata: Metadata = {
   title: "codeblue-ecg&sounds",
@@ -8,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const Sky = SkyBackground as any;
   return (
     <html
       lang="en"
@@ -28,8 +31,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Cairo:wght@400..900&family=DM+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400..900&family=Plus+Jakarta+Sans:wght@400..700&display=swap"
         />
       </head>
-      <body className="min-h-screen bg-[#060913] text-slate-100 antialiased overflow-hidden" suppressHydrationWarning>
-        {children}
+      <body className="min-h-screen bg-transparent text-slate-100 antialiased overflow-hidden" suppressHydrationWarning>
+        <Script id="theme-sync" strategy="beforeInteractive">{`
+          (function () {
+            try {
+              var saved = localStorage.getItem('codeblue_theme');
+              var theme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+              var root = document.documentElement;
+              root.dataset.theme = theme;
+              if (theme === 'dark') root.classList.add('dark');
+              else root.classList.remove('dark');
+            } catch (e) {}
+          })();
+        `}</Script>
+        <Sky governorate="القاهرة" showSwitcher={false} />
+        <div className="cb-glass" style={{ position: "relative", zIndex: 1 }}>
+          {children}
+        </div>
       </body>
     </html>
   );
