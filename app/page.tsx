@@ -115,20 +115,6 @@ export default function SoundsLabPage() {
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>{locale === "ar" ? "بنك الأسئلة" : "Main Bank"}</span>
           </a>
-          <a
-            href={RADIOLOGY_URL}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition"
-          >
-            <ScanLine className="w-3.5 h-3.5" />
-            <span>{locale === "ar" ? "الأشعة والـ AI" : "Radiology AI"}</span>
-          </a>
-          <a
-            href={ATLAS_URL}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 transition"
-          >
-            <Box className="w-3.5 h-3.5" />
-            <span>{locale === "ar" ? "الأطلس 3D" : "3D Atlas"}</span>
-          </a>
           <button
             type="button"
             onClick={() => setLocale(locale === "ar" ? "en" : "ar")}

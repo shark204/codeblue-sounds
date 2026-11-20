@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -34,6 +34,14 @@ const LIVE_HEART_MOTION = {
   enabled: true,
 };
 
+const CHAMBER_UNIFORMS = {
+  uAtria: { value: 0 },
+  uVentricles: { value: 0 },
+  uVfib: { value: 0 },
+  uAfib: { value: 0 },
+  uTime: { value: 0 },
+};
+
 function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) {
   const heartEnabled = useHeartStore((s) => s.enabled);
   const heartSound = useHeartStore((s) => s.sound);
@@ -50,7 +58,6 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
   const lastVfTickRef = useRef<number>(0);
   const breathClockRef = useRef<number>(0);
 
-  // Reset cardiac cycle cleanly whenever rhythm or audio toggle changes
   useEffect(() => {
     playerRef.current = null;
     clockRef.current = 0;
@@ -154,28 +161,87 @@ function SpecimenMesh({ url, mode }: { url: string; mode: "heart" | "breath" }) 
     c.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z, 0.001);
     const target = mode === "heart" ? 2.0 : 2.2;
+
+    if (mode === "heart") {
+      const halfY = Math.max(size.y * 0.5, 0.001);
+      const halfX = Math.max(size.x * 0.5, 0.001);
+      const cx = center.x.toFixed(4);
+      const cy = center.y.toFixed(4);
+      const cz = center.z.toFixed(4);
+      const hy = halfY.toFixed(4);
+      const hx = halfX.toFixed(4);
+      const radAmp = (maxDim * 0.42).toFixed(4);
+      const lonAmp = (maxDim * 0.14).toFixed(4);
+
+      c.traverse((obj) => {
+        const mesh = obj as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.material) return;
+        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        const patched = mats.map((m) => {
+          const mat = m.clone();
+          mat.onBeforeCompile = (shader) => {
+            shader.uniforms.uAtria = CHAMBER_UNIFORMS.uAtria;
+            shader.uniforms.uVentricles = CHAMBER_UNIFORMS.uVentricles;
+            shader.uniforms.uVfib = CHAMBER_UNIFORMS.uVfib;
+            shader.uniforms.uAfib = CHAMBER_UNIFORMS.uAfib;
+            shader.uniforms.uTime = CHAMBER_UNIFORMS.uTime;
+            shader.vertexShader =
+              "uniform float uAtria;\nuniform float uVentricles;\nuniform float uVfib;\nuniform float uAfib;\nuniform float uTime;\n" +
+              shader.vertexShader;
+            shader.vertexShader = shader.vertexShader.replace(
+              "#include <begin_vertex>",
+              `#include <begin_vertex>
+              {
+                float ny = (position.y - ${cy}) / ${hy};
+                float nx = (position.x - ${cx}) / ${hx};
+                // 4 distinct anatomical cardiac chambers (RA, LA, RV, LV)
+                float atrialMask = smoothstep(0.02, 0.42, ny) * (1.0 - smoothstep(0.72, 0.98, ny));
+                float ventMask   = smoothstep(0.18, -0.35, ny);
+                float rightSide  = smoothstep(0.12, -0.25, nx);
+                float leftSide   = smoothstep(-0.12, 0.25, nx);
+
+                float raSqueeze = uAtria * 0.105 * atrialMask * rightSide;
+                float laSqueeze = uAtria * 0.095 * atrialMask * leftSide;
+                float rvSqueeze = uVentricles * 0.105 * ventMask * rightSide;
+                float lvSqueeze = uVentricles * 0.145 * ventMask * leftSide;
+
+                float afibQuiver = uAfib * atrialMask * 0.018 * sin(uTime * 36.0 + position.x * 18.0 + position.z * 14.0);
+                float vfibQuiver = uVfib * ventMask * 0.024 * sin(uTime * 44.0 + position.y * 22.0 + position.x * 19.0);
+
+                float totalInward = (raSqueeze + laSqueeze + rvSqueeze + lvSqueeze) + afibQuiver + vfibQuiver;
+                vec3 radialDir = normalize(vec3(position.x - ${cx}, (position.y - ${cy}) * 0.35, position.z - ${cz}) + vec3(0.0001));
+                transformed -= radialDir * totalInward * ${radAmp};
+                transformed.y += (rvSqueeze + lvSqueeze) * ${lonAmp};
+              }`
+            );
+          };
+          mat.needsUpdate = true;
+          return mat;
+        });
+        mesh.material = Array.isArray(mesh.material) ? patched : patched[0]!;
+      });
+    }
+
     return { normalized: c, baseScale: target / maxDim };
   }, [scene, mode]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
     if (mode === "heart") {
-      if (!LIVE_HEART_MOTION.enabled || LIVE_HEART_MOTION.rhythmId === "asystole") {
-        groupRef.current.scale.setScalar(baseScale);
-      } else if (LIVE_HEART_MOTION.rhythmId === "ventricular_fibrillation") {
-        const t = state.clock.elapsedTime;
-        const qx = 1 + Math.sin(t * 47) * 0.016;
-        const qy = 1 + Math.cos(t * 53) * 0.014;
-        const qz = 1 + Math.sin(t * 61) * 0.016;
-        groupRef.current.scale.set(baseScale * qx, baseScale * qy, baseScale * qz);
+      CHAMBER_UNIFORMS.uTime.value = state.clock.elapsedTime;
+      const rid = LIVE_HEART_MOTION.rhythmId;
+      if (!LIVE_HEART_MOTION.enabled || rid === "asystole") {
+        CHAMBER_UNIFORMS.uAtria.value = 0;
+        CHAMBER_UNIFORMS.uVentricles.value = 0;
+        CHAMBER_UNIFORMS.uVfib.value = 0;
+        CHAMBER_UNIFORMS.uAfib.value = 0;
       } else {
-        const vSqueeze = Math.min(1, Math.max(0, LIVE_HEART_MOTION.ventricles * 1.4));
-        const aSqueeze = Math.min(1, Math.max(0, LIVE_HEART_MOTION.atria * 1.2));
-        const sx = baseScale * (1 - vSqueeze * 0.065 + aSqueeze * 0.022);
-        const sy = baseScale * (1 - vSqueeze * 0.045 - aSqueeze * 0.015);
-        const sz = baseScale * (1 - vSqueeze * 0.065 + aSqueeze * 0.022);
-        groupRef.current.scale.set(sx, sy, sz);
+        CHAMBER_UNIFORMS.uAtria.value = Math.min(1.4, Math.max(0, LIVE_HEART_MOTION.atria * 2.2));
+        CHAMBER_UNIFORMS.uVentricles.value = Math.min(1.4, Math.max(0, LIVE_HEART_MOTION.ventricles * 2.2));
+        CHAMBER_UNIFORMS.uVfib.value = rid === "ventricular_fibrillation" ? 1 : 0;
+        CHAMBER_UNIFORMS.uAfib.value = rid === "atrial_fibrillation" ? 1 : 0;
       }
+      groupRef.current.scale.setScalar(baseScale);
     } else {
       const f = BREATH_NOW.running ? (BREATH_NOW.fill || 0) : 0;
       groupRef.current.scale.set(
@@ -198,47 +264,12 @@ function ProceduralOrganFallback({ mode }: { mode: "heart" | "breath" }) {
   useFrame((state) => {
     if (!ref.current) return;
     ref.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.35) * 0.25;
-    if (mode === "heart") {
-      const s = 1 + Math.pow(Math.max(0, Math.sin(state.clock.elapsedTime * 4.2)), 6) * 0.08;
-      ref.current.scale.setScalar(s);
-    } else {
-      const b = 1 + (BREATH_NOW.fill || (Math.sin(state.clock.elapsedTime * 1.4) * 0.5 + 0.5)) * 0.09;
-      ref.current.scale.set(b, 1 + (b - 1) * 0.45, b);
-    }
   });
-
-  if (mode === "heart") {
-    return (
-      <group ref={ref}>
-        <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[1.05, 48, 48]} />
-          <meshStandardMaterial color="#b91c1c" roughness={0.35} metalness={0.08} />
-        </mesh>
-        <mesh position={[-0.35, 0.95, 0.05]} rotation={[0, 0, 0.25]}>
-          <cylinderGeometry args={[0.24, 0.28, 1.1, 32]} />
-          <meshStandardMaterial color="#dc2626" roughness={0.35} />
-        </mesh>
-        <mesh position={[0.45, 0.85, -0.1]} rotation={[0, 0, -0.35]}>
-          <cylinderGeometry args={[0.22, 0.25, 1.0, 32]} />
-          <meshStandardMaterial color="#2563eb" roughness={0.4} />
-        </mesh>
-      </group>
-    );
-  }
-
   return (
     <group ref={ref}>
-      <mesh position={[-0.78, 0, 0]} scale={[0.72, 1.25, 0.65]}>
-        <sphereGeometry args={[0.95, 40, 40]} />
-        <meshStandardMaterial color="#e89cb0" roughness={0.48} />
-      </mesh>
-      <mesh position={[0.78, 0, 0]} scale={[0.72, 1.25, 0.65]}>
-        <sphereGeometry args={[0.95, 40, 40]} />
-        <meshStandardMaterial color="#e89cb0" roughness={0.48} />
-      </mesh>
-      <mesh position={[0, 1.15, 0]}>
-        <cylinderGeometry args={[0.16, 0.18, 1.1, 24]} />
-        <meshStandardMaterial color="#38bdf8" roughness={0.4} />
+      <mesh>
+        <sphereGeometry args={[0.9, 32, 32]} />
+        <meshStandardMaterial color={mode === "heart" ? "#b91c1c" : "#e89cb0"} roughness={0.4} />
       </mesh>
     </group>
   );
