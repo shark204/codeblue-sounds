@@ -1,0 +1,466 @@
+/* glass-theme.css — makes legacy white/tinted cards follow the Settings look.
+   Opt-in: add className="cb-glass" to <main> and wrap <LandingScreen/>. */
+
+/* ===== Tune here =====
+   --cbg-glass : panel fill (lower = more transparent)
+   --cbg-line  : border
+   --cbg-text / mute / dim : text (soft white, easier on the eyes than pure #fff) */
+.cb-glass{
+  --cbg-glass:rgba(255,255,255,.032);
+  --cbg-line:rgba(160,175,255,.11);
+  --cbg-text:#E9EDFB;
+  --cbg-mute:rgba(233,237,251,.72);
+  --cbg-dim:rgba(233,237,251,.52);
+  --cbg-shadow:0 18px 40px -26px rgba(0,0,0,.55);
+}
+
+/* ---- DARK: surfaces ---- */
+html.dark .cb-glass [class~="bg-white"],
+html.dark .cb-glass [class~="bg-white/40"],
+html.dark .cb-glass [class~="bg-white/50"],
+html.dark .cb-glass [class~="bg-white/60"],
+html.dark .cb-glass [class~="bg-white/70"],
+html.dark .cb-glass [class~="bg-white/80"],
+html.dark .cb-glass [class~="bg-white/90"],
+html.dark .cb-glass [class~="bg-white/95"],
+html.dark .cb-glass [class~="bg-slate-50"],
+html.dark .cb-glass [class~="bg-slate-100"],
+html.dark .cb-glass [class~="bg-gray-50"],
+html.dark .cb-glass [class~="bg-gray-100"],
+html.dark .cb-glass [class~="bg-neutral-50"],
+html.dark .cb-glass [class~="bg-zinc-50"],
+html.dark .cb-glass [class~="bg-slate-900"],
+html.dark .cb-glass [class~="bg-slate-800"],
+html.dark .cb-glass [class~="bg-slate-950"],
+html.dark .cb-glass [class~="bg-gray-900"],
+html.dark .cb-glass [class~="bg-gray-800"],
+html.dark .cb-glass [class~="bg-gray-950"]{background-color:var(--cbg-glass)!important;background-image:none;border-color:var(--cbg-line)}
+html.dark .cb-glass [class~="bg-slate-200"],
+html.dark .cb-glass [class~="bg-gray-200"],
+html.dark .cb-glass [class~="bg-slate-300/50"],
+html.dark .cb-glass [class~="bg-slate-200/60"]{background-color:rgba(255,255,255,.08)!important}
+html.dark .cb-glass [class~="bg-white"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-white"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-white/40"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-white/40"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-white/50"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-white/50"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-white/60"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-white/60"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-white/70"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-white/70"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-white/80"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-white/80"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-white/90"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-white/90"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-white/95"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-white/95"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-slate-50"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-slate-50"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-slate-100"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-slate-100"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-gray-50"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-gray-50"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-gray-100"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-gray-100"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-neutral-50"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-neutral-50"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-zinc-50"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-zinc-50"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-slate-900"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-slate-900"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-slate-800"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-slate-800"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-slate-950"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-slate-950"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-gray-900"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-gray-900"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-gray-800"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-gray-800"][class*="rounded-3xl"],
+html.dark .cb-glass [class~="bg-gray-950"][class*="rounded-2xl"],
+html.dark .cb-glass [class~="bg-gray-950"][class*="rounded-3xl"]{backdrop-filter:blur(16px) saturate(110%);-webkit-backdrop-filter:blur(16px) saturate(110%);box-shadow:var(--cbg-shadow),inset 0 1px 0 rgba(255,255,255,.05)}
+
+/* ---- DARK: light gradients become flat glass ---- */
+html.dark .cb-glass [class~="from-white"],
+html.dark .cb-glass [class~="from-slate-50"],
+html.dark .cb-glass [class~="from-gray-50"],
+html.dark .cb-glass [class~="from-slate-100"]{background-image:none!important;background-color:var(--cbg-glass)!important;border-color:var(--cbg-line)}
+
+/* ---- DARK: borders ---- */
+html.dark .cb-glass [class~="border-slate-100"],
+html.dark .cb-glass [class~="border-slate-200"],
+html.dark .cb-glass [class~="border-slate-300"],
+html.dark .cb-glass [class~="border-slate-700"],
+html.dark .cb-glass [class~="border-slate-800"],
+html.dark .cb-glass [class~="border-gray-100"],
+html.dark .cb-glass [class~="border-gray-200"],
+html.dark .cb-glass [class~="border-gray-300"],
+html.dark .cb-glass [class~="border-gray-700"],
+html.dark .cb-glass [class~="border-gray-800"],
+html.dark .cb-glass [class~="border-neutral-100"],
+html.dark .cb-glass [class~="border-neutral-200"],
+html.dark .cb-glass [class~="border-neutral-300"],
+html.dark .cb-glass [class~="border-neutral-700"],
+html.dark .cb-glass [class~="border-neutral-800"],
+html.dark .cb-glass [class~="border-zinc-100"],
+html.dark .cb-glass [class~="border-zinc-200"],
+html.dark .cb-glass [class~="border-zinc-300"],
+html.dark .cb-glass [class~="border-zinc-700"],
+html.dark .cb-glass [class~="border-zinc-800"],
+html.dark .cb-glass [class~="border-white"],
+html.dark .cb-glass [class~="border-white/50"]{border-color:var(--cbg-line)!important}
+
+/* ---- DARK: text ---- */
+html.dark .cb-glass [class~="text-slate-700"],
+html.dark .cb-glass [class~="text-slate-800"],
+html.dark .cb-glass [class~="text-slate-900"],
+html.dark .cb-glass [class~="text-gray-700"],
+html.dark .cb-glass [class~="text-gray-800"],
+html.dark .cb-glass [class~="text-gray-900"],
+html.dark .cb-glass [class~="text-neutral-700"],
+html.dark .cb-glass [class~="text-neutral-800"],
+html.dark .cb-glass [class~="text-neutral-900"],
+html.dark .cb-glass [class~="text-zinc-700"],
+html.dark .cb-glass [class~="text-zinc-800"],
+html.dark .cb-glass [class~="text-zinc-900"],
+html.dark .cb-glass [class~="text-black"]{color:var(--cbg-text)!important}
+html.dark .cb-glass [class~="text-slate-500"],
+html.dark .cb-glass [class~="text-slate-600"],
+html.dark .cb-glass [class~="text-gray-500"],
+html.dark .cb-glass [class~="text-gray-600"],
+html.dark .cb-glass [class~="text-neutral-500"],
+html.dark .cb-glass [class~="text-neutral-600"],
+html.dark .cb-glass [class~="text-zinc-500"],
+html.dark .cb-glass [class~="text-zinc-600"]{color:var(--cbg-mute)!important}
+html.dark .cb-glass [class~="text-slate-400"],
+html.dark .cb-glass [class~="text-gray-400"],
+html.dark .cb-glass [class~="text-neutral-400"],
+html.dark .cb-glass [class~="text-zinc-400"]{color:var(--cbg-dim)!important}
+
+/* ---- DARK: tinted cards (mint / sky / amber / rose / violet) ---- */
+html.dark .cb-glass [class~="bg-emerald-50"],
+html.dark .cb-glass [class~="bg-emerald-100"],
+html.dark .cb-glass [class~="bg-green-50"],
+html.dark .cb-glass [class~="bg-green-100"],
+html.dark .cb-glass [class~="bg-teal-50"],
+html.dark .cb-glass [class~="bg-teal-100"],
+html.dark .cb-glass [class~="bg-lime-50"],
+html.dark .cb-glass [class~="bg-lime-100"],
+html.dark .cb-glass [class~="from-emerald-50"],
+html.dark .cb-glass [class~="from-emerald-100"],
+html.dark .cb-glass [class~="from-green-50"],
+html.dark .cb-glass [class~="from-green-100"],
+html.dark .cb-glass [class~="from-teal-50"],
+html.dark .cb-glass [class~="from-teal-100"],
+html.dark .cb-glass [class~="from-lime-50"],
+html.dark .cb-glass [class~="from-lime-100"]{background-image:none!important;background-color:rgba(52,211,153,.065)!important}
+html.dark .cb-glass [class~="border-emerald-100"],
+html.dark .cb-glass [class~="border-emerald-200"],
+html.dark .cb-glass [class~="border-emerald-300"],
+html.dark .cb-glass [class~="border-green-100"],
+html.dark .cb-glass [class~="border-green-200"],
+html.dark .cb-glass [class~="border-green-300"],
+html.dark .cb-glass [class~="border-teal-100"],
+html.dark .cb-glass [class~="border-teal-200"],
+html.dark .cb-glass [class~="border-teal-300"],
+html.dark .cb-glass [class~="border-lime-100"],
+html.dark .cb-glass [class~="border-lime-200"],
+html.dark .cb-glass [class~="border-lime-300"]{border-color:rgba(52,211,153,.24)!important}
+html.dark .cb-glass [class~="text-emerald-600"],
+html.dark .cb-glass [class~="text-emerald-700"],
+html.dark .cb-glass [class~="text-emerald-800"],
+html.dark .cb-glass [class~="text-emerald-900"],
+html.dark .cb-glass [class~="text-green-600"],
+html.dark .cb-glass [class~="text-green-700"],
+html.dark .cb-glass [class~="text-green-800"],
+html.dark .cb-glass [class~="text-green-900"],
+html.dark .cb-glass [class~="text-teal-600"],
+html.dark .cb-glass [class~="text-teal-700"],
+html.dark .cb-glass [class~="text-teal-800"],
+html.dark .cb-glass [class~="text-teal-900"],
+html.dark .cb-glass [class~="text-lime-600"],
+html.dark .cb-glass [class~="text-lime-700"],
+html.dark .cb-glass [class~="text-lime-800"],
+html.dark .cb-glass [class~="text-lime-900"]{color:#6EE7B7!important}
+html.dark .cb-glass [class~="bg-sky-50"],
+html.dark .cb-glass [class~="bg-sky-100"],
+html.dark .cb-glass [class~="bg-blue-50"],
+html.dark .cb-glass [class~="bg-blue-100"],
+html.dark .cb-glass [class~="bg-cyan-50"],
+html.dark .cb-glass [class~="bg-cyan-100"],
+html.dark .cb-glass [class~="from-sky-50"],
+html.dark .cb-glass [class~="from-sky-100"],
+html.dark .cb-glass [class~="from-blue-50"],
+html.dark .cb-glass [class~="from-blue-100"],
+html.dark .cb-glass [class~="from-cyan-50"],
+html.dark .cb-glass [class~="from-cyan-100"]{background-image:none!important;background-color:rgba(76,201,255,.065)!important}
+html.dark .cb-glass [class~="border-sky-100"],
+html.dark .cb-glass [class~="border-sky-200"],
+html.dark .cb-glass [class~="border-sky-300"],
+html.dark .cb-glass [class~="border-blue-100"],
+html.dark .cb-glass [class~="border-blue-200"],
+html.dark .cb-glass [class~="border-blue-300"],
+html.dark .cb-glass [class~="border-cyan-100"],
+html.dark .cb-glass [class~="border-cyan-200"],
+html.dark .cb-glass [class~="border-cyan-300"]{border-color:rgba(76,201,255,.24)!important}
+html.dark .cb-glass [class~="text-sky-600"],
+html.dark .cb-glass [class~="text-sky-700"],
+html.dark .cb-glass [class~="text-sky-800"],
+html.dark .cb-glass [class~="text-sky-900"],
+html.dark .cb-glass [class~="text-blue-600"],
+html.dark .cb-glass [class~="text-blue-700"],
+html.dark .cb-glass [class~="text-blue-800"],
+html.dark .cb-glass [class~="text-blue-900"],
+html.dark .cb-glass [class~="text-cyan-600"],
+html.dark .cb-glass [class~="text-cyan-700"],
+html.dark .cb-glass [class~="text-cyan-800"],
+html.dark .cb-glass [class~="text-cyan-900"]{color:#7DD3FC!important}
+html.dark .cb-glass [class~="bg-indigo-50"],
+html.dark .cb-glass [class~="bg-indigo-100"],
+html.dark .cb-glass [class~="bg-violet-50"],
+html.dark .cb-glass [class~="bg-violet-100"],
+html.dark .cb-glass [class~="bg-purple-50"],
+html.dark .cb-glass [class~="bg-purple-100"],
+html.dark .cb-glass [class~="bg-fuchsia-50"],
+html.dark .cb-glass [class~="bg-fuchsia-100"],
+html.dark .cb-glass [class~="from-indigo-50"],
+html.dark .cb-glass [class~="from-indigo-100"],
+html.dark .cb-glass [class~="from-violet-50"],
+html.dark .cb-glass [class~="from-violet-100"],
+html.dark .cb-glass [class~="from-purple-50"],
+html.dark .cb-glass [class~="from-purple-100"],
+html.dark .cb-glass [class~="from-fuchsia-50"],
+html.dark .cb-glass [class~="from-fuchsia-100"]{background-image:none!important;background-color:rgba(167,139,250,.065)!important}
+html.dark .cb-glass [class~="border-indigo-100"],
+html.dark .cb-glass [class~="border-indigo-200"],
+html.dark .cb-glass [class~="border-indigo-300"],
+html.dark .cb-glass [class~="border-violet-100"],
+html.dark .cb-glass [class~="border-violet-200"],
+html.dark .cb-glass [class~="border-violet-300"],
+html.dark .cb-glass [class~="border-purple-100"],
+html.dark .cb-glass [class~="border-purple-200"],
+html.dark .cb-glass [class~="border-purple-300"],
+html.dark .cb-glass [class~="border-fuchsia-100"],
+html.dark .cb-glass [class~="border-fuchsia-200"],
+html.dark .cb-glass [class~="border-fuchsia-300"]{border-color:rgba(167,139,250,.24)!important}
+html.dark .cb-glass [class~="text-indigo-600"],
+html.dark .cb-glass [class~="text-indigo-700"],
+html.dark .cb-glass [class~="text-indigo-800"],
+html.dark .cb-glass [class~="text-indigo-900"],
+html.dark .cb-glass [class~="text-violet-600"],
+html.dark .cb-glass [class~="text-violet-700"],
+html.dark .cb-glass [class~="text-violet-800"],
+html.dark .cb-glass [class~="text-violet-900"],
+html.dark .cb-glass [class~="text-purple-600"],
+html.dark .cb-glass [class~="text-purple-700"],
+html.dark .cb-glass [class~="text-purple-800"],
+html.dark .cb-glass [class~="text-purple-900"],
+html.dark .cb-glass [class~="text-fuchsia-600"],
+html.dark .cb-glass [class~="text-fuchsia-700"],
+html.dark .cb-glass [class~="text-fuchsia-800"],
+html.dark .cb-glass [class~="text-fuchsia-900"]{color:#C4B5FD!important}
+html.dark .cb-glass [class~="bg-amber-50"],
+html.dark .cb-glass [class~="bg-amber-100"],
+html.dark .cb-glass [class~="bg-yellow-50"],
+html.dark .cb-glass [class~="bg-yellow-100"],
+html.dark .cb-glass [class~="bg-orange-50"],
+html.dark .cb-glass [class~="bg-orange-100"],
+html.dark .cb-glass [class~="from-amber-50"],
+html.dark .cb-glass [class~="from-amber-100"],
+html.dark .cb-glass [class~="from-yellow-50"],
+html.dark .cb-glass [class~="from-yellow-100"],
+html.dark .cb-glass [class~="from-orange-50"],
+html.dark .cb-glass [class~="from-orange-100"]{background-image:none!important;background-color:rgba(255,180,84,.065)!important}
+html.dark .cb-glass [class~="border-amber-100"],
+html.dark .cb-glass [class~="border-amber-200"],
+html.dark .cb-glass [class~="border-amber-300"],
+html.dark .cb-glass [class~="border-yellow-100"],
+html.dark .cb-glass [class~="border-yellow-200"],
+html.dark .cb-glass [class~="border-yellow-300"],
+html.dark .cb-glass [class~="border-orange-100"],
+html.dark .cb-glass [class~="border-orange-200"],
+html.dark .cb-glass [class~="border-orange-300"]{border-color:rgba(255,180,84,.24)!important}
+html.dark .cb-glass [class~="text-amber-600"],
+html.dark .cb-glass [class~="text-amber-700"],
+html.dark .cb-glass [class~="text-amber-800"],
+html.dark .cb-glass [class~="text-amber-900"],
+html.dark .cb-glass [class~="text-yellow-600"],
+html.dark .cb-glass [class~="text-yellow-700"],
+html.dark .cb-glass [class~="text-yellow-800"],
+html.dark .cb-glass [class~="text-yellow-900"],
+html.dark .cb-glass [class~="text-orange-600"],
+html.dark .cb-glass [class~="text-orange-700"],
+html.dark .cb-glass [class~="text-orange-800"],
+html.dark .cb-glass [class~="text-orange-900"]{color:#FCD34D!important}
+html.dark .cb-glass [class~="bg-red-50"],
+html.dark .cb-glass [class~="bg-red-100"],
+html.dark .cb-glass [class~="bg-rose-50"],
+html.dark .cb-glass [class~="bg-rose-100"],
+html.dark .cb-glass [class~="bg-pink-50"],
+html.dark .cb-glass [class~="bg-pink-100"],
+html.dark .cb-glass [class~="from-red-50"],
+html.dark .cb-glass [class~="from-red-100"],
+html.dark .cb-glass [class~="from-rose-50"],
+html.dark .cb-glass [class~="from-rose-100"],
+html.dark .cb-glass [class~="from-pink-50"],
+html.dark .cb-glass [class~="from-pink-100"]{background-image:none!important;background-color:rgba(255,92,127,.065)!important}
+html.dark .cb-glass [class~="border-red-100"],
+html.dark .cb-glass [class~="border-red-200"],
+html.dark .cb-glass [class~="border-red-300"],
+html.dark .cb-glass [class~="border-rose-100"],
+html.dark .cb-glass [class~="border-rose-200"],
+html.dark .cb-glass [class~="border-rose-300"],
+html.dark .cb-glass [class~="border-pink-100"],
+html.dark .cb-glass [class~="border-pink-200"],
+html.dark .cb-glass [class~="border-pink-300"]{border-color:rgba(255,92,127,.24)!important}
+html.dark .cb-glass [class~="text-red-600"],
+html.dark .cb-glass [class~="text-red-700"],
+html.dark .cb-glass [class~="text-red-800"],
+html.dark .cb-glass [class~="text-red-900"],
+html.dark .cb-glass [class~="text-rose-600"],
+html.dark .cb-glass [class~="text-rose-700"],
+html.dark .cb-glass [class~="text-rose-800"],
+html.dark .cb-glass [class~="text-rose-900"],
+html.dark .cb-glass [class~="text-pink-600"],
+html.dark .cb-glass [class~="text-pink-700"],
+html.dark .cb-glass [class~="text-pink-800"],
+html.dark .cb-glass [class~="text-pink-900"]{color:#FDA4AF!important}
+
+/* inputs inside legacy cards */
+html.dark .cb-glass input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),html.dark .cb-glass select,html.dark .cb-glass textarea{color:var(--cbg-text);color-scheme:dark}
+html.dark .cb-glass input::placeholder,html.dark .cb-glass textarea::placeholder{color:var(--cbg-dim)}
+
+/* ---- LIGHT / DAY THEME: Transparent Crystal Glass Panels ---- */
+html:not(.dark) .cb-glass {
+  --cbg-light-glass: rgba(255, 255, 255, 0.25);
+  --cbg-light-sub: rgba(255, 255, 255, 0.18);
+  --cbg-light-line: rgba(255, 255, 255, 0.45);
+  --cbg-light-text: #0f172a;
+  --cbg-light-mute: #1e293b;
+  --cbg-light-dim: #334155;
+  --cbg-light-shadow: 0 18px 40px -22px rgba(14, 116, 144, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+html:not(.dark) .cb-glass [class~="bg-white"],
+html:not(.dark) .cb-glass [class~="bg-white/60"],
+html:not(.dark) .cb-glass [class~="bg-white/70"],
+html:not(.dark) .cb-glass [class~="bg-white/80"],
+html:not(.dark) .cb-glass [class~="bg-white/90"],
+html:not(.dark) .cb-glass [class~="bg-white/95"] {
+  background-color: var(--cbg-light-glass) !important;
+  border-color: var(--cbg-light-line) !important;
+}
+
+html:not(.dark) .cb-glass [class~="bg-white"][class*="rounded-xl"],
+html:not(.dark) .cb-glass [class~="bg-white"][class*="rounded-2xl"],
+html:not(.dark) .cb-glass [class~="bg-white"][class*="rounded-3xl"],
+html:not(.dark) .cb-glass [class~="bg-white/60"][class*="rounded-2xl"],
+html:not(.dark) .cb-glass [class~="bg-white/60"][class*="rounded-3xl"],
+html:not(.dark) .cb-glass [class~="bg-white/70"][class*="rounded-2xl"],
+html:not(.dark) .cb-glass [class~="bg-white/70"][class*="rounded-3xl"],
+html:not(.dark) .cb-glass [class~="bg-white/80"][class*="rounded-2xl"],
+html:not(.dark) .cb-glass [class~="bg-white/80"][class*="rounded-3xl"],
+html:not(.dark) .cb-glass [class~="bg-white/90"][class*="rounded-2xl"],
+html:not(.dark) .cb-glass [class~="bg-white/90"][class*="rounded-3xl"],
+html:not(.dark) .cb-glass [class~="bg-white/95"][class*="rounded-2xl"],
+html:not(.dark) .cb-glass [class~="bg-white/95"][class*="rounded-3xl"] {
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--cbg-light-shadow);
+}
+
+html:not(.dark) .cb-glass [class~="bg-slate-50"],
+html:not(.dark) .cb-glass [class~="bg-slate-100"],
+html:not(.dark) .cb-glass [class~="bg-gray-50"],
+html:not(.dark) .cb-glass [class~="bg-gray-100"] {
+  background-color: var(--cbg-light-sub) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+html:not(.dark) .cb-glass [class~="from-slate-50"],
+html:not(.dark) .cb-glass [class~="from-white"] {
+  background-image: none !important;
+  background-color: var(--cbg-light-glass) !important;
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+
+html:not(.dark) .cb-glass [class~="text-slate-800"],
+html:not(.dark) .cb-glass [class~="text-slate-900"],
+html:not(.dark) .cb-glass [class~="text-gray-800"],
+html:not(.dark) .cb-glass [class~="text-gray-900"] {
+  color: var(--cbg-light-text) !important;
+}
+
+html:not(.dark) .cb-glass [class~="text-slate-500"],
+html:not(.dark) .cb-glass [class~="text-slate-600"],
+html:not(.dark) .cb-glass [class~="text-slate-700"],
+html:not(.dark) .cb-glass [class~="text-gray-500"],
+html:not(.dark) .cb-glass [class~="text-gray-600"],
+html:not(.dark) .cb-glass [class~="text-gray-700"],
+html:not(.dark) .cb-glass [class~="text-neutral-500"],
+html:not(.dark) .cb-glass [class~="text-neutral-600"],
+html:not(.dark) .cb-glass [class~="text-zinc-500"],
+html:not(.dark) .cb-glass [class~="text-zinc-600"] {
+  color: var(--cbg-light-mute) !important;
+}
+
+html:not(.dark) .cb-glass [class~="text-slate-400"],
+html:not(.dark) .cb-glass [class~="text-gray-400"],
+html:not(.dark) .cb-glass [class~="text-neutral-400"],
+html:not(.dark) .cb-glass [class~="text-zinc-400"] {
+  color: var(--cbg-light-dim) !important;
+}
+
+html:not(.dark) .cb-glass [class~="border-slate-100"],
+html:not(.dark) .cb-glass [class~="border-slate-200"],
+html:not(.dark) .cb-glass [class~="border-slate-300"],
+html:not(.dark) .cb-glass [class~="border-gray-100"],
+html:not(.dark) .cb-glass [class~="border-gray-200"],
+html:not(.dark) .cb-glass [class~="border-gray-300"] {
+  border-color: var(--cbg-light-line) !important;
+}
+
+html:not(.dark) .cb-glass input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),
+html:not(.dark) .cb-glass select,
+html:not(.dark) .cb-glass textarea {
+  color: var(--cbg-light-text);
+  color-scheme: light;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   إخفاء شريط وأزرار السكرول داون/أب مع بقاء التمرير شغال
+   ═══════════════════════════════════════════════════════ */
+html,
+body,
+#__next,
+main,
+div,
+section,
+aside,
+[class*=overflow-] {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE & Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Edge, Opera */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+*::-webkit-scrollbar-button {
+  display: none !important; /* إخفاء زرار السكرول داون والسكرول أب */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
+*::-webkit-scrollbar-track {
+  display: none !important;
+}
