@@ -39,6 +39,34 @@ export default function SoundsLabPage() {
     setMode("breath");
   };
 
+  if (!mounted) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "14px",
+          background: "radial-gradient(circle at 50% 35%, #0f1b38 0%, #060913 75%)",
+          color: "#e2e8f0",
+          fontFamily: "system-ui, -apple-system, sans-serif",
+        }}
+      >
+        <img
+          src="/icon.png"
+          alt="Code Blue ECG & Sounds"
+          style={{ width: 68, height: 68, borderRadius: 16, boxShadow: "0 0 30px rgba(16,185,129,0.35)" }}
+        />
+        <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "0.04em" }}>CODE BLUE ECG &amp; SOUNDS</div>
+        <div style={{ fontSize: 12, color: "#94a3b8" }}>Loading 3D Heart, Lungs &amp; Audio Engine...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen w-screen bg-transparent text-slate-100 flex flex-col overflow-hidden">
       <header className="h-13 shrink-0 px-4 border-b border-slate-800/80 bg-[#070b16]/95 backdrop-blur-md flex items-center justify-between gap-3 z-30">

@@ -245,17 +245,24 @@ function ProceduralOrganFallback({ mode }: { mode: "heart" | "breath" }) {
 }
 
 export function SoundsSpecimenCanvas({ mode }: { mode: "heart" | "breath" }) {
-  const [glbAvailable, setGlbAvailable] = useState(false);
+  const [glbState, setGlbState] = useState<"checking" | "ready" | "missing">("checking");
   const url = mode === "heart" ? "/anatomy/heart.glb" : "/anatomy/lungs.glb";
 
   useEffect(() => {
     let active = true;
+    setGlbState("checking");
     fetch(url, { method: "HEAD" })
       .then((res) => {
-        if (active) setGlbAvailable(res.ok);
+        if (!active) return;
+        if (res.ok) {
+          try { useGLTF.preload(url); } catch {}
+          setGlbState("ready");
+        } else {
+          setGlbState("missing");
+        }
       })
       .catch(() => {
-        if (active) setGlbAvailable(false);
+        if (active) setGlbState("missing");
       });
     return () => {
       active = false;
@@ -264,17 +271,20 @@ export function SoundsSpecimenCanvas({ mode }: { mode: "heart" | "breath" }) {
 
   return (
     <div className="relative w-full h-full min-h-[420px]">
-      {!glbAvailable && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-slate-900/85 border border-cyan-500/30 text-[11px] text-cyan-200 backdrop-blur">
-          3D Preview Mode — Copy <code className="font-mono text-cyan-400">{mode === "heart" ? "heart.glb" : "lungs.glb"}</code> into <code className="font-mono text-cyan-400">public/anatomy/</code>
+      {glbState === "checking" && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <div className="rounded-2xl border border-cyan-500/30 bg-[#0b1120]/80 px-4 py-2 text-xs font-semibold text-cyan-200 backdrop-blur-md">
+            Loading 3D {mode === "heart" ? "Heart" : "Lungs"}...
+          </div>
         </div>
       )}
       <Canvas camera={{ position: [0, 0.08, 3.55], fov: 40 }} dpr={[1, 2]} gl={{ alpha: true, antialias: true }} style={{ background: "transparent" }}>
         <ambientLight intensity={0.65} />
         <directionalLight position={[4, 6, 5]} intensity={1.35} />
         <directionalLight position={[-4, -2, -4]} intensity={0.45} color="#38bdf8" />
-        <Suspense fallback={<ProceduralOrganFallback mode={mode} />}>
-          {glbAvailable ? <SpecimenMesh url={url} mode={mode} /> : <ProceduralOrganFallback mode={mode} />}
+        <Suspense fallback={null}>
+          {glbState === "ready" && <SpecimenMesh url={url} mode={mode} />}
+          {glbState === "missing" && <ProceduralOrganFallback mode={mode} />}
           <Environment preset="studio" />
         </Suspense>
         <ContactShadows position={[0, -1.7, 0]} opacity={0.35} scale={8} blur={2.4} />
