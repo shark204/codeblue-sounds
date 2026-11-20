@@ -37,6 +37,7 @@ export default function SoundsLabPage() {
   const toggleTheme = useUIStore((s) => s.toggleTheme);
   const { locale, setLocale } = useAtlasLocale();
   const isAr = locale === "ar";
+  const isLight = theme === "light";
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
@@ -95,37 +96,62 @@ export default function SoundsLabPage() {
   }
 
   if (view === "landing") {
+    const petalBase = isLight
+      ? "bg-white/90 border-slate-200/90 text-slate-800 shadow-[0_14px_30px_rgba(15,23,42,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] hover:bg-white"
+      : "bg-[#0e172c]/82 border-white/14 text-slate-100 shadow-[0_16px_34px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.12)] hover:bg-[#13203d]/92";
+
     return (
       <div
         dir={isAr ? "rtl" : "ltr"}
-        className="min-h-screen w-full bg-transparent text-slate-100 flex flex-col overflow-y-auto"
+        className={`min-h-screen lg:h-screen lg:overflow-hidden w-full bg-transparent flex flex-col ${
+          isLight ? "text-slate-900" : "text-slate-100"
+        }`}
       >
         {/* Top Bar */}
-        <header className="sticky top-0 z-40 h-16 px-5 md:px-10 border-b border-white/10 bg-[#070b16]/70 backdrop-blur-xl flex items-center justify-between gap-4">
+        <header
+          className={`shrink-0 h-14 px-5 md:px-10 border-b backdrop-blur-xl flex items-center justify-between gap-4 z-40 ${
+            isLight
+              ? "border-slate-200/80 bg-white/75"
+              : "border-white/10 bg-[#070b16]/70"
+          }`}
+        >
           <div className="flex items-center gap-3">
-            <img src="/icon.png" alt="Code Blue" className="w-9 h-9 rounded-xl border border-cyan-400/30 shadow-lg shadow-cyan-500/20" />
+            <img
+              src="/icon.png"
+              alt="Code Blue"
+              className="w-8 h-8 rounded-xl border border-cyan-400/30 shadow-lg shadow-cyan-500/20"
+            />
             <div className="leading-tight">
-              <div className="font-extrabold text-base text-white tracking-tight">Code Blue</div>
-              <div className="text-[11px] font-mono text-cyan-300/80">codeblue-ecg&amp;sounds</div>
+              <div className={`font-extrabold text-sm md:text-base tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>
+                Code Blue
+              </div>
+              <div className={`text-[10.5px] font-mono ${isLight ? "text-cyan-700" : "text-cyan-300/80"}`}>
+                codeblue-ecg&amp;sounds
+              </div>
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-200">
-            <button type="button" onClick={() => launchMode("heart")} className="hover:text-cyan-300 transition">
-              {isAr ? "أصوات القلب" : "Heart Sounds"}
-            </button>
-            <button type="button" onClick={() => launchMode("heart")} className="hover:text-cyan-300 transition">
-              {isAr ? "تخطيط ECG" : "Live ECG"}
-            </button>
-            <button type="button" onClick={() => launchMode("breath")} className="hover:text-cyan-300 transition">
-              {isAr ? "أصوات التنفس" : "Breath Sounds"}
-            </button>
-          </nav>
+          <div
+            aria-hidden="true"
+            className={`hidden md:flex items-center gap-5 text-xs font-semibold select-none cursor-default ${
+              isLight ? "text-slate-500" : "text-slate-300/80"
+            }`}
+          >
+            <span>{isAr ? "أصوات القلب" : "Heart Sounds"}</span>
+            <span className="opacity-40">•</span>
+            <span>{isAr ? "تخطيط ECG" : "Live ECG"}</span>
+            <span className="opacity-40">•</span>
+            <span>{isAr ? "أصوات التنفس" : "Breath Sounds"}</span>
+          </div>
 
           <div className="flex items-center gap-2 text-xs">
             <a
               href={MAIN_URL}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition"
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition ${
+                isLight
+                  ? "bg-slate-100/80 hover:bg-slate-200/80 text-slate-800 border-slate-300/70"
+                  : "bg-white/5 hover:bg-white/10 text-slate-200 border-white/10"
+              }`}
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>{isAr ? "بنك الأسئلة" : "Main Bank"}</span>
@@ -133,14 +159,22 @@ export default function SoundsLabPage() {
             <button
               type="button"
               onClick={() => setLocale(isAr ? "en" : "ar")}
-              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-cyan-200 border border-white/10 font-bold transition"
+              className={`px-3 py-1.5 rounded-xl border font-bold transition ${
+                isLight
+                  ? "bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border-cyan-200"
+                  : "bg-white/5 hover:bg-white/10 text-cyan-200 border-white/10"
+              }`}
             >
               {isAr ? "EN" : "AR"}
             </button>
             <button
               type="button"
               onClick={handleToggleTheme}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition"
+              className={`p-2 rounded-xl border transition ${
+                isLight
+                  ? "bg-slate-100/80 hover:bg-slate-200/80 text-slate-800 border-slate-300/70"
+                  : "bg-white/5 hover:bg-white/10 text-slate-200 border-white/10"
+              }`}
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -148,108 +182,129 @@ export default function SoundsLabPage() {
           </div>
         </header>
 
-        {/* Hero Section */}
-        <main className="flex-1 w-full max-w-7xl mx-auto px-5 md:px-10 py-8 md:py-12 flex flex-col justify-between gap-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8">
-            <div className="lg:col-span-6 space-y-5">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight text-white">
-                {isAr
-                  ? "منصة أصوات القلب والتنفس والتشخيص الذكي"
-                  : "Interactive Heart, Breath Sounds & Live ECG Platform"}
-              </h1>
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl">
-                {isAr
-                  ? "محاكي تفاعلي ثلاثي الأبعاد لأصوات القلب واللغط (Murmurs) وتخطيط الـ ECG المباشر وأصوات الصدر والتنفس السريرية."
-                  : "Interactive 3D physiological simulator for heart murmurs, 4-chamber rhythm synchronization, live ECG strips, and clinical breath auscultation."}
-              </p>
-              <div className="pt-2 flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => launchMode("heart")}
-                  className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-teal-300 hover:from-cyan-300 hover:to-teal-200 text-slate-950 font-black text-base shadow-[0_0_32px_rgba(34,211,238,0.45)] transition transform hover:scale-[1.02]"
+        {/* Single-Viewport Hero + Integrated 4-Quadrant Showcase */}
+        <main className="flex-1 min-h-0 w-full max-w-7xl mx-auto px-5 md:px-10 py-4 lg:py-0 flex items-center">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-8">
+            {/* Left / Text + CTA + Integrated 4-Quadrant Petal Showcase */}
+            <div className="lg:col-span-6 flex flex-col gap-4">
+              <div className="space-y-2.5">
+                <h1
+                  className={`text-2xl sm:text-3xl xl:text-4xl font-black leading-[1.18] ${
+                    isLight ? "text-slate-900" : "text-white"
+                  }`}
                 >
-                  {isAr ? "ابدأ المحاكاة الآن" : "Start Simulation Now"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => launchMode("breath")}
-                  className="px-5 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-cyan-200 border border-cyan-400/30 font-bold text-sm transition"
+                  {isAr
+                    ? "منصة أصوات القلب والتنفس والتشخيص الذكي"
+                    : "Interactive Heart, Breath Sounds & Live ECG"}
+                </h1>
+                <p
+                  className={`text-sm sm:text-base leading-relaxed max-w-xl ${
+                    isLight ? "text-slate-600" : "text-slate-300"
+                  }`}
                 >
-                  {isAr ? "أصوات الصدر والتنفس" : "Chest & Breath Lab"}
-                </button>
+                  {isAr
+                    ? "محاكي تفاعلي ثلاثي الأبعاد لأصوات القلب واللغط القلبي وتخطيط الـ ECG المباشر وأصوات الصدر والتنفس السريرية."
+                    : "Interactive 3D simulator for heart murmurs, 4-chamber rhythm sync, live ECG strips, and clinical breath auscultation."}
+                </p>
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => launchMode("heart")}
+                    className="px-7 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 to-teal-300 hover:from-cyan-300 hover:to-teal-200 text-slate-950 font-black text-sm sm:text-base shadow-[0_0_30px_rgba(34,211,238,0.45)] transition transform hover:scale-[1.03] active:scale-[0.99] cursor-pointer"
+                  >
+                    {isAr ? "ابدأ المحاكاة الآن" : "Start Simulation Now"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Integrated "What Does the Platform Offer?" 4-Quadrant Split-Circle Showcase (Non-clickable) */}
+              <div className="pt-1 space-y-2.5">
+                <div
+                  className={`text-xs font-extrabold uppercase tracking-wider ${
+                    isLight ? "text-cyan-700" : "text-cyan-300/90"
+                  }`}
+                >
+                  {isAr ? "ماذا تقدم المنصة؟" : "What Does the Platform Offer?"}
+                </div>
+
+                <div dir="ltr" className="grid grid-cols-2 gap-2.5 max-w-[440px]">
+                  {/* Top-Left Quadrant */}
+                  <div
+                    dir={isAr ? "rtl" : "ltr"}
+                    className={`group select-none cursor-default rounded-tl-[64px] rounded-tr-xl rounded-bl-xl rounded-br-md border backdrop-blur-xl px-4 py-3.5 pl-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border-rose-400/60 hover:shadow-[0_18px_36px_rgba(244,63,94,0.22)] ${petalBase}`}
+                  >
+                    <div className="w-9 h-9 mb-1.5 rounded-2xl bg-rose-500/15 border border-rose-400/35 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform duration-300">
+                      <HeartPulse className="w-5 h-5" />
+                    </div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">
+                      {isAr ? "أصوات ولغط القلب" : "Heart Murmurs"}
+                    </div>
+                    <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                      {isAr ? "S1/S2 وS3/S4 واضطرابات الصمامات" : "S1–S4 & valve murmurs"}
+                    </div>
+                  </div>
+
+                  {/* Top-Right Quadrant */}
+                  <div
+                    dir={isAr ? "rtl" : "ltr"}
+                    className={`group select-none cursor-default rounded-tr-[64px] rounded-tl-xl rounded-br-xl rounded-bl-md border backdrop-blur-xl px-4 py-3.5 pr-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border-cyan-400/60 hover:shadow-[0_18px_36px_rgba(34,211,238,0.24)] ${petalBase}`}
+                  >
+                    <div className="w-9 h-9 mb-1.5 rounded-2xl bg-cyan-500/15 border border-cyan-400/35 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform duration-300">
+                      <Activity className="w-5 h-5" />
+                    </div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">
+                      {isAr ? "تخطيط ECG المباشر" : "Live ECG Strips"}
+                    </div>
+                    <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                      {isAr ? "AFib وVFib والـ Heart Blocks" : "AFib, VFib & Heart Blocks"}
+                    </div>
+                  </div>
+
+                  {/* Bottom-Left Quadrant */}
+                  <div
+                    dir={isAr ? "rtl" : "ltr"}
+                    className={`group select-none cursor-default rounded-bl-[64px] rounded-tl-xl rounded-br-xl rounded-tr-md border backdrop-blur-xl px-4 py-3.5 pl-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:translate-y-1 hover:scale-[1.03] hover:border-emerald-400/60 hover:shadow-[0_18px_36px_rgba(16,185,129,0.22)] ${petalBase}`}
+                  >
+                    <div className="w-9 h-9 mb-1.5 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform duration-300">
+                      <Wind className="w-5 h-5" />
+                    </div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">
+                      {isAr ? "أصوات الصدر والتنفس" : "Breath Sounds"}
+                    </div>
+                    <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                      {isAr ? "Wheezes وCrackles وStridor" : "Wheezes, Crackles & Stridor"}
+                    </div>
+                  </div>
+
+                  {/* Bottom-Right Quadrant */}
+                  <div
+                    dir={isAr ? "rtl" : "ltr"}
+                    className={`group select-none cursor-default rounded-br-[64px] rounded-tr-xl rounded-bl-xl rounded-tl-md border backdrop-blur-xl px-4 py-3.5 pr-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:translate-y-1 hover:scale-[1.03] hover:border-violet-400/60 hover:shadow-[0_18px_36px_rgba(139,92,246,0.22)] ${petalBase}`}
+                  >
+                    <div className="w-9 h-9 mb-1.5 rounded-2xl bg-violet-500/15 border border-violet-400/35 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform duration-300">
+                      <Stethoscope className="w-5 h-5" />
+                    </div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">
+                      {isAr ? "حركة القلب 4 حجرات" : "4-Chamber 3D Sync"}
+                    </div>
+                    <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                      {isAr ? "تزامن إيقاعي مع بطاقة سريرية" : "Rhythmic chambers & cards"}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* Right / Transparent PNG Hero Visual (Non-clickable) */}
             <div className="lg:col-span-6 flex items-center justify-center">
               <img
-                src="/hero-sounds.png"
+                src="/hero-sounds.png?v=2"
                 alt="Heart & ECG Simulator Preview"
-                className="w-full max-w-[600px] h-auto object-contain drop-shadow-[0_0_40px_rgba(34,211,238,0.28)] transition duration-500 hover:scale-[1.02]"
+                draggable={false}
+                className="w-full max-w-[540px] max-h-[68vh] h-auto object-contain select-none pointer-events-none drop-shadow-[0_20px_45px_rgba(34,211,238,0.28)]"
               />
             </div>
           </div>
-
-          {/* Bottom 3 Feature Cards */}
-          <section className="space-y-4">
-            <h2 className="text-lg font-extrabold text-white">
-              {isAr ? "ماذا تقدم المنصة؟" : "What Does the Platform Offer?"}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button
-                type="button"
-                onClick={() => launchMode("heart")}
-                className="group text-start rounded-2xl border border-white/12 bg-[#0d1528]/70 hover:bg-[#121e38]/85 hover:border-rose-400/50 backdrop-blur-xl p-5 flex items-center justify-between gap-4 transition shadow-xl"
-              >
-                <div>
-                  <div className="font-bold text-white text-base group-hover:text-rose-200 transition">
-                    {isAr ? "محاكاة أصوات اضطرابات القلب" : "Heart Murmurs & Sounds"}
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    {isAr ? "S1/S2 وS3/S4 واللغط القلبي مع حركة 4 حجرات" : "S1/S2, S3/S4 & murmurs with 4-chamber sync"}
-                  </div>
-                </div>
-                <div className="w-12 h-12 shrink-0 rounded-2xl bg-rose-500/15 border border-rose-400/35 flex items-center justify-center text-rose-300">
-                  <HeartPulse className="w-6 h-6" />
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => launchMode("heart")}
-                className="group text-start rounded-2xl border border-white/12 bg-[#0d1528]/70 hover:bg-[#121e38]/85 hover:border-cyan-400/50 backdrop-blur-xl p-5 flex items-center justify-between gap-4 transition shadow-xl"
-              >
-                <div>
-                  <div className="font-bold text-white text-base group-hover:text-cyan-200 transition">
-                    {isAr ? "تشخيص اضطرابات النبض الفورية" : "Live ECG Arrhythmia Lab"}
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    {isAr ? "AFib وVFib والـ Heart Blocks وبطاقة المرض" : "AFib, VFib, Heart Blocks & clinical cards"}
-                  </div>
-                </div>
-                <div className="w-12 h-12 shrink-0 rounded-2xl bg-cyan-500/15 border border-cyan-400/35 flex items-center justify-center text-cyan-300">
-                  <Activity className="w-6 h-6" />
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => launchMode("breath")}
-                className="group text-start rounded-2xl border border-white/12 bg-[#0d1528]/70 hover:bg-[#121e38]/85 hover:border-emerald-400/50 backdrop-blur-xl p-5 flex items-center justify-between gap-4 transition shadow-xl"
-              >
-                <div>
-                  <div className="font-bold text-white text-base group-hover:text-emerald-200 transition">
-                    {isAr ? "محاكاة أصوات الصدر والتنفس" : "Chest & Breath Auscultation"}
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    {isAr ? "Wheezes وCrackles وStridor مع رئة 3D" : "Wheezes, Crackles, Stridor & 3D lungs"}
-                  </div>
-                </div>
-                <div className="w-12 h-12 shrink-0 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 flex items-center justify-center text-emerald-300">
-                  <Wind className="w-6 h-6" />
-                </div>
-              </button>
-            </div>
-          </section>
         </main>
       </div>
     );
