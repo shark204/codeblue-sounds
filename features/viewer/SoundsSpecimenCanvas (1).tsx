@@ -7,10 +7,25 @@ import * as THREE from "three";
 import { useHeartStore } from "@/stores/heartStore";
 import { useBreathStore } from "@/stores/breathStore";
 import { rhythm, RhythmPlayer } from "./rhythms";
-import { playDub, playExtra, playLub, playMurmur, playVentricularFibrillationTick, startAsystoleTone, stopAsystoleTone } from "./heartSound";
+import { BreathPacer } from "./sinusArrhythmia";
+import {
+  playDub,
+  playExtra,
+  playLub,
+  playMurmur,
+  playVentricularFibrillationTick,
+  startAsystoleTone,
+  stopAsystoleTone,
+} from "./heartSound";
 import { HEART_TRACE } from "./EcgStrip";
 import { BREATH_NOW } from "./BreathDriver";
-import { BREATH_PATTERNS, breathFill, breathingIn, stopBreathSound, updateBreathSoundFrame } from "./breathing";
+import {
+  BREATH_PATTERNS,
+  breathFill,
+  breathingIn,
+  stopBreathSound,
+  updateBreathSoundFrame,
+} from "./breathing";
 
 function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) {
   const heartEnabled = useHeartStore((s) => s.enabled);
@@ -21,13 +36,34 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
   const breathPattern = useBreathStore((s) => s.pattern);
 
   const playerRef = useRef<RhythmPlayer | null>(null);
-  const lastRhythmRef = useRef<string>("");
-  const breathPhaseRef = useRef<number>(0);
+  const pacerRef = useRef<BreathPacer>(new BreathPacer());
+  const clockRef = useRef<number>(0);
+  const realRef = useRef<number>(0);
+  const restingRef = useRef<boolean>(true);
+  const lastVfTickRef = useRef<number>(0);
+  const breathClockRef = useRef<number>(0);
+
+  // Reset cardiac cycle cleanly whenever rhythm or audio toggle changes
+  useEffect(() => {
+    playerRef.current = null;
+    clockRef.current = 0;
+    realRef.current = 0;
+    restingRef.current = true;
+    pacerRef.current.reset();
+    HEART_TRACE.clock.reset();
+    HEART_TRACE.player = null;
+    lastVfTickRef.current = 0;
+    if (!heartSound || heartRhythmId !== "asystole") {
+      stopAsystoleTone();
+    }
+  }, [heartRhythmId, heartEnabled, heartSound, mode]);
 
   useEffect(() => {
     return () => {
       stopAsystoleTone();
       stopBreathSound();
+      HEART_TRACE.player = null;
+      HEART_TRACE.clock.reset();
     };
   }, []);
 
@@ -35,26 +71,39 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
     const dt = Math.min(rawDelta, 0.05);
 
     if (mode === "heart" && heartEnabled) {
-      const spec = rhythm(heartRhythmId);
-      if (!playerRef.current || lastRhythmRef.current !== heartRhythmId) {
-        playerRef.current = new RhythmPlayer(spec);
-        lastRhythmRef.current = heartRhythmId;
-        stopAsystoleTone();
-      }
-      const step = playerRef.current.step(dt, 1);
-      HEART_TRACE.push?.(step.ecg, dt);
-      if (heartSound) {
-        if (spec.id === "asystole") {
+      const definition = rhythm(heartRhythmId);
+      const swing = BREATH_NOW.swing * (definition.followsBreath ?? 0);
+      const before = clockRef.current;
+      const after = before + pacerRef.current.advance(dt, swing, restingRef.current);
+      clockRef.current = after;
+      realRef.current += dt;
+      const now = realRef.current;
+
+      playerRef.current ??= new RhythmPlayer(definition);
+      const beat = playerRef.current.advance(before, after);
+      restingRef.current = beat.atria === 0 && beat.ventricles === 0;
+
+      HEART_TRACE.player = playerRef.current;
+      HEART_TRACE.now = now;
+      HEART_TRACE.clock.push(now, after);
+
+      if (heartSound && before > 0.02) {
+        if (heartRhythmId === "ventricular_fibrillation") {
+          stopAsystoleTone();
+          if (now - lastVfTickRef.current >= 0.13) {
+            lastVfTickRef.current = now;
+            playVentricularFibrillationTick(0.85);
+          }
+        } else if (heartRhythmId === "asystole") {
           startAsystoleTone();
         } else {
           stopAsystoleTone();
-          if (step.lub) playLub(spec.s1Gain ?? 1);
-          if (step.dub) playDub(spec.s2Gain ?? 1);
-          if (step.extra) playExtra(step.extra);
-          if (step.murmur) playMurmur(step.murmur);
-          if (spec.id === "vfib" && Math.random() < dt * 8) playVentricularFibrillationTick();
+          for (const level of beat.lub) playLub(level);
+          for (const level of beat.dub) playDub(level);
+          for (const murmur of beat.murmurs) playMurmur(murmur);
+          for (const kind of beat.extras) playExtra(kind);
         }
-      } else {
+      } else if (!heartSound) {
         stopAsystoleTone();
       }
     } else {
@@ -62,16 +111,16 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
     }
 
     if (mode === "breath" && breathEnabled) {
-      breathPhaseRef.current = (breathPhaseRef.current + dt * 0.28) % 1;
-      const p = breathPhaseRef.current;
-      const expansion = p < 0.42 ? Math.sin((p / 0.42) * Math.PI * 0.5) : Math.cos(((p - 0.42) / 0.58) * Math.PI * 0.5);
-      BREATH_NOW.fill = Math.max(0, expansion);
-      BREATH_NOW.inhaling = p < 0.42;
-      if (breathSound && true) {
-        try {
-          const pat = BREATH_PATTERNS[breathPattern] ?? BREATH_PATTERNS.quiet; updateBreathSoundFrame(p * 4, pat, breathSound);
-        } catch {}
-      }
+      breathClockRef.current += dt;
+      const pat = BREATH_PATTERNS[breathPattern] ?? BREATH_PATTERNS.quiet;
+      const fill = breathFill(breathClockRef.current, pat);
+      BREATH_NOW.running = true;
+      BREATH_NOW.fill = fill;
+      BREATH_NOW.inhaling = breathingIn(breathClockRef.current, pat);
+      BREATH_NOW.swing = fill;
+      updateBreathSoundFrame(breathClockRef.current, pat, breathSound);
+    } else {
+      BREATH_NOW.running = false;
     }
   });
 
@@ -174,7 +223,7 @@ export function SoundsSpecimenCanvas({ mode }: { mode: "heart" | "breath" }) {
     <div className="relative w-full h-full min-h-[420px]">
       {!glbAvailable && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-slate-900/85 border border-cyan-500/30 text-[11px] text-cyan-200 backdrop-blur">
-          3D Preview Mode â€” Run <code className="font-mono text-cyan-400">.\COPY_GLB_ASSETS.ps1</code> to load real {mode === "heart" ? "heart.glb" : "lungs.glb"}
+          3D Preview Mode — Copy <code className="font-mono text-cyan-400">{mode === "heart" ? "heart.glb" : "lungs.glb"}</code> into <code className="font-mono text-cyan-400">public/anatomy/</code>
         </div>
       )}
       <Canvas camera={{ position: [0, 0.3, 4.2], fov: 42 }} dpr={[1, 2]}>
@@ -193,4 +242,3 @@ export function SoundsSpecimenCanvas({ mode }: { mode: "heart" | "breath" }) {
     </div>
   );
 }
-

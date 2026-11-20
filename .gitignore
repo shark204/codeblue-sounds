@@ -6,3 +6,7 @@ out/
 .env.*.local
 desktop.ini
 *.tsbuildinfo
+
+.tmp.driveupload/
+.tmp.drivedownload/
+* (1).*
