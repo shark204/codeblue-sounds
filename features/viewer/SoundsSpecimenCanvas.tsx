@@ -42,6 +42,17 @@ const CHAMBER_UNIFORMS = {
   uTime: { value: 0 },
 };
 
+const VESSEL_NAME_PATTERN = /(aort|vena|cava|pulmon|arter|vein|vessel|trunk|coronary|sinus|brachio|carotid|subclav)/i;
+
+function isVesselObject(obj: THREE.Object3D): boolean {
+  let curr: THREE.Object3D | null = obj;
+  while (curr) {
+    if (curr.name && VESSEL_NAME_PATTERN.test(curr.name)) return true;
+    curr = curr.parent;
+  }
+  return false;
+}
+
 function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) {
   const heartEnabled = useHeartStore((s) => s.enabled);
   const heartSound = useHeartStore((s) => s.sound);
@@ -170,14 +181,18 @@ function SpecimenMesh({ url, mode }: { url: string; mode: "heart" | "breath" }) 
       const cz = center.z.toFixed(4);
       const hy = halfY.toFixed(4);
       const hx = halfX.toFixed(4);
-      const radAmp = (maxDim * 0.42).toFixed(4);
-      const lonAmp = (maxDim * 0.14).toFixed(4);
+      const radAmp = (maxDim * 0.40).toFixed(4);
+      const lonAmp = (maxDim * 0.13).toFixed(4);
 
       c.traverse((obj) => {
         const mesh = obj as THREE.Mesh;
         if (!mesh.isMesh || !mesh.material) return;
+        // Strictly exclude named artery/vein/great-vessel meshes from 4-chamber division & motion
+        if (isVesselObject(mesh)) return;
+
         const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         const patched = mats.map((m) => {
+          if (m.name && VESSEL_NAME_PATTERN.test(m.name)) return m;
           const mat = m.clone();
           mat.onBeforeCompile = (shader) => {
             shader.uniforms.uAtria = CHAMBER_UNIFORMS.uAtria;
@@ -194,24 +209,28 @@ function SpecimenMesh({ url, mode }: { url: string; mode: "heart" | "breath" }) 
               {
                 float ny = (position.y - ${cy}) / ${hy};
                 float nx = (position.x - ${cx}) / ${hx};
-                // 4 distinct anatomical cardiac chambers (RA, LA, RV, LV)
-                float atrialMask = smoothstep(0.02, 0.42, ny) * (1.0 - smoothstep(0.72, 0.98, ny));
-                float ventMask   = smoothstep(0.18, -0.35, ny);
-                float rightSide  = smoothstep(0.12, -0.25, nx);
-                float leftSide   = smoothstep(-0.12, 0.25, nx);
 
-                float raSqueeze = uAtria * 0.105 * atrialMask * rightSide;
+                // Strictly exclude upper great vessels (Aorta, SVC, Pulmonary Trunk & Veins) above atrial roof
+                float greatVesselExclude = 1.0 - smoothstep(0.28, 0.42, ny);
+
+                // 4 distinct anatomical cardiac chambers ONLY (RA, LA, RV, LV)
+                float atrialMask = smoothstep(-0.02, 0.14, ny) * greatVesselExclude;
+                float ventMask = smoothstep(0.10, -0.22, ny) * greatVesselExclude;
+                float rightSide = smoothstep(0.10, -0.22, nx);
+                float leftSide = smoothstep(-0.10, 0.22, nx);
+
+                float raSqueeze = uAtria * 0.10 * atrialMask * rightSide;
                 float laSqueeze = uAtria * 0.095 * atrialMask * leftSide;
                 float rvSqueeze = uVentricles * 0.105 * ventMask * rightSide;
-                float lvSqueeze = uVentricles * 0.145 * ventMask * leftSide;
+                float lvSqueeze = uVentricles * 0.14 * ventMask * leftSide;
 
                 float afibQuiver = uAfib * atrialMask * 0.018 * sin(uTime * 36.0 + position.x * 18.0 + position.z * 14.0);
                 float vfibQuiver = uVfib * ventMask * 0.024 * sin(uTime * 44.0 + position.y * 22.0 + position.x * 19.0);
 
-                float totalInward = (raSqueeze + laSqueeze + rvSqueeze + lvSqueeze) + afibQuiver + vfibQuiver;
-                vec3 radialDir = normalize(vec3(position.x - ${cx}, (position.y - ${cy}) * 0.35, position.z - ${cz}) + vec3(0.0001));
+                float totalInward = ((raSqueeze + laSqueeze + rvSqueeze + lvSqueeze) + afibQuiver + vfibQuiver) * greatVesselExclude;
+                vec3 radialDir = normalize(vec3(position.x - ${cx}, (position.y - ${cy}) * 0.30, position.z - ${cz}) + vec3(0.0001));
                 transformed -= radialDir * totalInward * ${radAmp};
-                transformed.y += (rvSqueeze + lvSqueeze) * ${lonAmp};
+                transformed.y += (rvSqueeze + lvSqueeze) * greatVesselExclude * ${lonAmp};
               }`
             );
           };
@@ -243,11 +262,11 @@ function SpecimenMesh({ url, mode }: { url: string; mode: "heart" | "breath" }) 
       }
       groupRef.current.scale.setScalar(baseScale);
     } else {
-      const f = BREATH_NOW.running ? (BREATH_NOW.fill || 0) : 0;
+      const f = BREATH_NOW.running ? BREATH_NOW.fill || 0 : 0;
       groupRef.current.scale.set(
         baseScale * (1 + f * 0.085),
         baseScale * (1 + f * 0.045),
-        baseScale * (1 + f * 0.085),
+        baseScale * (1 + f * 0.085)
       );
     }
   });
@@ -286,7 +305,9 @@ export function SoundsSpecimenCanvas({ mode }: { mode: "heart" | "breath" }) {
       .then((res) => {
         if (!active) return;
         if (res.ok) {
-          try { useGLTF.preload(url); } catch {}
+          try {
+            useGLTF.preload(url);
+          } catch {}
           setGlbState("ready");
         } else {
           setGlbState("missing");
