@@ -93,7 +93,6 @@ export function EcgDiagnosticStudio() {
   };
 
   const result = analysis?.interpretation || null;
-  // Red Emergency / Interventional Warning Banner triggers ONLY for CRITICAL conditions
   const criticalFindings = result ? result.all_findings.filter((f) => f.urgency === "CRITICAL") : [];
 
   return (
@@ -150,7 +149,7 @@ export function EcgDiagnosticStudio() {
           )}
         </div>
 
-        {/* CRITICAL Emergency Intervention Banner ONLY (e.g. STEMI, LMCA, Tamponade, VT/VF, Complete Heart Block) */}
+        {/* CRITICAL Immediate Emergency / Surgical Intervention Banner ONLY */}
         {criticalFindings.length > 0 && (
           <div className="rounded-xl border-2 border-red-500/80 bg-gradient-to-r from-red-950/90 via-red-900/60 to-red-950/90 px-4 py-2.5 text-red-100 shadow-lg shadow-red-950/40 flex items-center gap-2.5">
             <ShieldAlert className="w-5 h-5 text-red-400 animate-pulse shrink-0" />
@@ -162,7 +161,7 @@ export function EcgDiagnosticStudio() {
           </div>
         )}
 
-        {/* Single-Screen Balanced 2-Column Layout (Scrollable when needed) */}
+        {/* Single-Screen Layout */}
         {!imagePreview ? (
           <div className={`rounded-2xl border p-6 sm:p-10 max-w-2xl mx-auto mt-6 ${cardClass}`}>
             <label
@@ -197,9 +196,9 @@ export function EcgDiagnosticStudio() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
-            {/* LEFT COLUMN: Sticky ECG Image Card */}
-            <div className="lg:col-span-5 lg:sticky lg:top-2">
-              <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardClass}`}>
+            {/* LEFT COLUMN: ECG Image + 6 Metric Tiles Underneath (2 per row, including Regular/Irregular) */}
+            <div className="lg:col-span-5 space-y-2.5 lg:sticky lg:top-2">
+              <div className={`rounded-2xl border p-3 space-y-2 ${cardClass}`}>
                 <div className="flex items-center justify-between gap-2 text-xs">
                   <span className="font-extrabold flex items-center gap-1.5">
                     <Activity className="w-4 h-4 text-rose-400" />
@@ -207,9 +206,7 @@ export function EcgDiagnosticStudio() {
                   </span>
                   {analysis && (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-300 border border-rose-400/30">
-                      {analysis.layout === "single_lead"
-                        ? isAr ? "شريط أحادي" : "Single-Lead"
-                        : "12-Lead ECG"}
+                      {analysis.layout === "single_lead" ? (isAr ? "شريط أحادي" : "Single-Lead") : "12-Lead ECG"}
                     </span>
                   )}
                 </div>
@@ -227,58 +224,103 @@ export function EcgDiagnosticStudio() {
                   <img
                     src={imagePreview}
                     alt="Uploaded ECG"
-                    className="w-full max-h-[300px] object-contain mx-auto"
+                    className="w-full max-h-[250px] object-contain mx-auto"
                   />
                 </label>
 
-                <div className="flex items-center justify-between text-[10.5px] opacity-65">
-                  <span className="truncate max-w-[200px]">{imageName}</span>
+                <div className="flex items-center justify-between text-[10px] opacity-65">
+                  <span className="truncate max-w-[190px]">{imageName}</span>
                   <span>{isAr ? "اضغط على الصورة لتغييرها" : "Click image to replace"}</span>
                 </div>
 
                 {analyzing && (
-                  <div className="rounded-xl border border-rose-400/35 bg-rose-500/10 p-2.5 flex items-center justify-center gap-2 text-xs font-bold text-rose-300">
+                  <div className="rounded-xl border border-rose-400/35 bg-rose-500/10 p-2 flex items-center justify-center gap-2 text-xs font-bold text-rose-300">
                     <Loader2 className="w-4 h-4 animate-spin shrink-0" />
                     <span>{isAr ? "جاري فحص الموجة..." : "Analyzing waveform..."}</span>
                   </div>
                 )}
 
                 {errorMsg && (
-                  <div className="rounded-xl border border-amber-500/45 bg-amber-500/10 p-2.5 text-xs text-amber-300">
+                  <div className="rounded-xl border border-amber-500/45 bg-amber-500/10 p-2 text-xs text-amber-300">
                     {errorMsg}
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* RIGHT COLUMN: Compact Single-Screen Report (Telemetry + Diagnosis Cards) */}
-            <div className="lg:col-span-7 space-y-3 pb-3">
+              {/* 6 Telemetry Tiles Underneath Image (2 per row: HR | Regular/Irregular, PR | QRS, QTc | Axis) */}
               {result && analysis && (
-                <>
-                  {/* Compact 5-Tile Telemetry Bar */}
-                  <div className="grid grid-cols-5 gap-2">
-                    {[
-                      { label: "HR", value: result.measurements.hr_bpm ? `${result.measurements.hr_bpm}` : "—", unit: "bpm" },
-                      { label: "PR", value: result.measurements.pr_ms ? `${result.measurements.pr_ms}` : "—", unit: "ms" },
-                      { label: "QRS", value: result.measurements.qrs_ms ? `${result.measurements.qrs_ms}` : "—", unit: "ms" },
-                      { label: "QTc", value: result.measurements.qtc_bazett_ms ? `${result.measurements.qtc_bazett_ms}` : "—", unit: "ms" },
-                      { label: "Axis", value: result.measurements.axis_deg != null ? `${result.measurements.axis_deg}°` : "—", unit: "" },
-                    ].map((m) => (
-                      <div key={m.label} className={`rounded-xl border px-2 py-2 text-center ${cardClass}`}>
-                        <div className="text-[10px] opacity-65 font-bold">{m.label}</div>
-                        <div className="text-xs sm:text-sm font-black mt-0.5">
-                          {m.value} <span className="text-[9.5px] font-semibold opacity-65">{m.value !== "—" ? m.unit : ""}</span>
-                        </div>
-                      </div>
-                    ))}
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Tile 1: HR */}
+                  <div className={`rounded-xl border px-3 py-2 text-center ${cardClass}`}>
+                    <div className="text-[10px] opacity-65 font-bold">HR</div>
+                    <div className="text-sm font-black mt-0.5">
+                      {result.measurements.hr_bpm ? `${result.measurements.hr_bpm}` : "—"}{" "}
+                      <span className="text-[10px] font-semibold opacity-65">{result.measurements.hr_bpm ? "bpm" : ""}</span>
+                    </div>
                   </div>
 
-                  {/* Summary Strip */}
-                  <div className={`rounded-xl border px-3.5 py-2 text-xs leading-relaxed ${cardClass}`}>
+                  {/* Tile 2: Rhythm Regular (Green) / Irregular (Red) */}
+                  <div
+                    className={`rounded-xl border px-3 py-2 text-center font-black ${
+                      analysis.is_regular_rhythm
+                        ? "bg-emerald-500/15 border-emerald-400/45 text-emerald-400"
+                        : "bg-red-500/15 border-red-400/50 text-red-400"
+                    }`}
+                  >
+                    <div className="text-[10px] opacity-80 font-bold">{isAr ? "انتظام النظم" : "Rhythm"}</div>
+                    <div className="text-sm font-black mt-0.5">
+                      {analysis.is_regular_rhythm
+                        ? isAr ? "Regular • منتظم" : "Regular"
+                        : isAr ? "Irregular • غير منتظم" : "Irregular"}
+                    </div>
+                  </div>
+
+                  {/* Tile 3: PR */}
+                  <div className={`rounded-xl border px-3 py-2 text-center ${cardClass}`}>
+                    <div className="text-[10px] opacity-65 font-bold">PR</div>
+                    <div className="text-sm font-black mt-0.5">
+                      {result.measurements.pr_ms ? `${result.measurements.pr_ms}` : "—"}{" "}
+                      <span className="text-[10px] font-semibold opacity-65">{result.measurements.pr_ms ? "ms" : ""}</span>
+                    </div>
+                  </div>
+
+                  {/* Tile 4: QRS */}
+                  <div className={`rounded-xl border px-3 py-2 text-center ${cardClass}`}>
+                    <div className="text-[10px] opacity-65 font-bold">QRS</div>
+                    <div className="text-sm font-black mt-0.5">
+                      {result.measurements.qrs_ms ? `${result.measurements.qrs_ms}` : "—"}{" "}
+                      <span className="text-[10px] font-semibold opacity-65">{result.measurements.qrs_ms ? "ms" : ""}</span>
+                    </div>
+                  </div>
+
+                  {/* Tile 5: QTc */}
+                  <div className={`rounded-xl border px-3 py-2 text-center ${cardClass}`}>
+                    <div className="text-[10px] opacity-65 font-bold">QTc (Bazett)</div>
+                    <div className="text-sm font-black mt-0.5">
+                      {result.measurements.qtc_bazett_ms ? `${result.measurements.qtc_bazett_ms}` : "—"}{" "}
+                      <span className="text-[10px] font-semibold opacity-65">{result.measurements.qtc_bazett_ms ? "ms" : ""}</span>
+                    </div>
+                  </div>
+
+                  {/* Tile 6: Axis */}
+                  <div className={`rounded-xl border px-3 py-2 text-center ${cardClass}`}>
+                    <div className="text-[10px] opacity-65 font-bold">Axis</div>
+                    <div className="text-sm font-black mt-0.5">
+                      {result.measurements.axis_deg != null ? `${result.measurements.axis_deg}°` : "—"}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT COLUMN: Summary + Diagnostic Findings Cards */}
+            <div className="lg:col-span-7 space-y-2.5 pb-4">
+              {result && analysis && (
+                <>
+                  <div className={`rounded-xl border px-3.5 py-2.5 text-xs leading-relaxed ${cardClass}`}>
                     {isAr ? analysis.summary_ar : analysis.summary_en}
                   </div>
 
-                  {/* Diagnosis Cards */}
                   <div className="space-y-2.5">
                     {result.all_findings.map((f, idx) => (
                       <div key={f.code} className={`rounded-2xl border p-4 space-y-2.5 ${cardClass}`}>
