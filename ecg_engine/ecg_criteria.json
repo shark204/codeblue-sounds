@@ -1,0 +1,691 @@
+{
+  "metadata": {
+    "schema_version": "2.0.0",
+    "engine_name": "Code Blue Clinical ECG Diagnostic Criteria",
+    "editable_notice": "Modify any numeric threshold, lead group, or rule parameter below; ecg_rules.py reads all values dynamically at runtime.",
+    "primary_references": [
+      "Goldberger's Clinical Electrocardiography: A Simplified Approach (9th Ed, 2017)",
+      "Marriott's Practical Electrocardiography (13th Ed, 2021)",
+      "Pocket Cardiology (Pocket Notebook Series)",
+      "ECG Masters' Collection Vol. 1 & Vol. 2",
+      "Clinical Examinations in Cardiology (ECG Chapters 22-29)",
+      "Electrocardiography of Arrhythmias"
+    ]
+  },
+  "units_and_calibration": {
+    "paper_speed_mm_per_sec": 25.0,
+    "small_box_mm": 1.0,
+    "large_box_mm": 5.0,
+    "small_box_ms": 40.0,
+    "small_box_sec": 0.04,
+    "large_box_ms": 200.0,
+    "large_box_sec": 0.20,
+    "large_boxes_per_sec": 5,
+    "standard_strip_duration_sec": 10.0,
+    "voltage_calibration_mm_per_mv": 10.0,
+    "mv_per_small_box": 0.1,
+    "half_standard_mm_per_mv": 5.0,
+    "double_standard_mm_per_mv": 20.0
+  },
+  "heart_rate": {
+    "formulas": {
+      "from_large_boxes": "300 / rr_large_boxes",
+      "from_small_boxes": "1500 / rr_small_boxes",
+      "from_rr_ms": "60000 / rr_ms",
+      "from_rr_sec": "60 / rr_sec",
+      "irregular_10s_strip": "qrs_count_in_10s * 6"
+    },
+    "normal_min_bpm": 60,
+    "normal_max_bpm": 100,
+    "bradycardia_max_bpm": 59.9,
+    "severe_bradycardia_bpm": 40,
+    "tachycardia_min_bpm": 100.1,
+    "marked_tachycardia_bpm": 150,
+    "extreme_tachycardia_bpm": 200
+  },
+  "intervals_ms": {
+    "p_wave": {
+      "normal_max_duration_ms": 120,
+      "normal_max_amplitude_mm": 2.5,
+      "laa_duration_min_ms": 120,
+      "laa_v1_terminal_neg_depth_mm": 1.0,
+      "laa_v1_terminal_neg_duration_ms": 40,
+      "raa_amplitude_min_mm": 2.5
+    },
+    "pr": {
+      "normal_min_ms": 120,
+      "normal_max_ms": 200,
+      "short_pr_max_ms": 119,
+      "first_degree_avb_min_ms": 201,
+      "marked_first_degree_avb_ms": 300
+    },
+    "qrs": {
+      "normal_max_visual_ms": 100,
+      "normal_max_computer_ms": 110,
+      "incomplete_bbb_min_ms": 110,
+      "incomplete_bbb_max_ms": 119,
+      "wide_qrs_min_ms": 120,
+      "vt_favoring_rbbb_like_ms": 140,
+      "vt_favoring_lbbb_like_ms": 160,
+      "tca_toxicity_qrs_min_ms": 100
+    },
+    "qt_qtc": {
+      "default_formula": "bazett",
+      "supported_formulas": ["bazett", "fridericia", "hodges"],
+      "fridericia_preferred_hr_low": 50,
+      "fridericia_preferred_hr_high": 100,
+      "normal_upper_male_ms": 440,
+      "borderline_upper_male_ms": 450,
+      "normal_upper_female_ms": 460,
+      "borderline_upper_female_ms": 470,
+      "athlete_upper_male_ms": 470,
+      "athlete_upper_female_ms": 480,
+      "critical_torsades_risk_ms": 500,
+      "short_qt_max_ms": 350,
+      "severe_short_qt_max_ms": 330
+    }
+  },
+  "axis_degrees": {
+    "normal_min": -30,
+    "normal_max": 90,
+    "normal_extended_max": 100,
+    "lad_max": -31,
+    "lafb_min": -90,
+    "lafb_max": -45,
+    "rad_min": 91,
+    "lpfb_min": 110,
+    "extreme_nw_min": -180,
+    "extreme_nw_max": -90
+  },
+  "lead_groups_and_territories": {
+    "all_standard_leads": ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+    "limb_leads": ["I", "II", "III", "aVR", "aVL", "aVF"],
+    "precordial_leads": ["V1", "V2", "V3", "V4", "V5", "V6"],
+    "contiguous_territories": {
+      "septal": {
+        "leads": ["V1", "V2"],
+        "min_contiguous_leads": 2,
+        "artery": "Proximal LAD (Septal perforators)",
+        "reciprocal_leads": ["II", "III", "aVF"]
+      },
+      "anterior": {
+        "leads": ["V3", "V4"],
+        "min_contiguous_leads": 2,
+        "artery": "LAD (Mid-Distal)",
+        "reciprocal_leads": ["II", "III", "aVF"]
+      },
+      "anteroseptal": {
+        "leads": ["V1", "V2", "V3", "V4"],
+        "min_contiguous_leads": 2,
+        "artery": "LAD",
+        "reciprocal_leads": ["II", "III", "aVF"]
+      },
+      "lateral_low_apical": {
+        "leads": ["V5", "V6"],
+        "min_contiguous_leads": 2,
+        "artery": "LCx or Distal LAD",
+        "reciprocal_leads": ["V1", "V2", "III", "aVR"]
+      },
+      "lateral_high": {
+        "leads": ["I", "aVL"],
+        "min_contiguous_leads": 2,
+        "artery": "First Diagonal (D1) or LCx",
+        "reciprocal_leads": ["II", "III", "aVF"]
+      },
+      "anterolateral": {
+        "leads": ["V3", "V4", "V5", "V6", "I", "aVL"],
+        "min_contiguous_leads": 3,
+        "artery": "Proximal LAD / Diagonal / LCx",
+        "reciprocal_leads": ["II", "III", "aVF"]
+      },
+      "inferior": {
+        "leads": ["II", "III", "aVF"],
+        "min_contiguous_leads": 2,
+        "artery": "RCA (~85%, especially STE III > II) or LCx (~15%, STE II >= III)",
+        "reciprocal_leads": ["I", "aVL"]
+      },
+      "posterior": {
+        "leads": ["V7", "V8", "V9"],
+        "mirror_depression_leads": ["V1", "V2", "V3"],
+        "min_contiguous_leads": 2,
+        "artery": "LCx or Posterior Descending Artery (RCA)"
+      },
+      "right_ventricular": {
+        "leads": ["V3R", "V4R", "V5R", "V6R"],
+        "primary_lead": "V4R",
+        "min_contiguous_leads": 1,
+        "artery": "Proximal RCA"
+      }
+    }
+  },
+  "st_and_ischemia_criteria": {
+    "stemi_j_point_elevation_mm": {
+      "default_all_other_leads": 1.0,
+      "v2_v3_male_under_40": 2.5,
+      "v2_v3_male_40_and_over": 2.0,
+      "v2_v3_female_any_age": 1.5,
+      "v2_v3_unknown_demographics": 2.0,
+      "posterior_v7_v9": 0.5,
+      "rv_v4r": 1.0,
+      "age_cutoff_male_v2_v3": 40
+    },
+    "nstemi_ischemia_st_depression_mm": -0.5,
+    "significant_st_depression_mm": -1.0,
+    "posterior_mi_v1_v3_st_depression_mm": -0.5,
+    "lmca_avr_ste_min_mm": 1.0,
+    "lmca_diffuse_std_min_leads": 6,
+    "sgarbossa_lbbb_or_paced": {
+      "concordant_ste_mm": 1.0,
+      "concordant_ste_points": 5,
+      "concordant_std_v1_v3_mm": -1.0,
+      "concordant_std_v1_v3_points": 3,
+      "discordant_ste_mm": 5.0,
+      "discordant_ste_points": 2,
+      "modified_smith_st_s_ratio": 0.25,
+      "diagnostic_score_min": 3
+    },
+    "wellens_syndrome": {
+      "target_leads": ["V2", "V3", "V4"],
+      "deep_twi_mm": -2.0
+    },
+    "pathologic_q_wave": {
+      "duration_min_ms": 40,
+      "v2_v3_duration_min_ms": 20,
+      "depth_pct_of_r_min": 25.0
+    }
+  },
+  "hypertrophy_and_voltage_criteria": {
+    "lvh": {
+      "sokolow_lyon_sv1_plus_rv5_or_rv6_mm": 35.0,
+      "r_avl_min_mm": 11.0,
+      "cornell_male_ravl_plus_sv3_mm": 28.0,
+      "cornell_female_ravl_plus_sv3_mm": 20.0
+    },
+    "rvh": {
+      "v1_r_to_s_ratio_min": 1.0,
+      "v1_r_amplitude_min_mm": 7.0,
+      "v5_or_v6_s_amplitude_min_mm": 7.0,
+      "rad_min_degrees": 110
+    },
+    "low_voltage": {
+      "limb_leads_max_qrs_mm": 5.0,
+      "precordial_leads_max_qrs_mm": 10.0
+    }
+  },
+  "arrhythmia_and_conduction_criteria": {
+    "af": {
+      "irregular_rr": true,
+      "absent_discrete_p_waves": true,
+      "f_wave_rate_min_bpm": 350,
+      "f_wave_rate_max_bpm": 600,
+      "rvr_min_bpm": 100,
+      "slow_vr_max_bpm": 60,
+      "preexcited_af_shortest_rr_ms": 250
+    },
+    "atrial_flutter": {
+      "flutter_wave_rate_min_bpm": 240,
+      "flutter_wave_rate_max_bpm": 350,
+      "classic_2_to_1_ventricular_rate_min": 135,
+      "classic_2_to_1_ventricular_rate_max": 165
+    },
+    "mat": {
+      "min_rate_bpm": 100,
+      "min_distinct_p_morphologies": 3
+    },
+    "svt": {
+      "min_rate_bpm": 140,
+      "max_qrs_ms": 119,
+      "avnrt_short_rp_max_ms": 100
+    },
+    "wct_vt_criteria": {
+      "min_rate_bpm": 100,
+      "min_qrs_ms": 120,
+      "brugada_rs_interval_ms": 100,
+      "vereckei_avr_initial_rq_ms": 40,
+      "vereckei_vi_vt_ratio_max": 1.0
+    },
+    "brugada": {
+      "type1_coved_ste_min_mm": 2.0,
+      "type2_saddleback_ste_min_mm": 2.0,
+      "right_precordial_leads": ["V1", "V2"]
+    },
+    "pericarditis": {
+      "min_diffuse_ste_leads": 4,
+      "st_t_ratio_v6_min": 0.25,
+      "pr_depression_mm": -0.5
+    },
+    "hyperkalemia": {
+      "peaked_t_wave_amplitude_precordial_mm": 10.0,
+      "peaked_t_wave_amplitude_limb_mm": 5.0,
+      "severe_qrs_widening_ms": 120
+    },
+    "hypokalemia": {
+      "prominent_u_wave_mm": 1.5
+    },
+    "tca_toxicity": {
+      "qrs_min_ms": 100,
+      "avr_terminal_r_min_mm": 3.0,
+      "avr_r_to_s_ratio_min": 0.7
+    }
+  },
+  "urgency_levels": {
+    "CRITICAL": {
+      "priority": 1,
+      "label_en": "CRITICAL / LIFE-THREATENING",
+      "label_ar": "حالة حرجة جداً — تدخل فوري (طوارئ)"
+    },
+    "URGENT": {
+      "priority": 2,
+      "label_en": "URGENT / HIGH-RISK",
+      "label_ar": "حالة عاجلة — تقييم وتدخل سريع"
+    },
+    "ABNORMAL": {
+      "priority": 3,
+      "label_en": "ABNORMAL / CLINICALLY SIGNIFICANT",
+      "label_ar": "غير طبيعي — يحتاج متابعة وتقييم إكلينيكي"
+    },
+    "NORMAL": {
+      "priority": 4,
+      "label_en": "NORMAL",
+      "label_ar": "طبيعي"
+    }
+  },
+  "conditions_knowledge_base": {
+    "STEMI": {
+      "urgency": "CRITICAL",
+      "name_en": "ST-Elevation Myocardial Infarction (STEMI)",
+      "name_ar": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)",
+      "explanation_ar": "ارتفاع وصلة ST في ليدين متجاورين أو أكثر (حسب حدود السن والجنس في V2-V3) يشير إلى انسداد كامل حاد في شريان تاجي رئيسي مع إصابة عابرة لجدار عضلة القلب (Transmural Injury). وجود انخفاض عكسي (Reciprocal ST depression) في الليدات المقابلة يؤكد التشخيص بدرجة عالية جداً.",
+      "explanation_en": "J-point ST-segment elevation meeting age/sex thresholds in >=2 contiguous leads indicates acute transmural myocardial injury from complete coronary artery occlusion. Reciprocal ST depression strongly increases specificity.",
+      "immediate_action_ar": "تفعيل مسار القسطرة القلبية العاجلة (Primary PCI) فوراً (أو مذيب الجلطة إذا لم تتوفر قسطرة خلال 120 دقيقة)، إعطاء أسبرين + مضاد صفائح ثاني + هيبارين، ومراقبة مستمرة على المونيتور وجهاز الصدمات. في جلطة الجدار السفلي (Inferior) افحص V4R وتجنب النيترات إذا كان هناك إصابة بالبطين الأيمن.",
+      "immediate_action_en": "Activate cath lab for immediate Primary PCI (or fibrinolysis if PCI >120 min), dual antiplatelet therapy, anticoagulation, continuous telemetry. For inferior STEMI, obtain V4R and avoid nitrates if RV infarction is present."
+    },
+    "POSTERIOR_STEMI": {
+      "urgency": "CRITICAL",
+      "name_en": "Acute Posterior Myocardial Infarction (STEMI Equivalent)",
+      "name_ar": "جلطة الجدار الخلفي للقلب (معادل لـ STEMI)",
+      "explanation_ar": "انخفاض وصلة ST الأفقي في V1-V3 (مع موجة R طويلة أو موجة T موجبة) يمثل صورة مرآة لارتفاع ST في الجدار الخلفي للبطين الأيسر. يتم تأكيدها برسم الليدات الخلفية V7-V9 (ارتفاع >= 0.5 مم).",
+      "explanation_en": "Horizontal ST depression in V1-V3 (often with tall R waves and upright T waves) is the mirror image of posterior wall ST elevation; confirm with posterior leads V7-V9 (>=0.5 mm STE).",
+      "immediate_action_ar": "يُعامل كـ STEMI تماماً: قسطرة قلبية عاجلة (Primary PCI) مع تأكيد فوري بليدات V7-V9 دون تأخير العلاج.",
+      "immediate_action_en": "Treat as a STEMI equivalent requiring emergent reperfusion (Primary PCI); confirm with V7-V9 leads without delaying care."
+    },
+    "RV_STEMI": {
+      "urgency": "CRITICAL",
+      "name_en": "Right Ventricular Myocardial Infarction",
+      "name_ar": "جلطة البطين الأيمن (مصاحبة لجلطة الجدار السفلي)",
+      "explanation_ar": "ارتفاع وصلة ST >= 1 مم في V4R (أو V1 مع جلطة الجدار السفلي) يشير إلى انسداد الشريان التاجي الأيمن القريب (Proximal RCA) وإصابة البطين الأيمن.",
+      "explanation_en": "ST elevation >=1 mm in right precordial lead V4R alongside inferior STEMI indicates proximal RCA occlusion with RV infarction.",
+      "immediate_action_ar": "ممنوع إعطاء النيترات (Nitroglycerin) أو مدرات البول لأنها تسبب هبوطاً حاداً في الضغط (Preload-dependent). أعطِ سوائل وريدية بحذر وفعل القسطرة العاجلة.",
+      "immediate_action_en": "Strictly avoid nitrates and diuretics (preload-dependent shock risk); administer cautious IV fluid boluses and expedite Primary PCI."
+    },
+    "LMCA_OCCLUSION": {
+      "urgency": "CRITICAL",
+      "name_en": "Suspected Left Main Coronary Artery (LMCA) / 3-Vessel Critical Ischemia",
+      "name_ar": "اشتباه انسداد الشريان التاجي الأيسر الرئيسي (LMCA) أو نقص تروية حاد لثلاثة شرايين",
+      "explanation_ar": "انخفاض منتشر في وصلة ST في 6 ليدات أو أكثر مصحوب بارتفاع ST >= 1 مم في aVR (خاصة لو aVR >= V1) علامة خطيرة جداً لنقص تروية شامل تحت الشغاف بسبب تضيق حرج في LMCA أو انسداد ثلاثي.",
+      "explanation_en": "Diffuse ST depression (>=6 leads) combined with ST elevation >=1 mm in aVR (especially aVR >= V1) signifies severe subendocardial ischemia from LMCA stenosis, proximal LAD, or severe 3-vessel disease.",
+      "immediate_action_ar": "استشارة قلب وقسطرة طارئة فوراً، مراقبة حثيثة للصدمة القلبية، وتأجيل إعطاء مثبطات P2Y12 القوية أحياناً إذا كان المريض مرشحاً لجراحة CABG طارئة حسب بروتوكول القلب.",
+      "immediate_action_en": "Urgent cardiology/cath lab activation for emergent angiography; prepare for hemodynamic instability or urgent surgical revascularization (CABG)."
+    },
+    "SGARBOSSA_POSITIVE": {
+      "urgency": "CRITICAL",
+      "name_en": "Acute MI in LBBB / Paced Rhythm (Sgarbossa Positive)",
+      "name_ar": "جلطة قلبية حادة في وجود LBBB أو منظم ضربات (معيار Sgarbossa إيجابي)",
+      "explanation_ar": "رغم وجود LBBB أو إيقاع منظم ضربات يغير شكل وصلة ST، فإن وجود ارتفاع ST متوافق (Concordant >= 1 مم = 5 نقاط) أو انخفاض ST متوافق في V1-V3 (= 3 نقاط) أو ارتفاع غير متوافق شديد >= 5 مم (أو نسبة ST/S >= 0.25 حسب Smith) يثبت وجود جلطة حادة.",
+      "explanation_en": "Sgarbossa score >=3 (concordant STE >=1 mm = 5 pts; concordant STD >=1 mm in V1-V3 = 3 pts; discordant STE >=5 mm = 2 pts) or Modified Smith ratio <= -0.25 diagnoses acute MI despite LBBB or RV pacing.",
+      "immediate_action_ar": "التعامل كحالة STEMI وتفعيل القسطرة القلبية العاجلة فوراً.",
+      "immediate_action_en": "Manage identically to STEMI with immediate cath lab activation."
+    },
+    "WELLENS_SYNDROME": {
+      "urgency": "URGENT",
+      "name_en": "Wellens' Syndrome (Critical Proximal LAD Stenosis)",
+      "name_ar": "متلازمة ويلينز (تضيق حرج جداً في الشريان الأمامي النازل LAD)",
+      "explanation_ar": "انقلاب عميق متماثل في موجة T (النوع B) أو موجة T ثنائية الطور (النوع A) في V2-V3 (وغالباً V4) حتى لو اختفى ألم الصدر حالياً، ينذر بجلطة أمامية واسعة وشيكة خلال أيام أو ساعات.",
+      "explanation_en": "Biphasic (Type A) or deeply inverted symmetric T waves (Type B) in V2-V3/V4 indicate critical proximal LAD stenosis with high risk of imminent extensive anterior MI.",
+      "immediate_action_ar": "حجز عاجل بالعناية القلبية، علاج ACS كامل، وقسطرة قلبية مبكرة. ممنوع تماماً إجراء رسم قلب بالمجهود (Stress Test) لأنه قد يسبب توقفاً قلبياً.",
+      "immediate_action_en": "Admit for urgent coronary angiography and ACS medical therapy. Strictly contraindicate exercise stress testing due to risk of acute MI/sudden death."
+    },
+    "NSTEMI_ISCHEMIA": {
+      "urgency": "URGENT",
+      "name_en": "Myocardial Ischemia / Possible NSTEMI",
+      "name_ar": "نقص تروية عضلة القلب / اشتباه NSTEMI",
+      "explanation_ar": "انخفاض أفقي أو هابط في وصلة ST (>= 0.5–1 مم) أو انقلاب عميق في موجة T في ليدين متجاورين يشير إلى نقص تروية تحت الشغاف أو جلطة بدون ارتفاع ST.",
+      "explanation_en": "Horizontal/downsloping ST depression (>=0.5-1.0 mm) or ischemic T-wave inversions in contiguous leads indicate subendocardial ischemia or NSTEMI.",
+      "immediate_action_ar": "قياس التروبونين المتسلسل (Serial Troponin)، إعادة رسم القلب كل 15–30 دقيقة، بدء بروتوكول ACS وتقييم درجة الخطورة (TIMI/GRACE).",
+      "immediate_action_en": "Obtain serial high-sensitivity troponins, repeat ECGs, initiate ACS therapy, and risk-stratify for early invasive strategy."
+    },
+    "VF_OR_ASYSTOLE": {
+      "urgency": "CRITICAL",
+      "name_en": "Ventricular Fibrillation / Cardiac Arrest Rhythm",
+      "name_ar": "رجفان بطيني / توقف قلبي (حالة إنعاش فوري)",
+      "explanation_ar": "نشاط كهربائي فوضوي تماماً بدون مركبات QRS مميزة (VF) أو خط مستقيم بدون نشاط كهربائي (Asystole) يعني توقف ضخ الدم تماماً.",
+      "explanation_en": "Chaotic electrical activity without identifiable QRS complexes (VF) or absent electrical activity (asystole) represents cardiac arrest.",
+      "immediate_action_ar": "بدء الإنعاش القلبي الرئوي (CPR) فوراً، وصدمة كهربائية غير متزامنة (Defibrillation) فورية في حالة VF، واتباع بروتوكول ACLS.",
+      "immediate_action_en": "Immediate high-quality CPR, immediate unsynchronized defibrillation for VF/pVT, and ACLS resuscitation protocol."
+    },
+    "TORSADES_DE_POINTES": {
+      "urgency": "CRITICAL",
+      "name_en": "Torsades de Pointes (Polymorphic VT with Long QT)",
+      "name_ar": "تسارع بطيني متعدد الأشكال (Torsades de Pointes)",
+      "explanation_ar": "تسارع بطيني سريع تتغير فيه محاور وسعة مركبات QRS وتلتف حول خط الأساس في وجود إطالة سابقة في QTc (>500 ms)، وقد يتحول بسرعة إلى رجفان بطيني.",
+      "explanation_en": "Polymorphic ventricular tachycardia twisting around the isoelectric baseline in the setting of QT prolongation; high risk of degeneration into VF.",
+      "immediate_action_ar": "إذا كان المريض غير مستقر: صدمة كهربائية غير متزامنة فوراً. أعطِ كبريتات المغنيسيوم الوريدية (IV Magnesium Sulfate 2g)، صحح البوتاسيوم، وأوقف الأدوية المطيلة للـ QT.",
+      "immediate_action_en": "Immediate defibrillation if unstable; IV Magnesium Sulfate 2 g bolus, correct hypokalemia, and stop QT-prolonging drugs."
+    },
+    "VENTRICULAR_TACHYCARDIA": {
+      "urgency": "CRITICAL",
+      "name_en": "Wide-Complex Tachycardia — Ventricular Tachycardia (VT) Until Proven Otherwise",
+      "name_ar": "تسارع قلب بمركب QRS عريض — تسارع بطيني (VT) حتى يثبت العكس",
+      "explanation_ar": "أي تسارع منتظم بـ QRS >= 120 ms ومعدل >= 100/دقيقة يُعامل كـ VT (تمثل >80% من الحالات). وجود انفصال أذيني بطيني (AV dissociation) أو ضربات التقاط/دمج (Capture/Fusion beats) أو توافق الصدرية (Concordance) أو معايير Brugada/Vereckei يؤكد VT.",
+      "explanation_en": "Regular wide-complex tachycardia (QRS >=120 ms, HR >=100 bpm) is VT until proven otherwise. AV dissociation, capture/fusion beats, precordial concordance, NW axis, or positive Brugada/Vereckei criteria confirm VT.",
+      "immediate_action_ar": "تقييم الاستقرار الهيموديناميكي فوراً: لو غير مستقر -> صدمة متزامنة (Synchronized Cardioversion) فوراً. لو مستقر -> أميودارون أو بروكيناميد وريدي. ممنوع إعطاء فيراباميل أو أدينوزين في غير المنتظم.",
+      "immediate_action_en": "Assess stability immediately: unstable -> synchronized cardioversion (or defibrillation if pulseless). Stable -> IV amiodarone or procainamide. Avoid AV nodal blockers like verapamil."
+    },
+    "PREEXCITED_AF": {
+      "urgency": "CRITICAL",
+      "name_en": "Pre-excited Atrial Fibrillation (AF with WPW)",
+      "name_ar": "رجفان أذيني مع مسار إضافي (Pre-excited AF / WPW) — خطر شديد",
+      "explanation_ar": "رجفان أذيني غير منتظم بمركبات QRS عريضة ومتغيرة الشكل وسرعة بطينية عالية جداً (أقصر مسافة RR < 250 ms) بسبب التوصيل السريع عبر المسار الإضافي، مما قد يتحول فجأة إلى VF.",
+      "explanation_en": "Irregularly irregular wide-complex tachycardia with varying QRS morphology and very rapid ventricular rate (shortest RR <250 ms) conducting down an accessory pathway.",
+      "immediate_action_ar": "صدمة كهربائية متزامنة فورية إذا كان غير مستقر (أو Procainamide / Ibutilide إذا مستقر). ممنوع منعاً باتاً إعطاء (Adenosine, Digoxin, Beta-blockers, Verapamil, Diltiazem, Amiodarone) لأنها تغلق العقدة AV وتدفع التيار للمسار الإضافي وتسبب VF!",
+      "immediate_action_en": "Immediate synchronized cardioversion if unstable (or IV procainamide if stable). STRICTLY AVOID AV nodal blockers (adenosine, digoxin, beta-blockers, CCBs, amiodarone) which can precipitate VF."
+    },
+    "COMPLETE_HEART_BLOCK": {
+      "urgency": "CRITICAL",
+      "name_en": "Third-Degree (Complete) AV Block",
+      "name_ar": "إحصار أذيني بطيني كامل (الدرجة الثالثة)",
+      "explanation_ar": "انقطاع تام للتوصيل بين الأذينين والبطينين (AV Dissociation) حيث ينبض الأذين بسرعة أعلى ومنتظمة (موجات P منتظمة) وينبض البطين بإيقاع هروبي بطيء ومنتظم مستقل تماماً بدون علاقة ثابتة بين P و QRS.",
+      "explanation_en": "Complete failure of atrial impulses to reach the ventricles resulting in AV dissociation: regular P waves at a faster atrial rate independent of a slower regular junctional or ventricular escape rhythm.",
+      "immediate_action_ar": "تجهيز منظم ضربات خارجي فوري (Transcutaneous Pacing) ومنظم مؤقت (Transvenous) تمهيداً لتركيب منظم دائم. الأتروبين غالباً غير فعال إذا كان الهروب بطينياً عريضاً.",
+      "immediate_action_en": "Prepare immediate transcutaneous pacing and arrange transvenous/permanent pacemaker. Atropine is rarely effective for wide-complex infranodal escape rhythms."
+    },
+    "MOBITZ_II_AV_BLOCK": {
+      "urgency": "URGENT",
+      "name_en": "Second-Degree AV Block — Mobitz Type II",
+      "name_ar": "إحصار أذيني بطيني من الدرجة الثانية — نوع موبيتز 2",
+      "explanation_ar": "مسافات PR ثابتة تماماً للنبضات الموصّلة مع سقوط مفاجئ غير متوقع لمركب QRS بعد موجة P (غالباً مع QRS عريض)، مما يدل على خلل تحت العقدة (Infranodal / His-Purkinje) وعرضة عالية للتحول المفاجئ لإحصار كامل.",
+      "explanation_en": "Constant PR intervals before and after intermittent non-conducted P waves. Indicates infranodal His-Purkinje disease with high risk of abrupt progression to complete heart block.",
+      "immediate_action_ar": "مراقبة مستمرة، تجهيز لصقات المنظم الخارجي، واستشارة عاجلة لتركيب منظم ضربات دائم.",
+      "immediate_action_en": "Continuous telemetry, transcutaneous pacing pads ready, and urgent cardiology consult for permanent pacemaker."
+    },
+    "HIGH_GRADE_OR_2_TO_1_AV_BLOCK": {
+      "urgency": "URGENT",
+      "name_en": "2:1 or High-Grade Second-Degree AV Block",
+      "name_ar": "إحصار أذيني بطيني 2:1 أو عالي الدرجة",
+      "explanation_ar": "كل ثاني موجة P لا توصل للبطين (2:1) أو سقوط موجتين P متتاليتين أو أكثر (High-grade). إذا كان QRS عريضاً فاحتمال أن يكون الخلل تحت العقدة (مثل موبيتز 2) مرتفع جداً.",
+      "explanation_en": "Every second P wave is dropped (2:1) or >=2 consecutive P waves fail to conduct (high-grade). Wide QRS strongly favors dangerous infranodal block.",
+      "immediate_action_ar": "تقييم الأعراض، مراقبة بالمنظم الخارجي الجاهز، وعرض عاجل على طبيب القلب.",
+      "immediate_action_en": "Assess hemodynamic stability, keep pacing ready, and obtain urgent cardiology evaluation."
+    },
+    "MOBITZ_I_AV_BLOCK": {
+      "urgency": "ABNORMAL",
+      "name_en": "Second-Degree AV Block — Mobitz Type I (Wenckebach)",
+      "name_ar": "إحصار أذيني بطيني من الدرجة الثانية — نوع موبيتز 1 (وينكباخ)",
+      "explanation_ar": "إطالة تدريجية في مسافة PR من نبضة لأخرى حتى تسقط موجة P بدون QRS، ثم تبدأ الدورة بمسافة PR أقصر (غالباً الخلل في العقدة AV نفسها وحميد نسبياً).",
+      "explanation_en": "Progressive PR prolongation until a P wave fails to conduct, followed by a reset shorter PR interval (typically benign AV nodal block).",
+      "immediate_action_ar": "مراجعة الأدوية المبطئة للعقدة AV (حاصرات بيتا، ديجوكسين، فيراباميل)؛ إذا كان المريض بدون أعراض يكفي المتابعة، ومع الأعراض يعطى أتروبين.",
+      "immediate_action_en": "Review AV nodal blocking medications; observe if asymptomatic, give atropine if symptomatic bradycardia."
+    },
+    "FIRST_DEGREE_AV_BLOCK": {
+      "urgency": "ABNORMAL",
+      "name_en": "First-Degree AV Block",
+      "name_ar": "إحصار أذيني بطيني من الدرجة الأولى",
+      "explanation_ar": "إطالة ثابتة في مسافة PR لتتجاوز 200 ms مع توصيل جميع موجات P بنسبة 1:1.",
+      "explanation_en": "Consistent PR interval >200 ms with 1:1 AV conduction.",
+      "immediate_action_ar": "غالباً لا يحتاج تدخلاً عاجلاً؛ راجع الأدوية المبطئة للتوصيل والأملاح، وتابع إذا كانت المسافة >300 ms أو مصحوبة بإحصار حزمي.",
+      "immediate_action_en": "Usually benign; review nodal-blocking drugs and electrolytes. Monitor closely if PR >300 ms or accompanied by bifascicular block."
+    },
+    "ATRIAL_FIBRILLATION": {
+      "urgency": "ABNORMAL",
+      "name_en": "Atrial Fibrillation (AF)",
+      "name_ar": "رجفان أذيني (Atrial Fibrillation)",
+      "explanation_ar": "إيقاع غير منتظم بشكل فوضوي (Irregularly irregular) مع غياب موجات P واضحة وظهور موجات رجفان دقيقة (f-waves) بمعدل 350–600/دقيقة.",
+      "explanation_en": "Irregularly irregular rhythm with absent discrete P waves and fibrillatory baseline undulations (350-600/min).",
+      "immediate_action_ar": "تقييم الاستقرار (صدمة كهربائية لو غير مستقر)، التحكم في معدل النبض (Rate control) أو النظم (Rhythm control)، وحساب CHA2DS2-VASc لتقييم مضادات التجلط.",
+      "immediate_action_en": "Assess hemodynamic stability, manage rate vs rhythm control, evaluate reversible triggers (thyroid, sepsis, electrolytes), and assess anticoagulation via CHA2DS2-VASc."
+    },
+    "ATRIAL_FIBRILLATION_RVR": {
+      "urgency": "URGENT",
+      "name_en": "Atrial Fibrillation with Rapid Ventricular Response (AF with RVR)",
+      "name_ar": "رجفان أذيني مع استجابة بطينية سريعة (AF with RVR)",
+      "explanation_ar": "رجفان أذيني بمعدل بطيني سريع (>100–150/دقيقة)، قد يؤدي لهبوط ضغط أو فشل قلب أو نقص تروية ثانوي.",
+      "explanation_en": "Atrial fibrillation with rapid ventricular rate (>100 bpm), risking hemodynamic compromise or demand ischemia.",
+      "immediate_action_ar": "تقييم العلامات الحيوية: صدمة كهربائية متزامنة لو غير مستقر. لو مستقر: التحكم بالسرعة بحاصرات بيتا أو ديلتيازيم (مع مراعاة كفاءة عضلة القلب) وعلاج السبب الثانوي.",
+      "immediate_action_en": "Cardiovert if unstable; otherwise rate control (IV beta-blocker or diltiazem if preserved EF) and treat underlying triggers."
+    },
+    "ATRIAL_FLUTTER": {
+      "urgency": "URGENT",
+      "name_en": "Atrial Flutter",
+      "name_ar": "رفرفة أذينية (Atrial Flutter)",
+      "explanation_ar": "موجات رفرفة منتظمة تشبه أسنان المنشار (Sawtooth F-waves) في الليدات السفلية II, III, aVF بمعدل أذيني ~300/دقيقة مع توصيل ثابت (غالباً 2:1 بمعدل بطيني ~150/دقيقة) أو متغير.",
+      "explanation_en": "Regular sawtooth atrial flutter waves (~240-350/min, typically 300/min) best seen in inferior leads, with fixed (classic 2:1 -> ~150 bpm) or variable AV conduction.",
+      "immediate_action_ar": "التحكم في معدل النبض وتقييم مضادات التجلط مثل الرجفان الأذيني، والتفكير في تقويم النظم الكهربائي أو الدوائي.",
+      "immediate_action_en": "Rate/rhythm control and identical anticoagulation assessment as AF; synchronized cardioversion if unstable."
+    },
+    "SVT_NARROW": {
+      "urgency": "URGENT",
+      "name_en": "Supraventricular Tachycardia (PSVT — AVNRT / AVRT / AT)",
+      "name_ar": "تسارع فوق بطيني منتظم (SVT)",
+      "explanation_ar": "تسارع منتظم بمركب QRS ضيق (<120 ms) ومعدل سريع (غالباً 140–250/دقيقة). في AVNRT تكون موجات P مخفية داخل QRS أو تظهر كـ pseudo-R' في V1 أو pseudo-S في II, III, aVF.",
+      "explanation_en": "Regular narrow-complex tachycardia (typically 140-250 bpm). AVNRT exhibits short RP (<100 ms) with hidden P waves or pseudo-R'/pseudo-S; AVRT/AT show longer RP intervals.",
+      "immediate_action_ar": "لو غير مستقر -> صدمة متزامنة فوراً. لو مستقر -> مناورات العصب الحائر (Modified Valsalva)، ثم Adenosine وريدي سريع (6 ملجم ثم 12 ملجم) مع تسجيل مستمر للرسم.",
+      "immediate_action_en": "Synchronized cardioversion if unstable; if stable, modified Valsalva maneuver followed by rapid IV adenosine (6 mg, then 12 mg) with continuous rhythm strip."
+    },
+    "MAT": {
+      "urgency": "ABNORMAL",
+      "name_en": "Multifocal Atrial Tachycardia (MAT)",
+      "name_ar": "تسارع أذيني متعدد البؤر (MAT)",
+      "explanation_ar": "تسارع غير منتظم (>100/دقيقة) مع وجود 3 أشكال مختلفة أو أكثر لموجة P ومسافات PR متغيرة، ويشيع بشدة في مرضى COPD ونقص الأكسجين والمغنيسيوم.",
+      "explanation_en": "Irregular tachycardia (>100 bpm) with >=3 distinct P-wave morphologies and varying PR/PP intervals; strongly associated with COPD and hypoxia.",
+      "immediate_action_ar": "علاج السبب الأساسي (الأكسجين، موسعات الشعب، تصحيح البوتاسيوم والمغنيسيوم). تجنب الصدمة الكهربائية وحاصرات بيتا غير الانتقائية في مرضى الربو/COPD الحاد.",
+      "immediate_action_en": "Treat underlying pulmonary disease, hypoxia, and electrolyte deficits (K+, Mg2+); cardioversion is ineffective."
+    },
+    "WPW_PATTERN": {
+      "urgency": "ABNORMAL",
+      "name_en": "Wolff-Parkinson-White (WPW) Pre-excitation Pattern",
+      "name_ar": "نمط وولف-باركنسون-وايت (التنبيه المبكر WPW)",
+      "explanation_ar": "قِصر مسافة PR (<120 ms) مع اتساع QRS (>=120 ms) وظهور موجة دلتا (Delta wave) في بداية صعود QRS بسبب وجود مسار توصيل إضافي (Bundle of Kent).",
+      "explanation_en": "Short PR (<120 ms), widened QRS (>=120 ms), and slurred QRS upstroke (delta wave) caused by ventricular pre-excitation via an accessory pathway.",
+      "immediate_action_ar": "تقييم وجود تاريخ لخفقان أو إغماء وإحالة لطبيب كهرباء القلب (EP) لدراسة الكي بالقسطرة. توثيق التحذير من حاصرات العقدة AV إذا حدث رجفان أذيني.",
+      "immediate_action_en": "Refer to electrophysiology for risk stratification/ablation if symptomatic; warn against AV nodal blockers during AF."
+    },
+    "LONG_QT_CRITICAL": {
+      "urgency": "CRITICAL",
+      "name_en": "Markedly Prolonged QTc (>500 ms) — High Torsades de Pointes Risk",
+      "name_ar": "إطالة شديدة في QTc (>500 ms) — خطر مرتفع جداً لـ Torsades de Pointes",
+      "explanation_ar": "إطالة QTc لتتجاوز 500 ms تضاعف خطر حدوث التسارع البطيني متعدد الأشكال (Torsades de Pointes) والموت القلبي المفاجئ.",
+      "explanation_en": "QTc >500 ms carries a markedly elevated risk of Torsades de Pointes and sudden cardiac arrest.",
+      "immediate_action_ar": "مراقبة مستمرة على المونيتور، إيقاف جميع الأدوية المطيلة للـ QT فوراً، وتصحيح البوتاسيوم (>4.0) والمغنيسيوم (>2.0) والكالسيوم فوراً.",
+      "immediate_action_en": "Continuous telemetry, immediately discontinue QT-prolonging medications, and aggressively replete K+, Mg2+, and Ca2+."
+    },
+    "LONG_QT": {
+      "urgency": "URGENT",
+      "name_en": "Prolonged QTc Interval",
+      "name_ar": "إطالة في مسافة QTc",
+      "explanation_ar": "مسافة QTc أطول من الحد الطبيعي حسب الجنس (>440–450 ms للرجال، >460 ms للنساء). قد تكون خلقية أو مكتسبة بسبب الأدوية أو نقص البوتاسيوم/المغنيسيوم/الكالسيوم.",
+      "explanation_en": "QTc exceeds sex-specific normal upper limits (>440-450 ms men, >460 ms women) due to congenital LQTS, medications, ischemia, or electrolyte deficits.",
+      "immediate_action_ar": "مراجعة قائمة الأدوية وفحص الأملاح (K, Mg, Ca) ومتابعة رسم القلب.",
+      "immediate_action_en": "Review medications, check serum K+, Mg2+, Ca2+, and obtain serial ECGs."
+    },
+    "SHORT_QT": {
+      "urgency": "URGENT",
+      "name_en": "Short QTc Interval",
+      "name_ar": "قِصر في مسافة QTc",
+      "explanation_ar": "مسافة QTc قصيرة (<350 ms، وحرجة <330 ms)، قد تشير لفرط الكالسيوم أو تأثير الديجوكسين أو متلازمة Short QT الخلقية المعرضة للرجفان البطيني.",
+      "explanation_en": "Shortened QTc (<350 ms) associated with hypercalcemia, digoxin effect, or congenital Short QT syndrome (risk of AF/VF).",
+      "immediate_action_ar": "فحص مستوى الكالسيوم في الدم، ومراجعة تاريخ الإغماء أو الموت المفاجئ بالعائلة وإحالة للقلب.",
+      "immediate_action_en": "Check serum calcium and evaluate family history of sudden cardiac death."
+    },
+    "BRUGADA_TYPE_1": {
+      "urgency": "URGENT",
+      "name_en": "Brugada Pattern — Type 1 (Coved ST Elevation)",
+      "name_ar": "نمط بروجادا النوع الأول (Brugada Type 1) — خطر موت قلبي مفاجئ",
+      "explanation_ar": "ارتفاع مقوس (Coved) في وصلة ST >= 2 مم يتبعه انقلاب موجة T في V1 و/أو V2. هذا هو النمط التشخيصي لمتلازمة بروجادا المرتبطة بتوقف القلب المفاجئ أثناء النوم أو الحمى.",
+      "explanation_en": "Coved-type ST elevation >=2 mm followed by a negative T wave in >=1 right precordial lead (V1-V2); diagnostic of Brugada syndrome with risk of polymorphic VT/VF.",
+      "immediate_action_ar": "إحالة عاجلة لكهرباء القلب (تقييم زرع ICD لو مصحوب بإغماء/توقف قلب)، علاج أي حمى فوراً بمخفضات الحرارة، وتجنب أدوية BrugadaDrugs.org.",
+      "immediate_action_en": "Urgent electrophysiology consult (ICD evaluation if syncope/arrest), aggressive fever control, and strict avoidance of sodium-channel blockers."
+    },
+    "BRUGADA_TYPE_2": {
+      "urgency": "ABNORMAL",
+      "name_en": "Brugada Pattern — Type 2 (Saddleback)",
+      "name_ar": "نمط بروجادا النوع الثاني (Saddleback)",
+      "explanation_ar": "ارتفاع ST على شكل سرج الحصان (Saddleback) >= 2 مم في V1-V2 مع موجة T موجبة أو ثنائية الطور. غير تشخيصي بمفرده لكنه يستدعي التحقق برفع الليدات الصدرية أو اختبار استفزازي عند الاشتباه.",
+      "explanation_en": "Saddleback ST elevation >=2 mm in V1-V2 with positive/biphasic T wave; non-diagnostic alone but warrants high precordial lead ECG and EP evaluation if symptomatic.",
+      "immediate_action_ar": "إعادة الرسم مع رفع V1-V2 لمسافة ضلعية أعلى (2nd/3rd ICS) وتقييم الأعراض والتاريخ العائلي.",
+      "immediate_action_en": "Repeat ECG with high right precordial leads (2nd/3rd ICS) and assess personal/family syncope history."
+    },
+    "RBBB": {
+      "urgency": "ABNORMAL",
+      "name_en": "Right Bundle Branch Block (RBBB)",
+      "name_ar": "إحصار الحزمة اليمنى (RBBB)",
+      "explanation_ar": "اتساع QRS >= 120 ms مع نمط rSR' في V1-V2 وموجة S عريضة وممسوحة في I و V6 وتغيرات ثانوية متوقعة في ST-T في V1-V3.",
+      "explanation_en": "QRS >=120 ms, rSR' (rabbit-ears) morphology in V1-V2, wide slurred S wave (>40 ms) in I and V6, with secondary ST-T discordance in V1-V3.",
+      "immediate_action_ar": "قارن برسم قلب قديم؛ إذا كان حديثاً مع ألم صدر أو ضيق نفس استبعد جلطة أمامية أو جلطة رئوية (PE).",
+      "immediate_action_en": "Compare with prior ECG; new RBBB with chest pain or dyspnea warrants excluding acute MI or pulmonary embolism."
+    },
+    "LBBB": {
+      "urgency": "ABNORMAL",
+      "name_en": "Left Bundle Branch Block (LBBB)",
+      "name_ar": "إحصار الحزمة اليسرى (LBBB)",
+      "explanation_ar": "اتساع QRS >= 120 ms مع موجة R عريضة ومشقوقة في I, aVL, V5-V6 وغياب موجات Q الحاجزية وموجة QS/rS عميقة في V1 مع عدم توافق ST-T.",
+      "explanation_en": "QRS >=120 ms, broad notched monophasic R in I/aVL/V5-V6, absent septal Q waves, deep QS/rS in V1, and discordant ST-T segments.",
+      "immediate_action_ar": "تحقق من معايير Sgarbossa لو يوجد ألم صدر، وقارن برسم قلب سابق واطلب إيكو لتقييم كفاءة البطين الأيسر.",
+      "immediate_action_en": "Apply Sgarbossa criteria if ischemic symptoms exist; compare to prior ECG and evaluate LV function via echocardiography."
+    },
+    "BIFASCICULAR_BLOCK": {
+      "urgency": "ABNORMAL",
+      "name_en": "Bifascicular Block (RBBB + LAFB/LPFB)",
+      "name_ar": "إحصار ثنائي الحزم (Bifascicular Block)",
+      "explanation_ar": "اجتماع إحصار الحزمة اليمنى (RBBB) مع إحصار الحزمة الأمامية اليسرى (LAFB) أو الخلفية اليسرى (LPFB)، مما يعني اعتماد التوصيل البطيني على حزمة واحدة فقط.",
+      "explanation_en": "Combination of RBBB with either LAFB (marked LAD) or LPFB (RAD), leaving conduction dependent on a single remaining fascicle.",
+      "immediate_action_ar": "تقييم أي تاريخ إغماء (يستدعي تقييم منظم ضربات)، ومراقبة تطور إحصار أذيني بطيني.",
+      "immediate_action_en": "Evaluate for syncope (pacemaker indication) and monitor for progression to high-grade AV block."
+    },
+    "TRIFASCICULAR_BLOCK": {
+      "urgency": "URGENT",
+      "name_en": "Incomplete Trifascicular Block (Bifascicular Block + 1st-Degree AVB)",
+      "name_ar": "إحصار ثلاثي الحزم غير مكتمل (خطر التطور لإحصار كامل)",
+      "explanation_ar": "وجود إحصار ثنائي الحزم (RBBB + LAFB/LPFB) مصحوباً بإطالة PR (إحصار درجة أولى)، مما يشير لتأثر الحزمة الأخيرة المتبقية.",
+      "explanation_en": "Bifascicular block accompanied by 1st-degree AV block, indicating disease involving all three fascicles or AV node.",
+      "immediate_action_ar": "متابعة قلبية قريبة وتقييم فوري إذا وُجد دوار أو إغماء.",
+      "immediate_action_en": "Close cardiology follow-up and urgent evaluation/pacing if syncope or presyncope is present."
+    },
+    "HYPERKALEMIA_SEVERE": {
+      "urgency": "CRITICAL",
+      "name_en": "Severe Hyperkalemia (Wide QRS / Absent P / Sine-Wave)",
+      "name_ar": "ارتفاع شديد وخطير في البوتاسيوم (Hyperkalemia) — خطر توقف قلب فوري",
+      "explanation_ar": "ارتفاع حاد في البوتاسيوم يسبب تسطح أو اختفاء موجة P واتساع QRS (وقد يتحول لموجة جيبية Sine-wave) مما ينذر بتوقف قلب وشيك.",
+      "explanation_en": "Severe hyperkalemia causing P-wave flattening/loss, QRS widening (>=120 ms), or sine-wave morphology with imminent risk of VF/asystole.",
+      "immediate_action_ar": "إعطاء كالسيوم جلوكونات وريدي فوراً (IV Calcium Gluconate) لحماية غشاء القلب، ثم أنسولين + جلوكوز، سالبيوتامول، وتصريف البوتاسيوم/غسيل كلوي عاجل.",
+      "immediate_action_en": "Immediate IV Calcium Gluconate for cardiac membrane stabilization, followed by IV insulin + dextrose, nebulized albuterol, and urgent potassium removal/dialysis."
+    },
+    "HYPERKALEMIA": {
+      "urgency": "URGENT",
+      "name_en": "Hyperkalemia (Peaked Tented T Waves)",
+      "name_ar": "ارتفاع البوتاسيوم في الدم (موجات T حادة ومرتفعة)",
+      "explanation_ar": "موجات T طويلة وضيقة القاعدة وحادة القمة (Tented/Peaked) وهي أول علامة لارتفاع البوتاسيوم (>5.5 mEq/L).",
+      "explanation_en": "Tall, narrow-based, symmetrically peaked T waves representing early hyperkalemia (>5.5 mEq/L).",
+      "immediate_action_ar": "سحب عينة بوتاسيوم ووظائف كلى فوراً، ومراقبة رسم القلب وإعطاء كالسيوم وعلاج خفض البوتاسيوم عند التأكد أو تطور تغيرات QRS.",
+      "immediate_action_en": "Obtain stat serum potassium/renal panel, repeat ECG, and initiate hyperkalemia management promptly."
+    },
+    "HYPOKALEMIA": {
+      "urgency": "URGENT",
+      "name_en": "Hypokalemia (Flattened T, ST Depression, Prominent U Waves)",
+      "name_ar": "انخفاض البوتاسيوم في الدم (موجات U بارزة وتسطح T)",
+      "explanation_ar": "انخفاض البوتاسيوم يسبب تسطح/انقلاب موجة T، انخفاض ST، وظهور موجة U بارزة (>1.5 مم في V2-V4) مما يطيل QU ويزيد خطر Torsades de Pointes.",
+      "explanation_en": "ST depression, flattened/inverted T waves, and prominent U waves (>1.5 mm) increasing risk of ventricular ectopy and Torsades de Pointes.",
+      "immediate_action_ar": "قياس البوتاسيوم والمغنيسيوم وتعويضهما معاً (نقص المغنيسيوم يمنع تصحيح البوتاسيوم).",
+      "immediate_action_en": "Check and replete both serum potassium and magnesium."
+    },
+    "HYPOTHERMIA_OSBORN": {
+      "urgency": "URGENT",
+      "name_en": "Hypothermia (Osborn / J Waves)",
+      "name_ar": "انخفاض حرارة الجسم (موجات أوزبورن Osborn / J waves)",
+      "explanation_ar": "ظهور انحناء إيجابي مميز عند نقطة J (موجة Osborn) مصحوباً ببطء قلب وإطالة PR/QRS/QT، ويزداد ارتفاع الموجة كلما انخفضت حرارة الجسم.",
+      "explanation_en": "Characteristic positive deflection at the J-point (Osborn wave) with bradycardia and interval prolongation, proportional to hypothermia severity.",
+      "immediate_action_ar": "التدفئة النشطة للمريض، مراقبة المونيتور (خطر VF عند <30°C)، والتعامل برفق مع المريض.",
+      "immediate_action_en": "Active rewarming, gentle handling, and continuous monitoring for ventricular arrhythmias."
+    },
+    "ACUTE_PERICARDITIS": {
+      "urgency": "URGENT",
+      "name_en": "Acute Pericarditis",
+      "name_ar": "التهاب التامور الحاد (Acute Pericarditis)",
+      "explanation_ar": "ارتفاع مقعر لأعلى (Concave) منتشر في وصلة ST في معظم الليدات بدون انخفاض عكسي (باستثناء aVR/V1)، مع انخفاض مسافة PR (وارتفاع PR في aVR)، ونسبة ST/T في V6 > 0.25.",
+      "explanation_en": "Diffuse concave-upward ST elevation across multiple territories without reciprocal depression (except aVR/V1), PR depression (PR elevation in aVR), and V6 ST/T ratio >0.25.",
+      "immediate_action_ar": "التفريق الدقيق عن STEMI، تقييم وجود انصباب تاموري بالإيكو، وبدء مضادات الالتهاب (NSAIDs + Colchicine) بعد التأكد.",
+      "immediate_action_en": "Differentiate carefully from STEMI, perform bedside echo to rule out tamponade, and treat with NSAIDs + colchicine."
+    },
+    "CARDIAC_TAMPONADE_SUSPECTED": {
+      "urgency": "CRITICAL",
+      "name_en": "Suspected Cardiac Tamponade (Low Voltage + Tachycardia + Electrical Alternans)",
+      "name_ar": "اشتباه اندحاس قلبي (Cardiac Tamponade) — حالة طارئة",
+      "explanation_ar": "ثلاثية انخفاض الفولتية (Low QRS voltage) مع تسارع جيبي وتناوب كهربائي في ارتفاع QRS (Electrical Alternans) تشير بقوة إلى انصباب تاموري ضاغط.",
+      "explanation_en": "Low QRS voltage combined with sinus tachycardia and beat-to-beat electrical alternans strongly suggests pericardial tamponade.",
+      "immediate_action_ar": "إيكو طوارئ فوري (POCUS) وتحضير لبزل التامور العاجل (Pericardiocentesis).",
+      "immediate_action_en": "Immediate bedside echocardiography and emergent pericardiocentesis if hemodynamically compromised."
+    },
+    "PULMONARY_EMBOLISM": {
+      "urgency": "URGENT",
+      "name_en": "Suspected Pulmonary Embolism (Acute RV Strain / S1Q3T3)",
+      "name_ar": "اشتباه جلطة رئوية (علامات إجهاد البطين الأيمن / S1Q3T3)",
+      "explanation_ar": "تسارع جيبي مع نمط S1Q3T3 (موجة S في I، وموجة Q و T مقلوبة في III) و/أو انقلاب T في V1-V4 أو RBBB حديث يشير لإجهاد حاد بالبطين الأيمن.",
+      "explanation_en": "Sinus tachycardia with S1Q3T3 pattern, right precordial T-wave inversions (V1-V4), and/or new RBBB/RAD indicates acute RV pressure overload from pulmonary embolism.",
+      "immediate_action_ar": "تقييم Wells/PERC، أشعة مقطعية بالصبغة للشرايين الرئوية (CTPA) أو إيكو طوارئ، وبدء مضاد التجلط عند ارتفاع الاشتباه.",
+      "immediate_action_en": "Assess pretest probability, perform urgent CTPA (or bedside echo if unstable), and initiate anticoagulation."
+    },
+    "TCA_TOXICITY": {
+      "urgency": "CRITICAL",
+      "name_en": "Suspected Sodium-Channel Blocker / TCA Toxicity",
+      "name_ar": "اشتباه تسمم بحاصرات قنوات الصوديوم / مضادات الاكتئاب ثلاثية الحلقات (TCA)",
+      "explanation_ar": "تسارع جيبي مع اتساع QRS (>=100 ms) وموجة R طرفية عالية في aVR (>=3 مم أو R/S >0.7) وإطالة QTc؛ علامات خطيرة لتسمم TCA المهدد بالتشنجات والـ VT.",
+      "explanation_en": "Sinus tachycardia, QRS >=100 ms, terminal R wave in aVR >=3 mm (R/S >0.7), and prolonged QTc indicate severe sodium-channel blockade (e.g., TCA overdose).",
+      "immediate_action_ar": "إعطاء بيكربونات الصوديوم الوريدية (IV Sodium Bicarbonate) فوراً لتضييق QRS وحماية القلب، مع تقييم السموم ومراقبة العناية المركزة.",
+      "immediate_action_en": "Immediate IV Sodium Bicarbonate boluses/infusion to narrow QRS and prevent seizures/VT; ICU monitoring."
+    },
+    "LVH": {
+      "urgency": "ABNORMAL",
+      "name_en": "Left Ventricular Hypertrophy (LVH)",
+      "name_ar": "تضخم البطين الأيسر (LVH)",
+      "explanation_ar": "تحقق معيار Sokolow-Lyon (S_V1 + R_V5/V6 >= 35 مم) أو معيار Cornell (>28 مم للرجال، >20 مم للنساء) أو R في aVL >= 11 مم، وغالباً يصاحبه نمط إجهاد (Strain) في الليدات الجانبية.",
+      "explanation_en": "Meets Sokolow-Lyon (SV1 + RV5/V6 >=35 mm), Cornell (>28 mm men, >20 mm women), or R aVL >=11 mm criteria, optionally with secondary repolarization (strain) pattern.",
+      "immediate_action_ar": "تقييم ضغط الدم واستبعاد تضيق الصمام الأورطي أو اعتلال عضلة القلب الضخامي (HCM) عبر الإيكو.",
+      "immediate_action_en": "Evaluate hypertension, aortic stenosis, or HCM with echocardiography."
+    },
+    "RVH": {
+      "urgency": "ABNORMAL",
+      "name_en": "Right Ventricular Hypertrophy (RVH)",
+      "name_ar": "تضخم البطين الأيمن (RVH)",
+      "explanation_ar": "موجة R طويلة في V1 (نسبة R/S > 1 أو R >= 7 مم) مع انحراف المحور لليمين (>= +110°) وإجهاد البطين الأيمن في V1-V3.",
+      "explanation_en": "Dominant R wave in V1 (R/S >1 or R >=7 mm) with right axis deviation and right precordial T-wave inversions.",
+      "immediate_action_ar": "تقييم ارتفاع ضغط الشريان الرئوي أو أمراض الرئة المزمنة أو العيوب الخلقية بالإيكو.",
+      "immediate_action_en": "Evaluate for pulmonary hypertension, chronic lung disease, or congenital heart disease via echo."
+    },
+    "PACEMAKER_RHYTHM": {
+      "urgency": "ABNORMAL",
+      "name_en": "Ventricular / Dual-Chamber Paced Rhythm",
+      "name_ar": "إيقاع منظم ضربات القلب (Pacemaker Rhythm)",
+      "explanation_ar": "ظهور شوكات تنبيه كهربائية (Pacing spikes) تسبق موجات P و/أو مركبات QRS (غالباً بشكل LBBB عند التنبيه من البطين الأيمن).",
+      "explanation_en": "Visible pacing spikes preceding atrial and/or ventricular depolarization (typically LBBB-like QRS in RV apical pacing).",
+      "immediate_action_ar": "التأكد من سلامة الالتقاط والاستشعار (Capture & Sensing)، واستخدام معايير Sgarbossa المعدلة لو وُجد اشتباه جلطة قلبية.",
+      "immediate_action_en": "Verify proper capture and sensing; apply Sgarbossa criteria if evaluating for acute ischemia."
+    },
+    "LEAD_REVERSAL_RA_LA": {
+      "urgency": "ABNORMAL",
+      "name_en": "Suspected Limb Lead Reversal (RA-LA Swap)",
+      "name_ar": "اشتباه تبديل أسلاك الأطراف (RA-LA Lead Reversal)",
+      "explanation_ar": "انقلاب عالمي لموجة P و QRS و T في الليد I (مع aVR موجب) بينما يتطور ارتفاع R بشكل طبيعي في الليدات الصدرية V1-V6 (بخلاف Dextrocardia).",
+      "explanation_en": "Negative P and QRS in Lead I (and upright aVR) with normal precordial R-wave progression (V1->V6), indicating RA-LA electrode swap rather than dextrocardia.",
+      "immediate_action_ar": "أعد توصيل أسلاك الأطراف بشكل صحيح وأعد تسجيل رسم القلب قبل اتخاذ أي قرار علاجي.",
+      "immediate_action_en": "Correct electrode placement and repeat the 12-lead ECG before clinical interpretation."
+    },
+    "NORMAL_SINUS_RHYTHM": {
+      "urgency": "NORMAL",
+      "name_en": "Normal Sinus Rhythm (NSR)",
+      "name_ar": "إيقاع جيبي طبيعي (Normal Sinus Rhythm)",
+      "explanation_ar": "إيقاع منتظم بمعدل 60–100 نبضة/دقيقة، موجة P طبيعية تسبق كل QRS (موجبة في II وسالبة في aVR)، ومسافات PR و QRS و QTc ومحور القلب ووصلة ST جميعها ضمن الحدود الطبيعية.",
+      "explanation_en": "Regular sinus rhythm (60-100 bpm) with normal P waves preceding every QRS, normal PR/QRS/QTc intervals, normal electrical axis, and no acute ischemic ST-T changes.",
+      "immediate_action_ar": "لا توجد تغيرات مرضية حادة في رسم القلب الحالي. تذكر دائماً ربط النتيجة بالحالة الإكلينيكية وإعادة الرسم عند استمرار الأعراض.",
+      "immediate_action_en": "No acute ECG abnormalities detected. Always correlate clinically and obtain serial ECGs if chest pain or symptoms persist."
+    }
+  }
+}

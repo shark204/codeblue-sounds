@@ -1,0 +1,4794 @@
+{
+  "metadata": {
+    "total_conditions": 20,
+    "total_numeric_examples": 101,
+    "total_extracted_images": 100,
+    "validation_passed": 101,
+    "validation_failed": 0,
+    "dynamic_json_threshold_test_passed": true
+  },
+  "conditions": {
+    "01_normal_sinus_rhythm": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "NSR_01",
+          "title": "Healthy adult male NSR",
+          "expected_code": "NORMAL_SINUS_RHYTHM",
+          "detected_codes": [
+            "NORMAL_SINUS_RHYTHM"
+          ],
+          "top_urgency": "NORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 28,
+            "sex": "male",
+            "rr_large_boxes": 4.0,
+            "pr_ms": 160,
+            "qrs_ms": 88,
+            "qt_ms": 380,
+            "axis_deg": 45,
+            "rhythm_regular": true,
+            "p_waves_present": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 75.0,
+            "hr_method": "300 / rr_large_boxes",
+            "rr_ms": 800.0,
+            "pr_ms": 160.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 424.9,
+            "qtc_fridericia_ms": 409.3,
+            "qtc_hodges_ms": 406.2,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إيقاع جيبي طبيعي (Normal Sinus Rhythm)"
+        },
+        {
+          "id": "NSR_02",
+          "title": "Healthy adult female NSR",
+          "expected_code": "NORMAL_SINUS_RHYTHM",
+          "detected_codes": [
+            "NORMAL_SINUS_RHYTHM"
+          ],
+          "top_urgency": "NORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 34,
+            "sex": "female",
+            "rr_ms": 820,
+            "pr_ms": 152,
+            "qrs_ms": 82,
+            "qt_ms": 390,
+            "axis_deg": 60,
+            "rhythm_regular": true,
+            "p_waves_present": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 73.2,
+            "hr_method": "60000 / rr_ms",
+            "rr_ms": 820.0,
+            "pr_ms": 152.0,
+            "qrs_ms": 82.0,
+            "qt_ms": 390.0,
+            "qtc_bazett_ms": 430.7,
+            "qtc_fridericia_ms": 416.7,
+            "qtc_hodges_ms": 413.1,
+            "axis_deg": 60.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إيقاع جيبي طبيعي (Normal Sinus Rhythm)"
+        },
+        {
+          "id": "NSR_03",
+          "title": "NSR at lower-normal rate (62 bpm)",
+          "expected_code": "NORMAL_SINUS_RHYTHM",
+          "detected_codes": [
+            "NORMAL_SINUS_RHYTHM"
+          ],
+          "top_urgency": "NORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 45,
+            "sex": "male",
+            "hr_bpm": 62,
+            "pr_ms": 180,
+            "qrs_ms": 94,
+            "qt_ms": 410,
+            "axis_deg": 15,
+            "rhythm_regular": true,
+            "p_waves_present": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 62.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 967.7,
+            "pr_ms": 180.0,
+            "qrs_ms": 94.0,
+            "qt_ms": 410.0,
+            "qtc_bazett_ms": 416.8,
+            "qtc_fridericia_ms": 414.5,
+            "qtc_hodges_ms": 413.5,
+            "axis_deg": 15.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إيقاع جيبي طبيعي (Normal Sinus Rhythm)"
+        },
+        {
+          "id": "NSR_04",
+          "title": "NSR at upper-normal rate (94 bpm)",
+          "expected_code": "NORMAL_SINUS_RHYTHM",
+          "detected_codes": [
+            "NORMAL_SINUS_RHYTHM"
+          ],
+          "top_urgency": "NORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 22,
+            "sex": "female",
+            "rr_small_boxes": 16,
+            "pr_ms": 140,
+            "qrs_ms": 84,
+            "qt_ms": 350,
+            "axis_deg": 75,
+            "rhythm_regular": true,
+            "p_waves_present": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 93.8,
+            "hr_method": "1500 / rr_small_boxes",
+            "rr_ms": 640.0,
+            "pr_ms": 140.0,
+            "qrs_ms": 84.0,
+            "qt_ms": 350.0,
+            "qtc_bazett_ms": 437.5,
+            "qtc_fridericia_ms": 406.1,
+            "qtc_hodges_ms": 409.1,
+            "axis_deg": 75.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إيقاع جيبي طبيعي (Normal Sinus Rhythm)"
+        },
+        {
+          "id": "NSR_05",
+          "title": "NSR measured via 10s strip (12 QRS)",
+          "expected_code": "NORMAL_SINUS_RHYTHM",
+          "detected_codes": [
+            "NORMAL_SINUS_RHYTHM"
+          ],
+          "top_urgency": "NORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 50,
+            "sex": "male",
+            "qrs_count_10s": 12,
+            "pr_ms": 172,
+            "qrs_ms": 90,
+            "qt_ms": 395,
+            "axis_deg": 30,
+            "rhythm_regular": true,
+            "p_waves_present": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 72.0,
+            "hr_method": "qrs_count_10s * 6",
+            "rr_ms": 833.3,
+            "pr_ms": 172.0,
+            "qrs_ms": 90.0,
+            "qt_ms": 395.0,
+            "qtc_bazett_ms": 432.7,
+            "qtc_fridericia_ms": 419.8,
+            "qtc_hodges_ms": 416.0,
+            "axis_deg": 30.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إيقاع جيبي طبيعي (Normal Sinus Rhythm)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "01_normal_sinus_rhythm_img01",
+          "file_path": "images/01_normal_sinus_rhythm/01_normal_sinus_rhythm_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 21,
+          "caption": "Normal sinus rhythm — 12-lead ECG",
+          "extraction_method": "embedded",
+          "resolution": "725x358",
+          "size_kb": 315.2
+        },
+        {
+          "image_id": "01_normal_sinus_rhythm_img02",
+          "file_path": "images/01_normal_sinus_rhythm/01_normal_sinus_rhythm_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 22,
+          "caption": "Normal sinus rhythm variant",
+          "extraction_method": "embedded",
+          "resolution": "704x323",
+          "size_kb": 221.7
+        },
+        {
+          "image_id": "01_normal_sinus_rhythm_img03",
+          "file_path": "images/01_normal_sinus_rhythm/01_normal_sinus_rhythm_img03.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 32,
+          "caption": "Normal 12-lead ECG calibration & intervals",
+          "extraction_method": "embedded",
+          "resolution": "1600x752",
+          "size_kb": 122.2
+        },
+        {
+          "image_id": "01_normal_sinus_rhythm_img04",
+          "file_path": "images/01_normal_sinus_rhythm/01_normal_sinus_rhythm_img04.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 36,
+          "caption": "Normal sinus rhythm tracing",
+          "extraction_method": "embedded",
+          "resolution": "1600x632",
+          "size_kb": 150.7
+        },
+        {
+          "image_id": "01_normal_sinus_rhythm_img05",
+          "file_path": "images/01_normal_sinus_rhythm/01_normal_sinus_rhythm_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 137,
+          "caption": "Normal sinus rhythm baseline",
+          "extraction_method": "embedded",
+          "resolution": "1600x1418",
+          "size_kb": 123.2
+        }
+      ]
+    },
+    "02_stemi_acute_mi": {
+      "numeric_examples_count": 6,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "STEMI_01",
+          "title": "Acute Anterior STEMI (Male 58y, V2-V4 STE + reciprocal II/III/aVF)",
+          "expected_code": "STEMI",
+          "detected_codes": [
+            "STEMI",
+            "LONG_QT"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 58,
+            "sex": "male",
+            "hr_bpm": 92,
+            "pr_ms": 160,
+            "qrs_ms": 96,
+            "qt_ms": 380,
+            "axis_deg": 30,
+            "st_elevation_mm": {
+              "V2": 3.5,
+              "V3": 4.0,
+              "V4": 3.0,
+              "II": -1.5,
+              "III": -2.0,
+              "aVF": -1.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 92.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 652.2,
+            "pr_ms": 160.0,
+            "qrs_ms": 96.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 470.5,
+            "qtc_fridericia_ms": 438.2,
+            "qtc_hodges_ms": 436.0,
+            "axis_deg": 30.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)"
+        },
+        {
+          "id": "STEMI_02",
+          "title": "Acute Inferior STEMI (RCA: STE III > II + reciprocal I/aVL)",
+          "expected_code": "STEMI",
+          "detected_codes": [
+            "STEMI"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 64,
+            "sex": "male",
+            "hr_bpm": 58,
+            "pr_ms": 180,
+            "qrs_ms": 92,
+            "qt_ms": 400,
+            "axis_deg": 40,
+            "st_elevation_mm": {
+              "II": 2.0,
+              "III": 3.5,
+              "aVF": 2.5,
+              "I": -1.5,
+              "aVL": -2.0
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 58.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1034.5,
+            "pr_ms": 180.0,
+            "qrs_ms": 92.0,
+            "qt_ms": 400.0,
+            "qtc_bazett_ms": 393.3,
+            "qtc_fridericia_ms": 395.5,
+            "qtc_hodges_ms": 396.5,
+            "axis_deg": 40.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)"
+        },
+        {
+          "id": "STEMI_03",
+          "title": "Acute High Lateral STEMI (I, aVL) in Female 52y",
+          "expected_code": "STEMI",
+          "detected_codes": [
+            "STEMI",
+            "LONG_QT"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 52,
+            "sex": "female",
+            "hr_bpm": 88,
+            "pr_ms": 156,
+            "qrs_ms": 88,
+            "qt_ms": 385,
+            "axis_deg": 10,
+            "st_elevation_mm": {
+              "I": 2.0,
+              "aVL": 2.5,
+              "III": -1.5,
+              "aVF": -1.0
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 88.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 681.8,
+            "pr_ms": 156.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 385.0,
+            "qtc_bazett_ms": 466.3,
+            "qtc_fridericia_ms": 437.4,
+            "qtc_hodges_ms": 434.0,
+            "axis_deg": 10.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)"
+        },
+        {
+          "id": "STEMI_04",
+          "title": "Inferior + RV STEMI (V4R +1.5mm)",
+          "expected_code": "RV_STEMI",
+          "detected_codes": [
+            "STEMI",
+            "RV_STEMI"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 61,
+            "sex": "male",
+            "hr_bpm": 54,
+            "pr_ms": 190,
+            "qrs_ms": 94,
+            "qt_ms": 410,
+            "axis_deg": 50,
+            "st_elevation_mm": {
+              "II": 2.0,
+              "III": 3.0,
+              "aVF": 2.5,
+              "V4R": 1.5,
+              "aVL": -1.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 54.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1111.1,
+            "pr_ms": 190.0,
+            "qrs_ms": 94.0,
+            "qt_ms": 410.0,
+            "qtc_bazett_ms": 389.0,
+            "qtc_fridericia_ms": 395.9,
+            "qtc_hodges_ms": 399.5,
+            "axis_deg": 50.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)"
+        },
+        {
+          "id": "STEMI_05",
+          "title": "LMCA Occlusion Pattern (aVR STE +2mm + diffuse STD in 7 leads)",
+          "expected_code": "LMCA_OCCLUSION",
+          "detected_codes": [
+            "LMCA_OCCLUSION",
+            "LONG_QT"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 69,
+            "sex": "male",
+            "hr_bpm": 108,
+            "pr_ms": 164,
+            "qrs_ms": 98,
+            "qt_ms": 360,
+            "axis_deg": 20,
+            "st_elevation_mm": {
+              "aVR": 2.0,
+              "V1": 1.0,
+              "I": -1.5,
+              "II": -2.0,
+              "aVF": -1.5,
+              "V3": -2.0,
+              "V4": -2.5,
+              "V5": -2.5,
+              "V6": -2.0
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 108.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 555.6,
+            "pr_ms": 164.0,
+            "qrs_ms": 98.0,
+            "qt_ms": 360.0,
+            "qtc_bazett_ms": 483.0,
+            "qtc_fridericia_ms": 437.9,
+            "qtc_hodges_ms": 444.0,
+            "axis_deg": 20.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "اشتباه انسداد الشريان التاجي الأيسر الرئيسي (LMCA) أو نقص تروية حاد لثلاثة شرايين"
+        },
+        {
+          "id": "STEMI_06",
+          "title": "Posterior STEMI (V1-V3 STD + tall R + V7-V9 STE)",
+          "expected_code": "POSTERIOR_STEMI",
+          "detected_codes": [
+            "POSTERIOR_STEMI",
+            "LONG_QT"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 55,
+            "sex": "female",
+            "hr_bpm": 84,
+            "pr_ms": 150,
+            "qrs_ms": 86,
+            "qt_ms": 390,
+            "axis_deg": 45,
+            "tall_r_v1_v2": true,
+            "upright_t_v1_v3": true,
+            "st_elevation_mm": {
+              "V1": -1.5,
+              "V2": -2.0,
+              "V3": -1.5,
+              "V7": 1.0,
+              "V8": 1.0,
+              "V9": 0.8
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 84.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 714.3,
+            "pr_ms": 150.0,
+            "qrs_ms": 86.0,
+            "qt_ms": 390.0,
+            "qtc_bazett_ms": 461.4,
+            "qtc_fridericia_ms": 436.3,
+            "qtc_hodges_ms": 432.0,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة الجدار الخلفي للقلب (معادل لـ STEMI)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "02_stemi_acute_mi_img01",
+          "file_path": "images/02_stemi_acute_mi/02_stemi_acute_mi_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 395,
+          "caption": "Acute Posterior / Inferior STEMI",
+          "extraction_method": "embedded",
+          "resolution": "939x498",
+          "size_kb": 500.1
+        },
+        {
+          "image_id": "02_stemi_acute_mi_img02",
+          "file_path": "images/02_stemi_acute_mi/02_stemi_acute_mi_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 403,
+          "caption": "Acute Lateral STEMI",
+          "extraction_method": "embedded",
+          "resolution": "454x234",
+          "size_kb": 58.8
+        },
+        {
+          "image_id": "02_stemi_acute_mi_img03",
+          "file_path": "images/02_stemi_acute_mi/02_stemi_acute_mi_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 407,
+          "caption": "Acute Anterior STEMI with RBBB",
+          "extraction_method": "embedded",
+          "resolution": "781x432",
+          "size_kb": 302.1
+        },
+        {
+          "image_id": "02_stemi_acute_mi_img04",
+          "file_path": "images/02_stemi_acute_mi/02_stemi_acute_mi_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 411,
+          "caption": "Tombstoning Anterior STEMI",
+          "extraction_method": "embedded",
+          "resolution": "938x636",
+          "size_kb": 703.9
+        },
+        {
+          "image_id": "02_stemi_acute_mi_img05",
+          "file_path": "images/02_stemi_acute_mi/02_stemi_acute_mi_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 415,
+          "caption": "LMCA / Diffuse Subendocardial Ischemia (aVR STE)",
+          "extraction_method": "embedded",
+          "resolution": "923x479",
+          "size_kb": 617.1
+        }
+      ]
+    },
+    "03_wellens_and_ischemia": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "ISCH_01",
+          "title": "Wellens' Syndrome Type A (Biphasic T in V2-V3)",
+          "expected_code": "WELLENS_SYNDROME",
+          "detected_codes": [
+            "WELLENS_SYNDROME"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 57,
+            "sex": "male",
+            "hr_bpm": 72,
+            "pr_ms": 160,
+            "qrs_ms": 90,
+            "qt_ms": 400,
+            "axis_deg": 25,
+            "wellens_pattern": "type_a"
+          },
+          "computed_measurements": {
+            "hr_bpm": 72.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 833.3,
+            "pr_ms": 160.0,
+            "qrs_ms": 90.0,
+            "qt_ms": 400.0,
+            "qtc_bazett_ms": 438.2,
+            "qtc_fridericia_ms": 425.1,
+            "qtc_hodges_ms": 421.0,
+            "axis_deg": 25.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "متلازمة ويلينز (تضيق حرج جداً في الشريان الأمامي النازل LAD)"
+        },
+        {
+          "id": "ISCH_02",
+          "title": "Wellens' Syndrome Type B (Deep symmetric TWI V2-V4)",
+          "expected_code": "WELLENS_SYNDROME",
+          "detected_codes": [
+            "WELLENS_SYNDROME"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 63,
+            "sex": "female",
+            "hr_bpm": 68,
+            "pr_ms": 168,
+            "qrs_ms": 88,
+            "qt_ms": 415,
+            "axis_deg": 15,
+            "wellens_pattern": "type_b",
+            "t_wave_amplitude_mm": {
+              "V2": -4.0,
+              "V3": -5.0,
+              "V4": -3.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 68.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 882.4,
+            "pr_ms": 168.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 415.0,
+            "qtc_bazett_ms": 441.8,
+            "qtc_fridericia_ms": 432.7,
+            "qtc_hodges_ms": 429.0,
+            "axis_deg": 15.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "متلازمة ويلينز (تضيق حرج جداً في الشريان الأمامي النازل LAD)"
+        },
+        {
+          "id": "ISCH_03",
+          "title": "Lateral NSTEMI (Horizontal STD V4-V6)",
+          "expected_code": "NSTEMI_ISCHEMIA",
+          "detected_codes": [
+            "NSTEMI_ISCHEMIA",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 66,
+            "sex": "male",
+            "hr_bpm": 86,
+            "pr_ms": 170,
+            "qrs_ms": 92,
+            "qt_ms": 385,
+            "axis_deg": 10,
+            "st_elevation_mm": {
+              "V4": -1.5,
+              "V5": -2.0,
+              "V6": -1.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 86.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 697.7,
+            "pr_ms": 170.0,
+            "qrs_ms": 92.0,
+            "qt_ms": 385.0,
+            "qtc_bazett_ms": 460.9,
+            "qtc_fridericia_ms": 434.1,
+            "qtc_hodges_ms": 430.5,
+            "axis_deg": 10.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "نقص تروية عضلة القلب / اشتباه NSTEMI"
+        },
+        {
+          "id": "ISCH_04",
+          "title": "Inferior Subendocardial Ischemia (STD II, III, aVF)",
+          "expected_code": "NSTEMI_ISCHEMIA",
+          "detected_codes": [
+            "NSTEMI_ISCHEMIA",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 60,
+            "sex": "female",
+            "hr_bpm": 90,
+            "pr_ms": 158,
+            "qrs_ms": 86,
+            "qt_ms": 380,
+            "axis_deg": 35,
+            "st_elevation_mm": {
+              "II": -1.2,
+              "III": -1.0,
+              "aVF": -1.2
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 90.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 666.7,
+            "pr_ms": 158.0,
+            "qrs_ms": 86.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 465.4,
+            "qtc_fridericia_ms": 435.0,
+            "qtc_hodges_ms": 432.5,
+            "axis_deg": 35.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "نقص تروية عضلة القلب / اشتباه NSTEMI"
+        },
+        {
+          "id": "ISCH_05",
+          "title": "Anterolateral Ischemic T-wave Inversions (NSTEMI)",
+          "expected_code": "NSTEMI_ISCHEMIA",
+          "detected_codes": [
+            "NSTEMI_ISCHEMIA",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 71,
+            "sex": "male",
+            "hr_bpm": 78,
+            "pr_ms": 176,
+            "qrs_ms": 94,
+            "qt_ms": 400,
+            "axis_deg": 5,
+            "t_wave_inversion_leads": [
+              "I",
+              "aVL",
+              "V5",
+              "V6"
+            ]
+          },
+          "computed_measurements": {
+            "hr_bpm": 78.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 769.2,
+            "pr_ms": 176.0,
+            "qrs_ms": 94.0,
+            "qt_ms": 400.0,
+            "qtc_bazett_ms": 456.1,
+            "qtc_fridericia_ms": 436.6,
+            "qtc_hodges_ms": 431.5,
+            "axis_deg": 5.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "نقص تروية عضلة القلب / اشتباه NSTEMI"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "03_wellens_and_ischemia_img01",
+          "file_path": "images/03_wellens_and_ischemia/03_wellens_and_ischemia_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 416,
+          "caption": "Subendocardial ischemia / NSTEMI",
+          "extraction_method": "embedded",
+          "resolution": "939x448",
+          "size_kb": 300.0
+        },
+        {
+          "image_id": "03_wellens_and_ischemia_img02",
+          "file_path": "images/03_wellens_and_ischemia/03_wellens_and_ischemia_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 147,
+          "caption": "Ischemic T-wave / Wellens pattern",
+          "extraction_method": "embedded",
+          "resolution": "931x306",
+          "size_kb": 153.5
+        },
+        {
+          "image_id": "03_wellens_and_ischemia_img03",
+          "file_path": "images/03_wellens_and_ischemia/03_wellens_and_ischemia_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 148,
+          "caption": "Anterior ischemia / Wellens",
+          "extraction_method": "embedded",
+          "resolution": "915x456",
+          "size_kb": 316.3
+        },
+        {
+          "image_id": "03_wellens_and_ischemia_img04",
+          "file_path": "images/03_wellens_and_ischemia/03_wellens_and_ischemia_img04.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 104,
+          "caption": "Deep symmetric T-wave inversion / Wellens",
+          "extraction_method": "embedded",
+          "resolution": "751x1136",
+          "size_kb": 7.0
+        },
+        {
+          "image_id": "03_wellens_and_ischemia_img05",
+          "file_path": "images/03_wellens_and_ischemia/03_wellens_and_ischemia_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 114,
+          "caption": "Non-ST elevation myocardial ischemia",
+          "extraction_method": "embedded",
+          "resolution": "1600x588",
+          "size_kb": 111.9
+        }
+      ]
+    },
+    "04_atrial_fibrillation": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "AF_01",
+          "title": "AF with Controlled Ventricular Rate (78 bpm)",
+          "expected_code": "ATRIAL_FIBRILLATION",
+          "detected_codes": [
+            "ATRIAL_FIBRILLATION"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 72,
+            "sex": "male",
+            "qrs_count_10s": 13,
+            "qrs_ms": 90,
+            "qt_ms": 380,
+            "axis_deg": 30,
+            "rhythm_regular": false,
+            "p_waves_present": false,
+            "fibrillatory_waves": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 78.0,
+            "hr_method": "qrs_count_10s * 6",
+            "rr_ms": 769.2,
+            "pr_ms": null,
+            "qrs_ms": 90.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 433.3,
+            "qtc_fridericia_ms": 414.7,
+            "qtc_hodges_ms": 411.5,
+            "axis_deg": 30.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رجفان أذيني (Atrial Fibrillation)"
+        },
+        {
+          "id": "AF_02",
+          "title": "AF with Rapid Ventricular Response (138 bpm)",
+          "expected_code": "ATRIAL_FIBRILLATION_RVR",
+          "detected_codes": [
+            "ATRIAL_FIBRILLATION_RVR",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 65,
+            "sex": "female",
+            "qrs_count_10s": 23,
+            "qrs_ms": 88,
+            "qt_ms": 320,
+            "axis_deg": 45,
+            "rhythm_regular": false,
+            "p_waves_present": false,
+            "fibrillatory_waves": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 138.0,
+            "hr_method": "qrs_count_10s * 6",
+            "rr_ms": 434.8,
+            "pr_ms": null,
+            "qrs_ms": 88.0,
+            "qt_ms": 320.0,
+            "qtc_bazett_ms": 485.3,
+            "qtc_fridericia_ms": 422.4,
+            "qtc_hodges_ms": 456.5,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رجفان أذيني مع استجابة بطينية سريعة (AF with RVR)"
+        },
+        {
+          "id": "AF_03",
+          "title": "AF with Marked RVR (162 bpm)",
+          "expected_code": "ATRIAL_FIBRILLATION_RVR",
+          "detected_codes": [
+            "ATRIAL_FIBRILLATION_RVR",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 59,
+            "sex": "male",
+            "hr_bpm": 162,
+            "qrs_ms": 94,
+            "qt_ms": 300,
+            "axis_deg": 20,
+            "rhythm_regular": false,
+            "p_waves_present": false
+          },
+          "computed_measurements": {
+            "hr_bpm": 162.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 370.4,
+            "pr_ms": null,
+            "qrs_ms": 94.0,
+            "qt_ms": 300.0,
+            "qtc_bazett_ms": 492.9,
+            "qtc_fridericia_ms": 417.7,
+            "qtc_hodges_ms": 478.5,
+            "axis_deg": 20.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رجفان أذيني مع استجابة بطينية سريعة (AF with RVR)"
+        },
+        {
+          "id": "AF_04",
+          "title": "AF with Slow Ventricular Response (54 bpm)",
+          "expected_code": "ATRIAL_FIBRILLATION",
+          "detected_codes": [
+            "ATRIAL_FIBRILLATION"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 78,
+            "sex": "female",
+            "qrs_count_10s": 9,
+            "qrs_ms": 92,
+            "qt_ms": 430,
+            "axis_deg": 10,
+            "rhythm_regular": false,
+            "p_waves_present": false
+          },
+          "computed_measurements": {
+            "hr_bpm": 54.0,
+            "hr_method": "qrs_count_10s * 6",
+            "rr_ms": 1111.1,
+            "pr_ms": null,
+            "qrs_ms": 92.0,
+            "qt_ms": 430.0,
+            "qtc_bazett_ms": 407.9,
+            "qtc_fridericia_ms": 415.2,
+            "qtc_hodges_ms": 419.5,
+            "axis_deg": 10.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رجفان أذيني (Atrial Fibrillation)"
+        },
+        {
+          "id": "AF_05",
+          "title": "Pre-excited AF (WPW + AF, shortest RR 210 ms — CRITICAL)",
+          "expected_code": "PREEXCITED_AF",
+          "detected_codes": [
+            "PREEXCITED_AF"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 26,
+            "sex": "male",
+            "hr_bpm": 210,
+            "qrs_ms": 148,
+            "shortest_rr_ms": 210,
+            "rhythm_regular": false,
+            "p_waves_present": false,
+            "varying_qrs_morphology": true,
+            "delta_wave": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 210.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 285.7,
+            "pr_ms": null,
+            "qrs_ms": 148.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "رجفان أذيني مع مسار إضافي (Pre-excited AF / WPW) — خطر شديد"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "04_atrial_fibrillation_img01",
+          "file_path": "images/04_atrial_fibrillation/04_atrial_fibrillation_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 93,
+          "caption": "Atrial fibrillation tracing",
+          "extraction_method": "embedded",
+          "resolution": "996x600",
+          "size_kb": 857.9
+        },
+        {
+          "image_id": "04_atrial_fibrillation_img02",
+          "file_path": "images/04_atrial_fibrillation/04_atrial_fibrillation_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 259,
+          "caption": "Atrial fibrillation with RVR",
+          "extraction_method": "embedded",
+          "resolution": "994x520",
+          "size_kb": 622.1
+        },
+        {
+          "image_id": "04_atrial_fibrillation_img03",
+          "file_path": "images/04_atrial_fibrillation/04_atrial_fibrillation_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 261,
+          "caption": "Atrial fibrillation 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "995x478",
+          "size_kb": 371.3
+        },
+        {
+          "image_id": "04_atrial_fibrillation_img04",
+          "file_path": "images/04_atrial_fibrillation/04_atrial_fibrillation_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 307,
+          "caption": "Atrial fibrillation rhythm",
+          "extraction_method": "embedded",
+          "resolution": "939x506",
+          "size_kb": 500.9
+        },
+        {
+          "image_id": "04_atrial_fibrillation_img05",
+          "file_path": "images/04_atrial_fibrillation/04_atrial_fibrillation_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 101,
+          "caption": "Atrial fibrillation case",
+          "extraction_method": "embedded",
+          "resolution": "977x395",
+          "size_kb": 483.4
+        }
+      ]
+    },
+    "05_atrial_flutter": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "AFL_01",
+          "title": "Typical 2:1 Atrial Flutter (Atrial 300, Ventricular 150 bpm)",
+          "expected_code": "ATRIAL_FLUTTER",
+          "detected_codes": [
+            "ATRIAL_FLUTTER",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 64,
+            "sex": "male",
+            "hr_bpm": 150,
+            "qrs_ms": 90,
+            "qt_ms": 310,
+            "axis_deg": 40,
+            "sawtooth_flutter_waves": true,
+            "flutter_wave_rate_bpm": 300
+          },
+          "computed_measurements": {
+            "hr_bpm": 150.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 400.0,
+            "pr_ms": null,
+            "qrs_ms": 90.0,
+            "qt_ms": 310.0,
+            "qtc_bazett_ms": 490.2,
+            "qtc_fridericia_ms": 420.7,
+            "qtc_hodges_ms": 467.5,
+            "axis_deg": 40.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رفرفة أذينية (Atrial Flutter)"
+        },
+        {
+          "id": "AFL_02",
+          "title": "Typical 4:1 Atrial Flutter (Atrial 300, Ventricular 75 bpm)",
+          "expected_code": "ATRIAL_FLUTTER",
+          "detected_codes": [
+            "ATRIAL_FLUTTER"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 70,
+            "sex": "female",
+            "hr_bpm": 75,
+            "qrs_ms": 88,
+            "qt_ms": 390,
+            "axis_deg": 35,
+            "sawtooth_flutter_waves": true,
+            "flutter_wave_rate_bpm": 300
+          },
+          "computed_measurements": {
+            "hr_bpm": 75.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 800.0,
+            "pr_ms": null,
+            "qrs_ms": 88.0,
+            "qt_ms": 390.0,
+            "qtc_bazett_ms": 436.0,
+            "qtc_fridericia_ms": 420.1,
+            "qtc_hodges_ms": 416.2,
+            "axis_deg": 35.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رفرفة أذينية (Atrial Flutter)"
+        },
+        {
+          "id": "AFL_03",
+          "title": "Atrial Flutter with Variable AV Block (HR 96 bpm)",
+          "expected_code": "ATRIAL_FLUTTER",
+          "detected_codes": [
+            "ATRIAL_FLUTTER",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 67,
+            "sex": "male",
+            "qrs_count_10s": 16,
+            "qrs_ms": 92,
+            "qt_ms": 360,
+            "axis_deg": 25,
+            "rhythm_regular": false,
+            "sawtooth_flutter_waves": true,
+            "flutter_wave_rate_bpm": 280
+          },
+          "computed_measurements": {
+            "hr_bpm": 96.0,
+            "hr_method": "qrs_count_10s * 6",
+            "rr_ms": 625.0,
+            "pr_ms": null,
+            "qrs_ms": 92.0,
+            "qt_ms": 360.0,
+            "qtc_bazett_ms": 455.4,
+            "qtc_fridericia_ms": 421.1,
+            "qtc_hodges_ms": 423.0,
+            "axis_deg": 25.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رفرفة أذينية (Atrial Flutter)"
+        },
+        {
+          "id": "AFL_04",
+          "title": "3:1 Atrial Flutter (Atrial 270, Ventricular 90 bpm)",
+          "expected_code": "ATRIAL_FLUTTER",
+          "detected_codes": [
+            "ATRIAL_FLUTTER",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 58,
+            "sex": "male",
+            "hr_bpm": 90,
+            "qrs_ms": 94,
+            "qt_ms": 370,
+            "axis_deg": 50,
+            "sawtooth_flutter_waves": true,
+            "flutter_wave_rate_bpm": 270
+          },
+          "computed_measurements": {
+            "hr_bpm": 90.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 666.7,
+            "pr_ms": null,
+            "qrs_ms": 94.0,
+            "qt_ms": 370.0,
+            "qtc_bazett_ms": 453.1,
+            "qtc_fridericia_ms": 423.5,
+            "qtc_hodges_ms": 422.5,
+            "axis_deg": 50.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رفرفة أذينية (Atrial Flutter)"
+        },
+        {
+          "id": "AFL_05",
+          "title": "Fast 2:1 Atrial Flutter (Atrial 320, Ventricular 160 bpm)",
+          "expected_code": "ATRIAL_FLUTTER",
+          "detected_codes": [
+            "ATRIAL_FLUTTER",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 53,
+            "sex": "female",
+            "hr_bpm": 160,
+            "qrs_ms": 84,
+            "qt_ms": 300,
+            "axis_deg": 55,
+            "sawtooth_flutter_waves": true,
+            "flutter_wave_rate_bpm": 320
+          },
+          "computed_measurements": {
+            "hr_bpm": 160.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 375.0,
+            "pr_ms": null,
+            "qrs_ms": 84.0,
+            "qt_ms": 300.0,
+            "qtc_bazett_ms": 489.9,
+            "qtc_fridericia_ms": 416.0,
+            "qtc_hodges_ms": 475.0,
+            "axis_deg": 55.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "رفرفة أذينية (Atrial Flutter)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "05_atrial_flutter_img01",
+          "file_path": "images/05_atrial_flutter/05_atrial_flutter_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 251,
+          "caption": "Atrial flutter sawtooth waves",
+          "extraction_method": "embedded",
+          "resolution": "994x559",
+          "size_kb": 352.9
+        },
+        {
+          "image_id": "05_atrial_flutter_img02",
+          "file_path": "images/05_atrial_flutter/05_atrial_flutter_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 255,
+          "caption": "Atrial flutter with 2:1 conduction",
+          "extraction_method": "embedded",
+          "resolution": "596x404",
+          "size_kb": 380.5
+        },
+        {
+          "image_id": "05_atrial_flutter_img03",
+          "file_path": "images/05_atrial_flutter/05_atrial_flutter_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 263,
+          "caption": "Atrial flutter variable block",
+          "extraction_method": "embedded",
+          "resolution": "996x558",
+          "size_kb": 943.7
+        },
+        {
+          "image_id": "05_atrial_flutter_img04",
+          "file_path": "images/05_atrial_flutter/05_atrial_flutter_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 103,
+          "caption": "Atrial flutter 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "893x548",
+          "size_kb": 782.1
+        },
+        {
+          "image_id": "05_atrial_flutter_img05",
+          "file_path": "images/05_atrial_flutter/05_atrial_flutter_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 105,
+          "caption": "Atrial flutter typical counterclockwise",
+          "extraction_method": "embedded",
+          "resolution": "901x495",
+          "size_kb": 401.4
+        }
+      ]
+    },
+    "06_svt_and_mat": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "SVT_01",
+          "title": "Typical AVNRT (HR 185 bpm, short RP 60 ms)",
+          "expected_code": "SVT_NARROW",
+          "detected_codes": [
+            "SVT_NARROW",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 31,
+            "sex": "female",
+            "hr_bpm": 185,
+            "qrs_ms": 84,
+            "qt_ms": 280,
+            "axis_deg": 60,
+            "rhythm_regular": true,
+            "p_waves_present": false,
+            "rp_interval_ms": 60
+          },
+          "computed_measurements": {
+            "hr_bpm": 185.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 324.3,
+            "pr_ms": null,
+            "qrs_ms": 84.0,
+            "qt_ms": 280.0,
+            "qtc_bazett_ms": 491.7,
+            "qtc_fridericia_ms": 407.5,
+            "qtc_hodges_ms": 498.8,
+            "axis_deg": 60.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "تسارع فوق بطيني منتظم (SVT)"
+        },
+        {
+          "id": "SVT_02",
+          "title": "Orthodromic AVRT (HR 205 bpm, RP 120 ms)",
+          "expected_code": "SVT_NARROW",
+          "detected_codes": [
+            "SVT_NARROW",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 24,
+            "sex": "male",
+            "hr_bpm": 205,
+            "qrs_ms": 88,
+            "qt_ms": 270,
+            "axis_deg": 50,
+            "rhythm_regular": true,
+            "retrograde_p_waves": true,
+            "rp_interval_ms": 120
+          },
+          "computed_measurements": {
+            "hr_bpm": 205.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 292.7,
+            "pr_ms": null,
+            "qrs_ms": 88.0,
+            "qt_ms": 270.0,
+            "qtc_bazett_ms": 499.1,
+            "qtc_fridericia_ms": 406.7,
+            "qtc_hodges_ms": 523.8,
+            "axis_deg": 50.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "تسارع فوق بطيني منتظم (SVT)"
+        },
+        {
+          "id": "SVT_03",
+          "title": "PSVT at 165 bpm",
+          "expected_code": "SVT_NARROW",
+          "detected_codes": [
+            "SVT_NARROW",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 42,
+            "sex": "female",
+            "hr_bpm": 165,
+            "qrs_ms": 82,
+            "qt_ms": 295,
+            "axis_deg": 45,
+            "rhythm_regular": true,
+            "p_waves_present": false,
+            "rp_interval_ms": 70
+          },
+          "computed_measurements": {
+            "hr_bpm": 165.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 363.6,
+            "pr_ms": null,
+            "qrs_ms": 82.0,
+            "qt_ms": 295.0,
+            "qtc_bazett_ms": 489.2,
+            "qtc_fridericia_ms": 413.3,
+            "qtc_hodges_ms": 478.8,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "تسارع فوق بطيني منتظم (SVT)"
+        },
+        {
+          "id": "SVT_04",
+          "title": "Multifocal Atrial Tachycardia (COPD, HR 128, 4 P morphologies)",
+          "expected_code": "MAT",
+          "detected_codes": [
+            "LONG_QT",
+            "MAT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 71,
+            "sex": "male",
+            "hr_bpm": 128,
+            "qrs_ms": 88,
+            "qt_ms": 330,
+            "axis_deg": 75,
+            "rhythm_regular": false,
+            "p_waves_present": true,
+            "distinct_p_morphologies": 4
+          },
+          "computed_measurements": {
+            "hr_bpm": 128.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 468.8,
+            "pr_ms": null,
+            "qrs_ms": 88.0,
+            "qt_ms": 330.0,
+            "qtc_bazett_ms": 482.0,
+            "qtc_fridericia_ms": 424.8,
+            "qtc_hodges_ms": 449.0,
+            "axis_deg": 75.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "SVT_05",
+          "title": "Multifocal Atrial Tachycardia (HR 118, 3 P morphologies)",
+          "expected_code": "MAT",
+          "detected_codes": [
+            "LONG_QT",
+            "MAT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 68,
+            "sex": "female",
+            "hr_bpm": 118,
+            "qrs_ms": 86,
+            "qt_ms": 340,
+            "axis_deg": 80,
+            "rhythm_regular": false,
+            "p_waves_present": true,
+            "distinct_p_morphologies": 3
+          },
+          "computed_measurements": {
+            "hr_bpm": 118.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 508.5,
+            "pr_ms": null,
+            "qrs_ms": 86.0,
+            "qt_ms": 340.0,
+            "qtc_bazett_ms": 476.8,
+            "qtc_fridericia_ms": 426.0,
+            "qtc_hodges_ms": 441.5,
+            "axis_deg": 80.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "06_svt_and_mat_img01",
+          "file_path": "images/06_svt_and_mat/06_svt_and_mat_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 247,
+          "caption": "Narrow-complex SVT",
+          "extraction_method": "embedded",
+          "resolution": "994x639",
+          "size_kb": 638.7
+        },
+        {
+          "image_id": "06_svt_and_mat_img02",
+          "file_path": "images/06_svt_and_mat/06_svt_and_mat_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 275,
+          "caption": "AVNRT / PSVT",
+          "extraction_method": "embedded",
+          "resolution": "566x306",
+          "size_kb": 173.6
+        },
+        {
+          "image_id": "06_svt_and_mat_img03",
+          "file_path": "images/06_svt_and_mat/06_svt_and_mat_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 281,
+          "caption": "AVRT / SVT",
+          "extraction_method": "embedded",
+          "resolution": "960x541",
+          "size_kb": 366.4
+        },
+        {
+          "image_id": "06_svt_and_mat_img04",
+          "file_path": "images/06_svt_and_mat/06_svt_and_mat_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 289,
+          "caption": "Atrial tachycardia / SVT",
+          "extraction_method": "embedded",
+          "resolution": "938x679",
+          "size_kb": 486.8
+        },
+        {
+          "image_id": "06_svt_and_mat_img05",
+          "file_path": "images/06_svt_and_mat/06_svt_and_mat_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 109,
+          "caption": "Supraventricular tachycardia",
+          "extraction_method": "embedded",
+          "resolution": "661x703",
+          "size_kb": 528.0
+        }
+      ]
+    },
+    "07_wide_complex_vt_tdp": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "VT_01",
+          "title": "Monomorphic VT with AV dissociation & NW axis",
+          "expected_code": "VENTRICULAR_TACHYCARDIA",
+          "detected_codes": [
+            "VENTRICULAR_TACHYCARDIA"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 66,
+            "sex": "male",
+            "hr_bpm": 176,
+            "qrs_ms": 168,
+            "axis_deg": -125,
+            "rhythm_regular": true,
+            "av_dissociation": true,
+            "capture_or_fusion_beats": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 176.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 340.9,
+            "pr_ms": null,
+            "qrs_ms": 168.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": -125.0,
+            "axis_classification": "Extreme Axis Deviation (Northwest / No Man's Land)"
+          },
+          "arabic_summary": "تسارع قلب بمركب QRS عريض — تسارع بطيني (VT) حتى يثبت العكس"
+        },
+        {
+          "id": "VT_02",
+          "title": "Monomorphic VT — Positive Brugada RS > 100 ms",
+          "expected_code": "VENTRICULAR_TACHYCARDIA",
+          "detected_codes": [
+            "VENTRICULAR_TACHYCARDIA"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 70,
+            "sex": "male",
+            "hr_bpm": 158,
+            "qrs_ms": 154,
+            "axis_deg": -60,
+            "rhythm_regular": true,
+            "rs_interval_ms": 120,
+            "precordial_concordance": "positive"
+          },
+          "computed_measurements": {
+            "hr_bpm": 158.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 379.7,
+            "pr_ms": null,
+            "qrs_ms": 154.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": -60.0,
+            "axis_classification": "Left Axis Deviation (LAD)"
+          },
+          "arabic_summary": "تسارع قلب بمركب QRS عريض — تسارع بطيني (VT) حتى يثبت العكس"
+        },
+        {
+          "id": "VT_03",
+          "title": "Monomorphic VT — Positive Vereckei aVR initial R wave",
+          "expected_code": "VENTRICULAR_TACHYCARDIA",
+          "detected_codes": [
+            "VENTRICULAR_TACHYCARDIA"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 62,
+            "sex": "female",
+            "hr_bpm": 190,
+            "qrs_ms": 160,
+            "axis_deg": -110,
+            "rhythm_regular": true,
+            "avr_initial_r_wave": true,
+            "avr_vi_vt_ratio": 0.6
+          },
+          "computed_measurements": {
+            "hr_bpm": 190.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 315.8,
+            "pr_ms": null,
+            "qrs_ms": 160.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": -110.0,
+            "axis_classification": "Extreme Axis Deviation (Northwest / No Man's Land)"
+          },
+          "arabic_summary": "تسارع قلب بمركب QRS عريض — تسارع بطيني (VT) حتى يثبت العكس"
+        },
+        {
+          "id": "VT_04",
+          "title": "Torsades de Pointes (Polymorphic VT + QTc 560 ms)",
+          "expected_code": "TORSADES_DE_POINTES",
+          "detected_codes": [
+            "TORSADES_DE_POINTES",
+            "LONG_QT_CRITICAL"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 54,
+            "sex": "female",
+            "hr_bpm": 220,
+            "qrs_ms": 150,
+            "qt_ms": 540,
+            "rhythm_type": "torsades_de_pointes",
+            "polymorphic_vt": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 220.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 272.7,
+            "pr_ms": null,
+            "qrs_ms": 150.0,
+            "qt_ms": 540.0,
+            "qtc_bazett_ms": 1034.1,
+            "qtc_fridericia_ms": 832.7,
+            "qtc_hodges_ms": 820.0,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "تسارع بطيني متعدد الأشكال (Torsades de Pointes)"
+        },
+        {
+          "id": "VT_05",
+          "title": "Ventricular Fibrillation (Cardiac Arrest)",
+          "expected_code": "VF_OR_ASYSTOLE",
+          "detected_codes": [
+            "VF_OR_ASYSTOLE"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 68,
+            "sex": "male",
+            "rhythm_type": "ventricular_fibrillation"
+          },
+          "computed_measurements": {
+            "hr_bpm": null,
+            "hr_method": "unavailable",
+            "rr_ms": null,
+            "pr_ms": null,
+            "qrs_ms": null,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "رجفان بطيني / توقف قلبي (حالة إنعاش فوري)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "07_wide_complex_vt_tdp_img01",
+          "file_path": "images/07_wide_complex_vt_tdp/07_wide_complex_vt_tdp_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 317,
+          "caption": "Monomorphic Ventricular Tachycardia",
+          "extraction_method": "embedded",
+          "resolution": "994x547",
+          "size_kb": 408.3
+        },
+        {
+          "image_id": "07_wide_complex_vt_tdp_img02",
+          "file_path": "images/07_wide_complex_vt_tdp/07_wide_complex_vt_tdp_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 323,
+          "caption": "Wide-complex tachycardia (VT)",
+          "extraction_method": "embedded",
+          "resolution": "977x800",
+          "size_kb": 733.9
+        },
+        {
+          "image_id": "07_wide_complex_vt_tdp_img03",
+          "file_path": "images/07_wide_complex_vt_tdp/07_wide_complex_vt_tdp_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 331,
+          "caption": "Ventricular tachycardia with AV dissociation",
+          "extraction_method": "rendered_page",
+          "resolution": "892x1263",
+          "size_kb": 150.4
+        },
+        {
+          "image_id": "07_wide_complex_vt_tdp_img04",
+          "file_path": "images/07_wide_complex_vt_tdp/07_wide_complex_vt_tdp_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 341,
+          "caption": "Fascicular / RVOT VT",
+          "extraction_method": "embedded",
+          "resolution": "994x625",
+          "size_kb": 333.0
+        },
+        {
+          "image_id": "07_wide_complex_vt_tdp_img05",
+          "file_path": "images/07_wide_complex_vt_tdp/07_wide_complex_vt_tdp_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 175,
+          "caption": "Polymorphic VT / Torsades de Pointes",
+          "extraction_method": "embedded",
+          "resolution": "700x502",
+          "size_kb": 238.3
+        }
+      ]
+    },
+    "08_av_block_1st_2nd": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "AVB_01",
+          "title": "First-Degree AV Block (PR 240 ms)",
+          "expected_code": "FIRST_DEGREE_AV_BLOCK",
+          "detected_codes": [
+            "FIRST_DEGREE_AV_BLOCK"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 62,
+            "sex": "male",
+            "hr_bpm": 68,
+            "pr_ms": 240,
+            "qrs_ms": 92,
+            "qt_ms": 395,
+            "axis_deg": 30
+          },
+          "computed_measurements": {
+            "hr_bpm": 68.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 882.4,
+            "pr_ms": 240.0,
+            "qrs_ms": 92.0,
+            "qt_ms": 395.0,
+            "qtc_bazett_ms": 420.5,
+            "qtc_fridericia_ms": 411.8,
+            "qtc_hodges_ms": 409.0,
+            "axis_deg": 30.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إحصار أذيني بطيني من الدرجة الأولى"
+        },
+        {
+          "id": "AVB_02",
+          "title": "Marked First-Degree AV Block (PR 320 ms)",
+          "expected_code": "FIRST_DEGREE_AV_BLOCK",
+          "detected_codes": [
+            "FIRST_DEGREE_AV_BLOCK"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 74,
+            "sex": "female",
+            "hr_bpm": 60,
+            "pr_ms": 320,
+            "qrs_ms": 90,
+            "qt_ms": 410,
+            "axis_deg": 20
+          },
+          "computed_measurements": {
+            "hr_bpm": 60.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1000.0,
+            "pr_ms": 320.0,
+            "qrs_ms": 90.0,
+            "qt_ms": 410.0,
+            "qtc_bazett_ms": 410.0,
+            "qtc_fridericia_ms": 410.0,
+            "qtc_hodges_ms": 410.0,
+            "axis_deg": 20.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إحصار أذيني بطيني من الدرجة الأولى"
+        },
+        {
+          "id": "AVB_03",
+          "title": "Second-Degree AV Block — Mobitz I (Wenckebach)",
+          "expected_code": "MOBITZ_I_AV_BLOCK",
+          "detected_codes": [
+            "MOBITZ_I_AV_BLOCK"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 55,
+            "sex": "male",
+            "hr_bpm": 56,
+            "pr_ms": 220,
+            "qrs_ms": 88,
+            "qt_ms": 410,
+            "axis_deg": 40,
+            "av_block_type": "mobitz_1",
+            "progressive_pr_prolongation": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 56.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1071.4,
+            "pr_ms": 220.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 410.0,
+            "qtc_bazett_ms": 396.1,
+            "qtc_fridericia_ms": 400.7,
+            "qtc_hodges_ms": 403.0,
+            "axis_deg": 40.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إحصار أذيني بطيني من الدرجة الثانية — نوع موبيتز 1 (وينكباخ)"
+        },
+        {
+          "id": "AVB_04",
+          "title": "Second-Degree AV Block — Mobitz II (Infranodal, URGENT)",
+          "expected_code": "MOBITZ_II_AV_BLOCK",
+          "detected_codes": [
+            "MOBITZ_II_AV_BLOCK"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 76,
+            "sex": "male",
+            "hr_bpm": 46,
+            "pr_ms": 170,
+            "qrs_ms": 134,
+            "qt_ms": 430,
+            "axis_deg": -45,
+            "av_block_type": "mobitz_2"
+          },
+          "computed_measurements": {
+            "hr_bpm": 46.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1304.3,
+            "pr_ms": 170.0,
+            "qrs_ms": 134.0,
+            "qt_ms": 430.0,
+            "qtc_bazett_ms": 376.5,
+            "qtc_fridericia_ms": 393.6,
+            "qtc_hodges_ms": 405.5,
+            "axis_deg": -45.0,
+            "axis_classification": "Left Axis Deviation (LAD)"
+          },
+          "arabic_summary": "إحصار أذيني بطيني من الدرجة الثانية — نوع موبيتز 2"
+        },
+        {
+          "id": "AVB_05",
+          "title": "2:1 AV Block (URGENT)",
+          "expected_code": "HIGH_GRADE_OR_2_TO_1_AV_BLOCK",
+          "detected_codes": [
+            "HIGH_GRADE_OR_2_TO_1_AV_BLOCK"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 79,
+            "sex": "female",
+            "hr_bpm": 42,
+            "pr_ms": 180,
+            "qrs_ms": 126,
+            "qt_ms": 440,
+            "axis_deg": 10,
+            "av_block_type": "2:1"
+          },
+          "computed_measurements": {
+            "hr_bpm": 42.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1428.6,
+            "pr_ms": 180.0,
+            "qrs_ms": 126.0,
+            "qt_ms": 440.0,
+            "qtc_bazett_ms": 368.1,
+            "qtc_fridericia_ms": 390.7,
+            "qtc_hodges_ms": 408.5,
+            "axis_deg": 10.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إحصار أذيني بطيني 2:1 أو عالي الدرجة"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "08_av_block_1st_2nd_img01",
+          "file_path": "images/08_av_block_1st_2nd/08_av_block_1st_2nd_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 25,
+          "caption": "AV Block — 1st / 2nd degree",
+          "extraction_method": "embedded",
+          "resolution": "812x479",
+          "size_kb": 517.1
+        },
+        {
+          "image_id": "08_av_block_1st_2nd_img02",
+          "file_path": "images/08_av_block_1st_2nd/08_av_block_1st_2nd_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 31,
+          "caption": "Mobitz Type I (Wenckebach) AV Block",
+          "extraction_method": "embedded",
+          "resolution": "892x674",
+          "size_kb": 314.1
+        },
+        {
+          "image_id": "08_av_block_1st_2nd_img03",
+          "file_path": "images/08_av_block_1st_2nd/08_av_block_1st_2nd_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 37,
+          "caption": "Mobitz Type II AV Block",
+          "extraction_method": "embedded",
+          "resolution": "993x560",
+          "size_kb": 510.0
+        },
+        {
+          "image_id": "08_av_block_1st_2nd_img04",
+          "file_path": "images/08_av_block_1st_2nd/08_av_block_1st_2nd_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 43,
+          "caption": "2:1 AV Block",
+          "extraction_method": "rendered_page",
+          "resolution": "892x1264",
+          "size_kb": 436.2
+        },
+        {
+          "image_id": "08_av_block_1st_2nd_img05",
+          "file_path": "images/08_av_block_1st_2nd/08_av_block_1st_2nd_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 27,
+          "caption": "Second-degree AV Block",
+          "extraction_method": "embedded",
+          "resolution": "590x503",
+          "size_kb": 112.2
+        }
+      ]
+    },
+    "09_av_block_3rd_complete": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "CHB_01",
+          "title": "Complete Heart Block with Junctional Escape (HR 44)",
+          "expected_code": "COMPLETE_HEART_BLOCK",
+          "detected_codes": [
+            "COMPLETE_HEART_BLOCK"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 75,
+            "sex": "male",
+            "hr_bpm": 44,
+            "atrial_rate_bpm": 86,
+            "qrs_ms": 96,
+            "av_block_type": "3rd",
+            "av_dissociation": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 44.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1363.6,
+            "pr_ms": null,
+            "qrs_ms": 96.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "إحصار أذيني بطيني كامل (الدرجة الثالثة)"
+        },
+        {
+          "id": "CHB_02",
+          "title": "Complete Heart Block with Wide Ventricular Escape (HR 32)",
+          "expected_code": "COMPLETE_HEART_BLOCK",
+          "detected_codes": [
+            "COMPLETE_HEART_BLOCK"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 82,
+            "sex": "female",
+            "hr_bpm": 32,
+            "atrial_rate_bpm": 92,
+            "qrs_ms": 148,
+            "av_block_type": "complete",
+            "av_dissociation": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 32.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1875.0,
+            "pr_ms": null,
+            "qrs_ms": 148.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "إحصار أذيني بطيني كامل (الدرجة الثالثة)"
+        },
+        {
+          "id": "CHB_03",
+          "title": "Complete AV Block post-Inferior MI (HR 38)",
+          "expected_code": "COMPLETE_HEART_BLOCK",
+          "detected_codes": [
+            "COMPLETE_HEART_BLOCK"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 67,
+            "sex": "male",
+            "hr_bpm": 38,
+            "atrial_rate_bpm": 98,
+            "qrs_ms": 102,
+            "av_block_type": "3rd",
+            "av_dissociation": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 38.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1578.9,
+            "pr_ms": null,
+            "qrs_ms": 102.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "إحصار أذيني بطيني كامل (الدرجة الثالثة)"
+        },
+        {
+          "id": "CHB_04",
+          "title": "Complete Heart Block (HR 28, severe bradycardia)",
+          "expected_code": "COMPLETE_HEART_BLOCK",
+          "detected_codes": [
+            "COMPLETE_HEART_BLOCK"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 84,
+            "sex": "male",
+            "hr_bpm": 28,
+            "atrial_rate_bpm": 88,
+            "qrs_ms": 156,
+            "av_block_type": "complete",
+            "av_dissociation": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 28.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 2142.9,
+            "pr_ms": null,
+            "qrs_ms": 156.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "إحصار أذيني بطيني كامل (الدرجة الثالثة)"
+        },
+        {
+          "id": "CHB_05",
+          "title": "Congenital Complete Heart Block (HR 48)",
+          "expected_code": "COMPLETE_HEART_BLOCK",
+          "detected_codes": [
+            "COMPLETE_HEART_BLOCK"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 24,
+            "sex": "female",
+            "hr_bpm": 48,
+            "atrial_rate_bpm": 82,
+            "qrs_ms": 88,
+            "av_block_type": "3rd",
+            "av_dissociation": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 48.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1250.0,
+            "pr_ms": null,
+            "qrs_ms": 88.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "إحصار أذيني بطيني كامل (الدرجة الثالثة)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "09_av_block_3rd_complete_img01",
+          "file_path": "images/09_av_block_3rd_complete/09_av_block_3rd_complete_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 47,
+          "caption": "Complete Heart Block (3rd degree AVB)",
+          "extraction_method": "embedded",
+          "resolution": "924x507",
+          "size_kb": 550.2
+        },
+        {
+          "image_id": "09_av_block_3rd_complete_img02",
+          "file_path": "images/09_av_block_3rd_complete/09_av_block_3rd_complete_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 51,
+          "caption": "Complete AV Block with escape rhythm",
+          "extraction_method": "rendered_page",
+          "resolution": "890x1264",
+          "size_kb": 80.7
+        },
+        {
+          "image_id": "09_av_block_3rd_complete_img03",
+          "file_path": "images/09_av_block_3rd_complete/09_av_block_3rd_complete_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 55,
+          "caption": "Third-degree AV dissociation",
+          "extraction_method": "embedded",
+          "resolution": "995x455",
+          "size_kb": 154.3
+        },
+        {
+          "image_id": "09_av_block_3rd_complete_img04",
+          "file_path": "images/09_av_block_3rd_complete/09_av_block_3rd_complete_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 39,
+          "caption": "Complete Heart Block 12-lead",
+          "extraction_method": "rendered_page",
+          "resolution": "891x1265",
+          "size_kb": 75.7
+        },
+        {
+          "image_id": "09_av_block_3rd_complete_img05",
+          "file_path": "images/09_av_block_3rd_complete/09_av_block_3rd_complete_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 45,
+          "caption": "Complete AV Block",
+          "extraction_method": "embedded",
+          "resolution": "960x547",
+          "size_kb": 951.2
+        }
+      ]
+    },
+    "10_rbbb_and_fascicular": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "RBBB_01",
+          "title": "Isolated Complete RBBB (QRS 138 ms)",
+          "expected_code": "RBBB",
+          "detected_codes": [
+            "LONG_QT",
+            "RBBB"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 58,
+            "sex": "male",
+            "hr_bpm": 74,
+            "pr_ms": 168,
+            "qrs_ms": 138,
+            "qt_ms": 400,
+            "axis_deg": 45,
+            "qrs_morphology": "rbbb",
+            "rsr_prime_v1": true,
+            "wide_s_i_v6": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 74.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 810.8,
+            "pr_ms": 168.0,
+            "qrs_ms": 138.0,
+            "qt_ms": 400.0,
+            "qtc_bazett_ms": 444.2,
+            "qtc_fridericia_ms": 429.0,
+            "qtc_hodges_ms": 424.5,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "RBBB_02",
+          "title": "Complete RBBB (QRS 144 ms)",
+          "expected_code": "RBBB",
+          "detected_codes": [
+            "RBBB"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 66,
+            "sex": "female",
+            "hr_bpm": 80,
+            "pr_ms": 160,
+            "qrs_ms": 144,
+            "qt_ms": 390,
+            "axis_deg": 60,
+            "rsr_prime_v1": true,
+            "wide_s_i_v6": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 80.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 750.0,
+            "pr_ms": 160.0,
+            "qrs_ms": 144.0,
+            "qt_ms": 390.0,
+            "qtc_bazett_ms": 450.3,
+            "qtc_fridericia_ms": 429.3,
+            "qtc_hodges_ms": 425.0,
+            "axis_deg": 60.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إحصار الحزمة اليمنى (RBBB)"
+        },
+        {
+          "id": "RBBB_03",
+          "title": "Bifascicular Block (RBBB + LAFB, axis -60°)",
+          "expected_code": "BIFASCICULAR_BLOCK",
+          "detected_codes": [
+            "RBBB",
+            "BIFASCICULAR_BLOCK"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 72,
+            "sex": "male",
+            "hr_bpm": 70,
+            "pr_ms": 176,
+            "qrs_ms": 140,
+            "qt_ms": 405,
+            "axis_deg": -60,
+            "qrs_morphology": "rbbb",
+            "lafb": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 70.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 857.1,
+            "pr_ms": 176.0,
+            "qrs_ms": 140.0,
+            "qt_ms": 405.0,
+            "qtc_bazett_ms": 437.5,
+            "qtc_fridericia_ms": 426.4,
+            "qtc_hodges_ms": 422.5,
+            "axis_deg": -60.0,
+            "axis_classification": "Left Axis Deviation (LAD)"
+          },
+          "arabic_summary": "إحصار الحزمة اليمنى (RBBB)"
+        },
+        {
+          "id": "RBBB_04",
+          "title": "Bifascicular Block (RBBB + LPFB, axis +125°)",
+          "expected_code": "BIFASCICULAR_BLOCK",
+          "detected_codes": [
+            "RBBB",
+            "BIFASCICULAR_BLOCK"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 75,
+            "sex": "male",
+            "hr_bpm": 68,
+            "pr_ms": 182,
+            "qrs_ms": 142,
+            "qt_ms": 410,
+            "axis_deg": 125,
+            "qrs_morphology": "rbbb",
+            "lpfb": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 68.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 882.4,
+            "pr_ms": 182.0,
+            "qrs_ms": 142.0,
+            "qt_ms": 410.0,
+            "qtc_bazett_ms": 436.5,
+            "qtc_fridericia_ms": 427.5,
+            "qtc_hodges_ms": 424.0,
+            "axis_deg": 125.0,
+            "axis_classification": "Right Axis Deviation (RAD)"
+          },
+          "arabic_summary": "إحصار الحزمة اليمنى (RBBB)"
+        },
+        {
+          "id": "RBBB_05",
+          "title": "Incomplete Trifascicular Block (RBBB + LAFB + 1st-deg AVB)",
+          "expected_code": "TRIFASCICULAR_BLOCK",
+          "detected_codes": [
+            "TRIFASCICULAR_BLOCK",
+            "FIRST_DEGREE_AV_BLOCK",
+            "RBBB"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 78,
+            "sex": "male",
+            "hr_bpm": 64,
+            "pr_ms": 236,
+            "qrs_ms": 146,
+            "qt_ms": 415,
+            "axis_deg": -55,
+            "qrs_morphology": "rbbb",
+            "lafb": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 64.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 937.5,
+            "pr_ms": 236.0,
+            "qrs_ms": 146.0,
+            "qt_ms": 415.0,
+            "qtc_bazett_ms": 428.6,
+            "qtc_fridericia_ms": 424.0,
+            "qtc_hodges_ms": 422.0,
+            "axis_deg": -55.0,
+            "axis_classification": "Left Axis Deviation (LAD)"
+          },
+          "arabic_summary": "إحصار ثلاثي الحزم غير مكتمل (خطر التطور لإحصار كامل)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "10_rbbb_and_fascicular_img01",
+          "file_path": "images/10_rbbb_and_fascicular/10_rbbb_and_fascicular_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 35,
+          "caption": "RBBB with conduction disease",
+          "extraction_method": "embedded",
+          "resolution": "940x695",
+          "size_kb": 929.7
+        },
+        {
+          "image_id": "10_rbbb_and_fascicular_img02",
+          "file_path": "images/10_rbbb_and_fascicular/10_rbbb_and_fascicular_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 39,
+          "caption": "Bifascicular block (RBBB + LAFB)",
+          "extraction_method": "embedded",
+          "resolution": "903x456",
+          "size_kb": 493.5
+        },
+        {
+          "image_id": "10_rbbb_and_fascicular_img03",
+          "file_path": "images/10_rbbb_and_fascicular/10_rbbb_and_fascicular_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 516,
+          "caption": "RBBB 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "938x452",
+          "size_kb": 339.2
+        },
+        {
+          "image_id": "10_rbbb_and_fascicular_img04",
+          "file_path": "images/10_rbbb_and_fascicular/10_rbbb_and_fascicular_img04.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 77,
+          "caption": "Right Bundle Branch Block (RBBB)",
+          "extraction_method": "embedded",
+          "resolution": "851x1121",
+          "size_kb": 7.6
+        },
+        {
+          "image_id": "10_rbbb_and_fascicular_img05",
+          "file_path": "images/10_rbbb_and_fascicular/10_rbbb_and_fascicular_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 81,
+          "caption": "Left Anterior Fascicular Block (LAFB)",
+          "extraction_method": "embedded",
+          "resolution": "1600x798",
+          "size_kb": 69.5
+        }
+      ]
+    },
+    "11_lbbb": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "LBBB_01",
+          "title": "Complete LBBB (QRS 146 ms)",
+          "expected_code": "LBBB",
+          "detected_codes": [
+            "LONG_QT",
+            "LBBB"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 69,
+            "sex": "male",
+            "hr_bpm": 76,
+            "pr_ms": 178,
+            "qrs_ms": 146,
+            "qt_ms": 410,
+            "axis_deg": -20,
+            "qrs_morphology": "lbbb",
+            "broad_monophasic_r_lateral": true,
+            "deep_qs_v1": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 76.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 789.5,
+            "pr_ms": 178.0,
+            "qrs_ms": 146.0,
+            "qt_ms": 410.0,
+            "qtc_bazett_ms": 461.4,
+            "qtc_fridericia_ms": 443.6,
+            "qtc_hodges_ms": 438.0,
+            "axis_deg": -20.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "LBBB_02",
+          "title": "Complete LBBB with LAD (QRS 154 ms)",
+          "expected_code": "LBBB",
+          "detected_codes": [
+            "LONG_QT",
+            "LBBB"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 73,
+            "sex": "female",
+            "hr_bpm": 72,
+            "pr_ms": 184,
+            "qrs_ms": 154,
+            "qt_ms": 420,
+            "axis_deg": -40,
+            "broad_monophasic_r_lateral": true,
+            "deep_qs_v1": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 72.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 833.3,
+            "pr_ms": 184.0,
+            "qrs_ms": 154.0,
+            "qt_ms": 420.0,
+            "qtc_bazett_ms": 460.1,
+            "qtc_fridericia_ms": 446.3,
+            "qtc_hodges_ms": 441.0,
+            "axis_deg": -40.0,
+            "axis_classification": "Left Axis Deviation (LAD)"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "LBBB_03",
+          "title": "Complete LBBB in Heart Failure (QRS 162 ms)",
+          "expected_code": "LBBB",
+          "detected_codes": [
+            "LONG_QT",
+            "LBBB"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 65,
+            "sex": "male",
+            "hr_bpm": 82,
+            "pr_ms": 190,
+            "qrs_ms": 162,
+            "qt_ms": 400,
+            "axis_deg": -15,
+            "qrs_morphology": "lbbb"
+          },
+          "computed_measurements": {
+            "hr_bpm": 82.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 731.7,
+            "pr_ms": 190.0,
+            "qrs_ms": 162.0,
+            "qt_ms": 400.0,
+            "qtc_bazett_ms": 467.6,
+            "qtc_fridericia_ms": 443.9,
+            "qtc_hodges_ms": 438.5,
+            "axis_deg": -15.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "LBBB_04",
+          "title": "LBBB + Sgarbossa Positive (Concordant STE +2mm = 5 pts — CRITICAL)",
+          "expected_code": "SGARBOSSA_POSITIVE",
+          "detected_codes": [
+            "SGARBOSSA_POSITIVE",
+            "LBBB"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 68,
+            "sex": "male",
+            "hr_bpm": 96,
+            "pr_ms": 172,
+            "qrs_ms": 148,
+            "axis_deg": -25,
+            "qrs_morphology": "lbbb",
+            "concordant_ste_mm": 2.0
+          },
+          "computed_measurements": {
+            "hr_bpm": 96.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 625.0,
+            "pr_ms": 172.0,
+            "qrs_ms": 148.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": -25.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة في وجود LBBB أو منظم ضربات (معيار Sgarbossa إيجابي)"
+        },
+        {
+          "id": "LBBB_05",
+          "title": "LBBB + Sgarbossa Positive (Concordant STD V2 -2mm = 3 pts — CRITICAL)",
+          "expected_code": "SGARBOSSA_POSITIVE",
+          "detected_codes": [
+            "SGARBOSSA_POSITIVE",
+            "LBBB"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 71,
+            "sex": "female",
+            "hr_bpm": 90,
+            "pr_ms": 168,
+            "qrs_ms": 144,
+            "axis_deg": -10,
+            "qrs_morphology": "lbbb",
+            "concordant_std_v1_v3_mm": -2.0
+          },
+          "computed_measurements": {
+            "hr_bpm": 90.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 666.7,
+            "pr_ms": 168.0,
+            "qrs_ms": 144.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": -10.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة في وجود LBBB أو منظم ضربات (معيار Sgarbossa إيجابي)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "11_lbbb_img01",
+          "file_path": "images/11_lbbb/11_lbbb_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 91,
+          "caption": "Left Bundle Branch Block (LBBB)",
+          "extraction_method": "embedded",
+          "resolution": "996x581",
+          "size_kb": 763.4
+        },
+        {
+          "image_id": "11_lbbb_img02",
+          "file_path": "images/11_lbbb/11_lbbb_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 522,
+          "caption": "LBBB 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "930x375",
+          "size_kb": 391.1
+        },
+        {
+          "image_id": "11_lbbb_img03",
+          "file_path": "images/11_lbbb/11_lbbb_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 524,
+          "caption": "LBBB with secondary ST-T discordance",
+          "extraction_method": "embedded",
+          "resolution": "903x420",
+          "size_kb": 421.3
+        },
+        {
+          "image_id": "11_lbbb_img04",
+          "file_path": "images/11_lbbb/11_lbbb_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 204,
+          "caption": "Complete LBBB",
+          "extraction_method": "embedded",
+          "resolution": "881x416",
+          "size_kb": 344.1
+        },
+        {
+          "image_id": "11_lbbb_img05",
+          "file_path": "images/11_lbbb/11_lbbb_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 79,
+          "caption": "Left Bundle Branch Block (LBBB)",
+          "extraction_method": "embedded",
+          "resolution": "1600x786",
+          "size_kb": 140.9
+        }
+      ]
+    },
+    "12_wpw_preexcitation": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "WPW_01",
+          "title": "Classic WPW Pattern (PR 96 ms, QRS 132 ms, delta wave)",
+          "expected_code": "WPW_PATTERN",
+          "detected_codes": [
+            "WPW_PATTERN"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 23,
+            "sex": "male",
+            "hr_bpm": 74,
+            "pr_ms": 96,
+            "qrs_ms": 132,
+            "qt_ms": 380,
+            "axis_deg": 40,
+            "delta_wave": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 74.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 810.8,
+            "pr_ms": 96.0,
+            "qrs_ms": 132.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 422.0,
+            "qtc_fridericia_ms": 407.5,
+            "qtc_hodges_ms": 404.5,
+            "axis_deg": 40.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "نمط وولف-باركنسون-وايت (التنبيه المبكر WPW)"
+        },
+        {
+          "id": "WPW_02",
+          "title": "WPW Type A (Left-sided accessory pathway)",
+          "expected_code": "WPW_PATTERN",
+          "detected_codes": [
+            "WPW_PATTERN"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 29,
+            "sex": "female",
+            "hr_bpm": 80,
+            "pr_ms": 100,
+            "qrs_ms": 128,
+            "qt_ms": 370,
+            "axis_deg": 55,
+            "delta_wave": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 80.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 750.0,
+            "pr_ms": 100.0,
+            "qrs_ms": 128.0,
+            "qt_ms": 370.0,
+            "qtc_bazett_ms": 427.2,
+            "qtc_fridericia_ms": 407.2,
+            "qtc_hodges_ms": 405.0,
+            "axis_deg": 55.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "نمط وولف-باركنسون-وايت (التنبيه المبكر WPW)"
+        },
+        {
+          "id": "WPW_03",
+          "title": "WPW Type B (Right-sided accessory pathway)",
+          "expected_code": "WPW_PATTERN",
+          "detected_codes": [
+            "WPW_PATTERN"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 35,
+            "sex": "male",
+            "hr_bpm": 68,
+            "pr_ms": 104,
+            "qrs_ms": 136,
+            "qt_ms": 395,
+            "axis_deg": -25,
+            "delta_wave": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 68.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 882.4,
+            "pr_ms": 104.0,
+            "qrs_ms": 136.0,
+            "qt_ms": 395.0,
+            "qtc_bazett_ms": 420.5,
+            "qtc_fridericia_ms": 411.8,
+            "qtc_hodges_ms": 409.0,
+            "axis_deg": -25.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "نمط وولف-باركنسون-وايت (التنبيه المبكر WPW)"
+        },
+        {
+          "id": "WPW_04",
+          "title": "WPW Short PR 90 ms + Wide QRS 126 ms",
+          "expected_code": "WPW_PATTERN",
+          "detected_codes": [
+            "WPW_PATTERN"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 19,
+            "sex": "male",
+            "hr_bpm": 72,
+            "pr_ms": 90,
+            "qrs_ms": 126,
+            "qt_ms": 385,
+            "axis_deg": 30,
+            "delta_wave": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 72.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 833.3,
+            "pr_ms": 90.0,
+            "qrs_ms": 126.0,
+            "qt_ms": 385.0,
+            "qtc_bazett_ms": 421.8,
+            "qtc_fridericia_ms": 409.1,
+            "qtc_hodges_ms": 406.0,
+            "axis_deg": 30.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "نمط وولف-باركنسون-وايت (التنبيه المبكر WPW)"
+        },
+        {
+          "id": "WPW_05",
+          "title": "WPW Pre-excited AF (Irregular wide rapid tachycardia — CRITICAL)",
+          "expected_code": "PREEXCITED_AF",
+          "detected_codes": [
+            "PREEXCITED_AF"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 27,
+            "sex": "male",
+            "hr_bpm": 225,
+            "qrs_ms": 152,
+            "shortest_rr_ms": 200,
+            "rhythm_regular": false,
+            "p_waves_present": false,
+            "delta_wave": true,
+            "varying_qrs_morphology": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 225.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 266.7,
+            "pr_ms": null,
+            "qrs_ms": 152.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "رجفان أذيني مع مسار إضافي (Pre-excited AF / WPW) — خطر شديد"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "12_wpw_preexcitation_img01",
+          "file_path": "images/12_wpw_preexcitation/12_wpw_preexcitation_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 99,
+          "caption": "WPW Pre-excitation — delta waves",
+          "extraction_method": "rendered_page",
+          "resolution": "892x1264",
+          "size_kb": 235.8
+        },
+        {
+          "image_id": "12_wpw_preexcitation_img02",
+          "file_path": "images/12_wpw_preexcitation/12_wpw_preexcitation_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 107,
+          "caption": "WPW Pattern 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "939x533",
+          "size_kb": 700.0
+        },
+        {
+          "image_id": "12_wpw_preexcitation_img03",
+          "file_path": "images/12_wpw_preexcitation/12_wpw_preexcitation_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 115,
+          "caption": "WPW with accessory pathway",
+          "extraction_method": "embedded",
+          "resolution": "994x679",
+          "size_kb": 925.9
+        },
+        {
+          "image_id": "12_wpw_preexcitation_img04",
+          "file_path": "images/12_wpw_preexcitation/12_wpw_preexcitation_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 125,
+          "caption": "Pre-excited AF in WPW",
+          "extraction_method": "embedded",
+          "resolution": "994x580",
+          "size_kb": 338.1
+        },
+        {
+          "image_id": "12_wpw_preexcitation_img05",
+          "file_path": "images/12_wpw_preexcitation/12_wpw_preexcitation_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 63,
+          "caption": "WPW Syndrome",
+          "extraction_method": "embedded",
+          "resolution": "813x191",
+          "size_kb": 303.4
+        }
+      ]
+    },
+    "13_long_short_qt": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "QT_01",
+          "title": "Critical Long QTc (535 ms — High TdP Risk)",
+          "expected_code": "LONG_QT_CRITICAL",
+          "detected_codes": [
+            "LONG_QT_CRITICAL"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 48,
+            "sex": "female",
+            "hr_bpm": 60,
+            "pr_ms": 160,
+            "qrs_ms": 88,
+            "qt_ms": 535,
+            "axis_deg": 45
+          },
+          "computed_measurements": {
+            "hr_bpm": 60.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1000.0,
+            "pr_ms": 160.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 535.0,
+            "qtc_bazett_ms": 535.0,
+            "qtc_fridericia_ms": 535.0,
+            "qtc_hodges_ms": 535.0,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة شديدة في QTc (>500 ms) — خطر مرتفع جداً لـ Torsades de Pointes"
+        },
+        {
+          "id": "QT_02",
+          "title": "Critical Drug-Induced Long QTc (520 ms at HR 72)",
+          "expected_code": "LONG_QT_CRITICAL",
+          "detected_codes": [
+            "LONG_QT_CRITICAL"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 62,
+            "sex": "male",
+            "hr_bpm": 72,
+            "pr_ms": 170,
+            "qrs_ms": 92,
+            "qt_ms": 480,
+            "axis_deg": 30
+          },
+          "computed_measurements": {
+            "hr_bpm": 72.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 833.3,
+            "pr_ms": 170.0,
+            "qrs_ms": 92.0,
+            "qt_ms": 480.0,
+            "qtc_bazett_ms": 525.8,
+            "qtc_fridericia_ms": 510.1,
+            "qtc_hodges_ms": 501.0,
+            "axis_deg": 30.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة شديدة في QTc (>500 ms) — خطر مرتفع جداً لـ Torsades de Pointes"
+        },
+        {
+          "id": "QT_03",
+          "title": "Prolonged QTc in Male (QTc ~472 ms)",
+          "expected_code": "LONG_QT",
+          "detected_codes": [
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 35,
+            "sex": "male",
+            "hr_bpm": 65,
+            "pr_ms": 156,
+            "qrs_ms": 90,
+            "qt_ms": 454,
+            "axis_deg": 50
+          },
+          "computed_measurements": {
+            "hr_bpm": 65.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 923.1,
+            "pr_ms": 156.0,
+            "qrs_ms": 90.0,
+            "qt_ms": 454.0,
+            "qtc_bazett_ms": 472.5,
+            "qtc_fridericia_ms": 466.3,
+            "qtc_hodges_ms": 462.8,
+            "axis_deg": 50.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "QT_04",
+          "title": "Prolonged QTc in Female (QTc ~485 ms)",
+          "expected_code": "LONG_QT",
+          "detected_codes": [
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 41,
+            "sex": "female",
+            "hr_bpm": 70,
+            "pr_ms": 152,
+            "qrs_ms": 84,
+            "qt_ms": 450,
+            "axis_deg": 55
+          },
+          "computed_measurements": {
+            "hr_bpm": 70.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 857.1,
+            "pr_ms": 152.0,
+            "qrs_ms": 84.0,
+            "qt_ms": 450.0,
+            "qtc_bazett_ms": 486.1,
+            "qtc_fridericia_ms": 473.7,
+            "qtc_hodges_ms": 467.5,
+            "axis_deg": 55.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "QT_05",
+          "title": "Short QT Syndrome / Hypercalcemia (QTc 320 ms)",
+          "expected_code": "SHORT_QT",
+          "detected_codes": [
+            "SHORT_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 30,
+            "sex": "male",
+            "hr_bpm": 60,
+            "pr_ms": 150,
+            "qrs_ms": 86,
+            "qt_ms": 320,
+            "axis_deg": 40
+          },
+          "computed_measurements": {
+            "hr_bpm": 60.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1000.0,
+            "pr_ms": 150.0,
+            "qrs_ms": 86.0,
+            "qt_ms": 320.0,
+            "qtc_bazett_ms": 320.0,
+            "qtc_fridericia_ms": 320.0,
+            "qtc_hodges_ms": 320.0,
+            "axis_deg": 40.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "قِصر في مسافة QTc"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "13_long_short_qt_img01",
+          "file_path": "images/13_long_short_qt/13_long_short_qt_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 173,
+          "caption": "Long QT Syndrome (LQTS)",
+          "extraction_method": "rendered_page",
+          "resolution": "913x1267",
+          "size_kb": 344.1
+        },
+        {
+          "image_id": "13_long_short_qt_img02",
+          "file_path": "images/13_long_short_qt/13_long_short_qt_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 179,
+          "caption": "Marked QT prolongation",
+          "extraction_method": "embedded",
+          "resolution": "994x632",
+          "size_kb": 318.5
+        },
+        {
+          "image_id": "13_long_short_qt_img03",
+          "file_path": "images/13_long_short_qt/13_long_short_qt_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 185,
+          "caption": "Congenital/Acquired Long QT",
+          "extraction_method": "embedded",
+          "resolution": "788x749",
+          "size_kb": 1137.5
+        },
+        {
+          "image_id": "13_long_short_qt_img04",
+          "file_path": "images/13_long_short_qt/13_long_short_qt_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 191,
+          "caption": "Short QT / QT abnormality",
+          "extraction_method": "embedded",
+          "resolution": "779x826",
+          "size_kb": 691.5
+        },
+        {
+          "image_id": "13_long_short_qt_img05",
+          "file_path": "images/13_long_short_qt/13_long_short_qt_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 83,
+          "caption": "Long QT Syndrome",
+          "extraction_method": "embedded",
+          "resolution": "536x412",
+          "size_kb": 230.8
+        }
+      ]
+    },
+    "14_brugada_syndrome": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "BRUG_01",
+          "title": "Brugada Type 1 (Coved STE 3.0 mm in V1-V2)",
+          "expected_code": "BRUGADA_TYPE_1",
+          "detected_codes": [
+            "STEMI",
+            "BRUGADA_TYPE_1"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 38,
+            "sex": "male",
+            "hr_bpm": 74,
+            "pr_ms": 176,
+            "qrs_ms": 106,
+            "qt_ms": 380,
+            "axis_deg": 45,
+            "brugada_pattern": "type_1",
+            "coved_ste_v1_v2": true,
+            "st_elevation_mm": {
+              "V1": 3.0,
+              "V2": 2.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 74.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 810.8,
+            "pr_ms": 176.0,
+            "qrs_ms": 106.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 422.0,
+            "qtc_fridericia_ms": 407.5,
+            "qtc_hodges_ms": 404.5,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)"
+        },
+        {
+          "id": "BRUG_02",
+          "title": "Fever-Unmasked Brugada Type 1 (V1 STE 2.5 mm)",
+          "expected_code": "BRUGADA_TYPE_1",
+          "detected_codes": [
+            "STEMI",
+            "LONG_QT",
+            "BRUGADA_TYPE_1"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 44,
+            "sex": "male",
+            "hr_bpm": 102,
+            "pr_ms": 164,
+            "qrs_ms": 104,
+            "qt_ms": 350,
+            "axis_deg": 50,
+            "coved_ste_v1_v2": true,
+            "st_elevation_mm": {
+              "V1": 2.5,
+              "V2": 2.2
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 102.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 588.2,
+            "pr_ms": 164.0,
+            "qrs_ms": 104.0,
+            "qt_ms": 350.0,
+            "qtc_bazett_ms": 456.4,
+            "qtc_fridericia_ms": 417.7,
+            "qtc_hodges_ms": 423.5,
+            "axis_deg": 50.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)"
+        },
+        {
+          "id": "BRUG_03",
+          "title": "Brugada Type 1 with Syncope (V2 Coved STE 3.5 mm)",
+          "expected_code": "BRUGADA_TYPE_1",
+          "detected_codes": [
+            "STEMI",
+            "BRUGADA_TYPE_1"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 33,
+            "sex": "male",
+            "hr_bpm": 66,
+            "pr_ms": 182,
+            "qrs_ms": 108,
+            "qt_ms": 395,
+            "axis_deg": 35,
+            "brugada_pattern": "type_1",
+            "st_elevation_mm": {
+              "V1": 2.2,
+              "V2": 3.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 66.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 909.1,
+            "pr_ms": 182.0,
+            "qrs_ms": 108.0,
+            "qt_ms": 395.0,
+            "qtc_bazett_ms": 414.3,
+            "qtc_fridericia_ms": 407.7,
+            "qtc_hodges_ms": 405.5,
+            "axis_deg": 35.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)"
+        },
+        {
+          "id": "BRUG_04",
+          "title": "Brugada Type 2 (Saddleback STE 2.5 mm in V2)",
+          "expected_code": "BRUGADA_TYPE_2",
+          "detected_codes": [
+            "BRUGADA_TYPE_2"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 31,
+            "sex": "male",
+            "hr_bpm": 70,
+            "pr_ms": 160,
+            "qrs_ms": 98,
+            "qt_ms": 385,
+            "axis_deg": 55,
+            "brugada_pattern": "type_2",
+            "saddleback_ste_v1_v2": true,
+            "st_elevation_mm": {
+              "V2": 2.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 70.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 857.1,
+            "pr_ms": 160.0,
+            "qrs_ms": 98.0,
+            "qt_ms": 385.0,
+            "qtc_bazett_ms": 415.9,
+            "qtc_fridericia_ms": 405.3,
+            "qtc_hodges_ms": 402.5,
+            "axis_deg": 55.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "نمط بروجادا النوع الثاني (Saddleback)"
+        },
+        {
+          "id": "BRUG_05",
+          "title": "Brugada Type 2 (Saddleback V1-V2 2.2 mm)",
+          "expected_code": "BRUGADA_TYPE_2",
+          "detected_codes": [
+            "STEMI",
+            "BRUGADA_TYPE_2"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 40,
+            "sex": "female",
+            "hr_bpm": 76,
+            "pr_ms": 154,
+            "qrs_ms": 94,
+            "qt_ms": 390,
+            "axis_deg": 45,
+            "saddleback_ste_v1_v2": true,
+            "st_elevation_mm": {
+              "V1": 2.0,
+              "V2": 2.2
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 76.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 789.5,
+            "pr_ms": 154.0,
+            "qrs_ms": 94.0,
+            "qt_ms": 390.0,
+            "qtc_bazett_ms": 438.9,
+            "qtc_fridericia_ms": 422.0,
+            "qtc_hodges_ms": 418.0,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "جلطة قلبية حادة مصحوبة بارتفاع وصلة ST (STEMI)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "14_brugada_syndrome_img01",
+          "file_path": "images/14_brugada_syndrome/14_brugada_syndrome_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 219,
+          "caption": "Brugada Type 1 (Coved STE V1-V2)",
+          "extraction_method": "embedded",
+          "resolution": "995x469",
+          "size_kb": 669.3
+        },
+        {
+          "image_id": "14_brugada_syndrome_img02",
+          "file_path": "images/14_brugada_syndrome/14_brugada_syndrome_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 225,
+          "caption": "Brugada Syndrome 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "994x662",
+          "size_kb": 205.9
+        },
+        {
+          "image_id": "14_brugada_syndrome_img03",
+          "file_path": "images/14_brugada_syndrome/14_brugada_syndrome_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 231,
+          "caption": "Brugada Type 1 / Type 2",
+          "extraction_method": "embedded",
+          "resolution": "994x484",
+          "size_kb": 604.5
+        },
+        {
+          "image_id": "14_brugada_syndrome_img04",
+          "file_path": "images/14_brugada_syndrome/14_brugada_syndrome_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 239,
+          "caption": "Brugada pattern right precordial",
+          "extraction_method": "embedded",
+          "resolution": "994x460",
+          "size_kb": 462.0
+        },
+        {
+          "image_id": "14_brugada_syndrome_img05",
+          "file_path": "images/14_brugada_syndrome/14_brugada_syndrome_img05.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 89,
+          "caption": "Brugada Type 1",
+          "extraction_method": "embedded",
+          "resolution": "813x429",
+          "size_kb": 303.9
+        }
+      ]
+    },
+    "15_lvh_rvh_enlargement": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "HYP_01",
+          "title": "LVH by Sokolow-Lyon (SV1 18 + RV5 24 = 42 mm)",
+          "expected_code": "LVH",
+          "detected_codes": [
+            "LVH"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 62,
+            "sex": "male",
+            "hr_bpm": 74,
+            "pr_ms": 170,
+            "qrs_ms": 98,
+            "qt_ms": 395,
+            "axis_deg": -10,
+            "s_v1_mm": 18,
+            "r_v5_mm": 24,
+            "r_v6_mm": 21
+          },
+          "computed_measurements": {
+            "hr_bpm": 74.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 810.8,
+            "pr_ms": 170.0,
+            "qrs_ms": 98.0,
+            "qt_ms": 395.0,
+            "qtc_bazett_ms": 438.7,
+            "qtc_fridericia_ms": 423.6,
+            "qtc_hodges_ms": 419.5,
+            "axis_deg": -10.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "تضخم البطين الأيسر (LVH)"
+        },
+        {
+          "id": "HYP_02",
+          "title": "LVH by Cornell in Female (R aVL 12 + S V3 14 = 26 mm > 20)",
+          "expected_code": "LVH",
+          "detected_codes": [
+            "LVH"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 67,
+            "sex": "female",
+            "hr_bpm": 78,
+            "pr_ms": 164,
+            "qrs_ms": 94,
+            "qt_ms": 390,
+            "axis_deg": -20,
+            "r_avl_mm": 12,
+            "s_v3_mm": 14
+          },
+          "computed_measurements": {
+            "hr_bpm": 78.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 769.2,
+            "pr_ms": 164.0,
+            "qrs_ms": 94.0,
+            "qt_ms": 390.0,
+            "qtc_bazett_ms": 444.7,
+            "qtc_fridericia_ms": 425.6,
+            "qtc_hodges_ms": 421.5,
+            "axis_deg": -20.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "تضخم البطين الأيسر (LVH)"
+        },
+        {
+          "id": "HYP_03",
+          "title": "LVH by Cornell in Male (R aVL 15 + S V3 18 = 33 mm > 28)",
+          "expected_code": "LVH",
+          "detected_codes": [
+            "LVH"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 59,
+            "sex": "male",
+            "hr_bpm": 70,
+            "pr_ms": 174,
+            "qrs_ms": 100,
+            "qt_ms": 400,
+            "axis_deg": -25,
+            "r_avl_mm": 15,
+            "s_v3_mm": 18
+          },
+          "computed_measurements": {
+            "hr_bpm": 70.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 857.1,
+            "pr_ms": 174.0,
+            "qrs_ms": 100.0,
+            "qt_ms": 400.0,
+            "qtc_bazett_ms": 432.1,
+            "qtc_fridericia_ms": 421.1,
+            "qtc_hodges_ms": 417.5,
+            "axis_deg": -25.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "تضخم البطين الأيسر (LVH)"
+        },
+        {
+          "id": "HYP_04",
+          "title": "RVH with Pulmonary Hypertension (R V1 11 mm, R/S 2.2, RAD +125°)",
+          "expected_code": "RVH",
+          "detected_codes": [
+            "RVH"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 46,
+            "sex": "female",
+            "hr_bpm": 88,
+            "pr_ms": 158,
+            "qrs_ms": 92,
+            "qt_ms": 375,
+            "axis_deg": 125,
+            "r_v1_mm": 11,
+            "v1_r_to_s_ratio": 2.2
+          },
+          "computed_measurements": {
+            "hr_bpm": 88.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 681.8,
+            "pr_ms": 158.0,
+            "qrs_ms": 92.0,
+            "qt_ms": 375.0,
+            "qtc_bazett_ms": 454.2,
+            "qtc_fridericia_ms": 426.1,
+            "qtc_hodges_ms": 424.0,
+            "axis_deg": 125.0,
+            "axis_classification": "Right Axis Deviation (RAD)"
+          },
+          "arabic_summary": "تضخم البطين الأيمن (RVH)"
+        },
+        {
+          "id": "HYP_05",
+          "title": "RVH in Congenital Heart Disease (R V1 14 mm, RAD +135°)",
+          "expected_code": "RVH",
+          "detected_codes": [
+            "LONG_QT",
+            "RVH"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 28,
+            "sex": "male",
+            "hr_bpm": 82,
+            "pr_ms": 162,
+            "qrs_ms": 96,
+            "qt_ms": 380,
+            "axis_deg": 135,
+            "r_v1_mm": 14,
+            "v1_r_to_s_ratio": 3.0
+          },
+          "computed_measurements": {
+            "hr_bpm": 82.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 731.7,
+            "pr_ms": 162.0,
+            "qrs_ms": 96.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 444.2,
+            "qtc_fridericia_ms": 421.7,
+            "qtc_hodges_ms": 418.5,
+            "axis_deg": 135.0,
+            "axis_classification": "Right Axis Deviation (RAD)"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "15_lvh_rvh_enlargement_img01",
+          "file_path": "images/15_lvh_rvh_enlargement/15_lvh_rvh_enlargement_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 501,
+          "caption": "LVH with strain / HCM",
+          "extraction_method": "embedded",
+          "resolution": "949x519",
+          "size_kb": 347.6
+        },
+        {
+          "image_id": "15_lvh_rvh_enlargement_img02",
+          "file_path": "images/15_lvh_rvh_enlargement/15_lvh_rvh_enlargement_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 505,
+          "caption": "Severe LVH / Apical HCM",
+          "extraction_method": "embedded",
+          "resolution": "1001x667",
+          "size_kb": 528.9
+        },
+        {
+          "image_id": "15_lvh_rvh_enlargement_img03",
+          "file_path": "images/15_lvh_rvh_enlargement/15_lvh_rvh_enlargement_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 509,
+          "caption": "Ventricular hypertrophy 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "1201x637",
+          "size_kb": 859.1
+        },
+        {
+          "image_id": "15_lvh_rvh_enlargement_img04",
+          "file_path": "images/15_lvh_rvh_enlargement/15_lvh_rvh_enlargement_img04.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 71,
+          "caption": "Left Ventricular Hypertrophy (LVH)",
+          "extraction_method": "embedded",
+          "resolution": "1600x1306",
+          "size_kb": 130.2
+        },
+        {
+          "image_id": "15_lvh_rvh_enlargement_img05",
+          "file_path": "images/15_lvh_rvh_enlargement/15_lvh_rvh_enlargement_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 73,
+          "caption": "Right Ventricular Hypertrophy (RVH)",
+          "extraction_method": "embedded",
+          "resolution": "1600x880",
+          "size_kb": 53.8
+        }
+      ]
+    },
+    "16_hyperkalemia": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "HK_01",
+          "title": "Mild-Moderate Hyperkalemia (Peaked T waves 12 mm)",
+          "expected_code": "HYPERKALEMIA",
+          "detected_codes": [
+            "HYPERKALEMIA"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 58,
+            "sex": "male",
+            "hr_bpm": 72,
+            "pr_ms": 180,
+            "qrs_ms": 96,
+            "qt_ms": 370,
+            "axis_deg": 40,
+            "peaked_t_waves": true,
+            "max_t_wave_amplitude_mm": 12.0
+          },
+          "computed_measurements": {
+            "hr_bpm": 72.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 833.3,
+            "pr_ms": 180.0,
+            "qrs_ms": 96.0,
+            "qt_ms": 370.0,
+            "qtc_bazett_ms": 405.3,
+            "qtc_fridericia_ms": 393.2,
+            "qtc_hodges_ms": 391.0,
+            "axis_deg": 40.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "ارتفاع البوتاسيوم في الدم (موجات T حادة ومرتفعة)"
+        },
+        {
+          "id": "HK_02",
+          "title": "Hyperkalemia (Tented T waves 14 mm in V3-V4)",
+          "expected_code": "HYPERKALEMIA",
+          "detected_codes": [
+            "HYPERKALEMIA"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 64,
+            "sex": "female",
+            "hr_bpm": 66,
+            "pr_ms": 195,
+            "qrs_ms": 104,
+            "qt_ms": 380,
+            "axis_deg": 35,
+            "peaked_t_waves": true,
+            "max_t_wave_amplitude_mm": 14.0
+          },
+          "computed_measurements": {
+            "hr_bpm": 66.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 909.1,
+            "pr_ms": 195.0,
+            "qrs_ms": 104.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 398.5,
+            "qtc_fridericia_ms": 392.3,
+            "qtc_hodges_ms": 390.5,
+            "axis_deg": 35.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "ارتفاع البوتاسيوم في الدم (موجات T حادة ومرتفعة)"
+        },
+        {
+          "id": "HK_03",
+          "title": "Severe Hyperkalemia (Peaked T + QRS 144 ms + flattened P — CRITICAL)",
+          "expected_code": "HYPERKALEMIA_SEVERE",
+          "detected_codes": [
+            "HYPERKALEMIA_SEVERE",
+            "FIRST_DEGREE_AV_BLOCK"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 69,
+            "sex": "male",
+            "hr_bpm": 54,
+            "pr_ms": 240,
+            "qrs_ms": 144,
+            "qt_ms": 400,
+            "axis_deg": 20,
+            "peaked_t_waves": true,
+            "max_t_wave_amplitude_mm": 15.0,
+            "flattened_or_absent_p_hyperk": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 54.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1111.1,
+            "pr_ms": 240.0,
+            "qrs_ms": 144.0,
+            "qt_ms": 400.0,
+            "qtc_bazett_ms": 379.5,
+            "qtc_fridericia_ms": 386.2,
+            "qtc_hodges_ms": 389.5,
+            "axis_deg": 20.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "ارتفاع شديد وخطير في البوتاسيوم (Hyperkalemia) — خطر توقف قلب فوري"
+        },
+        {
+          "id": "HK_04",
+          "title": "Severe Hyperkalemia (QRS 168 ms, absent P — CRITICAL)",
+          "expected_code": "HYPERKALEMIA_SEVERE",
+          "detected_codes": [
+            "HYPERKALEMIA_SEVERE"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 72,
+            "sex": "female",
+            "hr_bpm": 48,
+            "qrs_ms": 168,
+            "peaked_t_waves": true,
+            "flattened_or_absent_p_hyperk": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 48.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1250.0,
+            "pr_ms": null,
+            "qrs_ms": 168.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "ارتفاع شديد وخطير في البوتاسيوم (Hyperkalemia) — خطر توقف قلب فوري"
+        },
+        {
+          "id": "HK_05",
+          "title": "Life-Threatening Hyperkalemia Sine-Wave Pattern (CRITICAL)",
+          "expected_code": "HYPERKALEMIA_SEVERE",
+          "detected_codes": [
+            "HYPERKALEMIA_SEVERE"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 61,
+            "sex": "male",
+            "hr_bpm": 42,
+            "qrs_ms": 210,
+            "sine_wave_pattern": true,
+            "peaked_t_waves": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 42.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1428.6,
+            "pr_ms": null,
+            "qrs_ms": 210.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": null,
+            "axis_classification": null
+          },
+          "arabic_summary": "ارتفاع شديد وخطير في البوتاسيوم (Hyperkalemia) — خطر توقف قلب فوري"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "16_hyperkalemia_img01",
+          "file_path": "images/16_hyperkalemia/16_hyperkalemia_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 435,
+          "caption": "Hyperkalemia peaked T waves",
+          "extraction_method": "rendered_page",
+          "resolution": "891x1273",
+          "size_kb": 244.3
+        },
+        {
+          "image_id": "16_hyperkalemia_img02",
+          "file_path": "images/16_hyperkalemia/16_hyperkalemia_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 439,
+          "caption": "Severe Hyperkalemia widened QRS",
+          "extraction_method": "rendered_page",
+          "resolution": "891x1264",
+          "size_kb": 75.6
+        },
+        {
+          "image_id": "16_hyperkalemia_img03",
+          "file_path": "images/16_hyperkalemia/16_hyperkalemia_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 441,
+          "caption": "Hyperkalemia sine-wave / absent P",
+          "extraction_method": "embedded",
+          "resolution": "998x461",
+          "size_kb": 471.1
+        },
+        {
+          "image_id": "16_hyperkalemia_img04",
+          "file_path": "images/16_hyperkalemia/16_hyperkalemia_img04.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 121,
+          "caption": "Hyperkalemia progression",
+          "extraction_method": "embedded",
+          "resolution": "1091x1731",
+          "size_kb": 14.6
+        },
+        {
+          "image_id": "16_hyperkalemia_img05",
+          "file_path": "images/16_hyperkalemia/16_hyperkalemia_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 122,
+          "caption": "Severe Hyperkalemia",
+          "extraction_method": "embedded",
+          "resolution": "1600x592",
+          "size_kb": 84.0
+        }
+      ]
+    },
+    "17_hypokalemia_electrolytes_hypothermia": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "ELEC_01",
+          "title": "Moderate Hypokalemia (Prominent U waves 2.0 mm)",
+          "expected_code": "HYPOKALEMIA",
+          "detected_codes": [
+            "HYPOKALEMIA"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 54,
+            "sex": "female",
+            "hr_bpm": 78,
+            "pr_ms": 164,
+            "qrs_ms": 88,
+            "qt_ms": 400,
+            "axis_deg": 45,
+            "prominent_u_waves": true,
+            "u_wave_amplitude_mm": 2.0
+          },
+          "computed_measurements": {
+            "hr_bpm": 78.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 769.2,
+            "pr_ms": 164.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 400.0,
+            "qtc_bazett_ms": 456.1,
+            "qtc_fridericia_ms": 436.6,
+            "qtc_hodges_ms": 431.5,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "انخفاض البوتاسيوم في الدم (موجات U بارزة وتسطح T)"
+        },
+        {
+          "id": "ELEC_02",
+          "title": "Severe Hypokalemia (U wave 3.0 mm + prolonged QTc)",
+          "expected_code": "HYPOKALEMIA",
+          "detected_codes": [
+            "LONG_QT_CRITICAL",
+            "HYPOKALEMIA"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 49,
+            "sex": "male",
+            "hr_bpm": 72,
+            "pr_ms": 172,
+            "qrs_ms": 92,
+            "qt_ms": 465,
+            "axis_deg": 35,
+            "prominent_u_waves": true,
+            "u_wave_amplitude_mm": 3.0
+          },
+          "computed_measurements": {
+            "hr_bpm": 72.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 833.3,
+            "pr_ms": 172.0,
+            "qrs_ms": 92.0,
+            "qt_ms": 465.0,
+            "qtc_bazett_ms": 509.4,
+            "qtc_fridericia_ms": 494.1,
+            "qtc_hodges_ms": 486.0,
+            "axis_deg": 35.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة شديدة في QTc (>500 ms) — خطر مرتفع جداً لـ Torsades de Pointes"
+        },
+        {
+          "id": "ELEC_03",
+          "title": "Hypokalemia (U wave 1.8 mm in V2-V4)",
+          "expected_code": "HYPOKALEMIA",
+          "detected_codes": [
+            "LONG_QT",
+            "HYPOKALEMIA"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 63,
+            "sex": "female",
+            "hr_bpm": 84,
+            "pr_ms": 158,
+            "qrs_ms": 86,
+            "qt_ms": 390,
+            "axis_deg": 40,
+            "u_wave_amplitude_mm": 1.8
+          },
+          "computed_measurements": {
+            "hr_bpm": 84.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 714.3,
+            "pr_ms": 158.0,
+            "qrs_ms": 86.0,
+            "qt_ms": 390.0,
+            "qtc_bazett_ms": 461.4,
+            "qtc_fridericia_ms": 436.3,
+            "qtc_hodges_ms": 432.0,
+            "axis_deg": 40.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "ELEC_04",
+          "title": "Hypothermia with Osborn (J) Waves (HR 46)",
+          "expected_code": "HYPOTHERMIA_OSBORN",
+          "detected_codes": [
+            "HYPOTHERMIA_OSBORN",
+            "FIRST_DEGREE_AV_BLOCK"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 70,
+            "sex": "male",
+            "hr_bpm": 46,
+            "pr_ms": 210,
+            "qrs_ms": 116,
+            "qt_ms": 470,
+            "axis_deg": 50,
+            "osborn_j_waves": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 46.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1304.3,
+            "pr_ms": 210.0,
+            "qrs_ms": 116.0,
+            "qt_ms": 470.0,
+            "qtc_bazett_ms": 411.5,
+            "qtc_fridericia_ms": 430.2,
+            "qtc_hodges_ms": 445.5,
+            "axis_deg": 50.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "انخفاض حرارة الجسم (موجات أوزبورن Osborn / J waves)"
+        },
+        {
+          "id": "ELEC_05",
+          "title": "Severe Hypothermia with Giant Osborn Waves (HR 38)",
+          "expected_code": "HYPOTHERMIA_OSBORN",
+          "detected_codes": [
+            "HYPOTHERMIA_OSBORN",
+            "FIRST_DEGREE_AV_BLOCK"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 65,
+            "sex": "male",
+            "hr_bpm": 38,
+            "pr_ms": 224,
+            "qrs_ms": 124,
+            "qt_ms": 510,
+            "axis_deg": 40,
+            "osborn_j_waves": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 38.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 1578.9,
+            "pr_ms": 224.0,
+            "qrs_ms": 124.0,
+            "qt_ms": 510.0,
+            "qtc_bazett_ms": 405.9,
+            "qtc_fridericia_ms": 438.0,
+            "qtc_hodges_ms": 471.5,
+            "axis_deg": 40.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "انخفاض حرارة الجسم (موجات أوزبورن Osborn / J waves)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "17_hypokalemia_electrolytes_hypothermia_img01",
+          "file_path": "images/17_hypokalemia_electrolytes_hypothermia/17_hypokalemia_electrolytes_hypothermia_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 433,
+          "caption": "Electrolyte abnormality (Hypokalemia)",
+          "extraction_method": "embedded",
+          "resolution": "1208x649",
+          "size_kb": 1546.4
+        },
+        {
+          "image_id": "17_hypokalemia_electrolytes_hypothermia_img02",
+          "file_path": "images/17_hypokalemia_electrolytes_hypothermia/17_hypokalemia_electrolytes_hypothermia_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 443,
+          "caption": "Hypokalemia prominent U waves",
+          "extraction_method": "rendered_page",
+          "resolution": "893x1265",
+          "size_kb": 465.5
+        },
+        {
+          "image_id": "17_hypokalemia_electrolytes_hypothermia_img03",
+          "file_path": "images/17_hypokalemia_electrolytes_hypothermia/17_hypokalemia_electrolytes_hypothermia_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 213,
+          "caption": "Hypothermia Osborn (J) waves",
+          "extraction_method": "embedded",
+          "resolution": "1166x584",
+          "size_kb": 687.5
+        },
+        {
+          "image_id": "17_hypokalemia_electrolytes_hypothermia_img04",
+          "file_path": "images/17_hypokalemia_electrolytes_hypothermia/17_hypokalemia_electrolytes_hypothermia_img04.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 123,
+          "caption": "Hypokalemia ST depression & U waves",
+          "extraction_method": "embedded",
+          "resolution": "1490x1194",
+          "size_kb": 12.1
+        },
+        {
+          "image_id": "17_hypokalemia_electrolytes_hypothermia_img05",
+          "file_path": "images/17_hypokalemia_electrolytes_hypothermia/17_hypokalemia_electrolytes_hypothermia_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 124,
+          "caption": "Hypocalcemia / Hypercalcemia QT",
+          "extraction_method": "embedded",
+          "resolution": "1525x2448",
+          "size_kb": 24.3
+        }
+      ]
+    },
+    "18_pericarditis_tamponade": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "PER_01",
+          "title": "Acute Pericarditis (Diffuse concave STE in 6 leads + PR depression)",
+          "expected_code": "ACUTE_PERICARDITIS",
+          "detected_codes": [
+            "ACUTE_PERICARDITIS",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 29,
+            "sex": "male",
+            "hr_bpm": 96,
+            "pr_ms": 152,
+            "qrs_ms": 86,
+            "qt_ms": 360,
+            "axis_deg": 50,
+            "st_morphology_concave": true,
+            "pr_depression": true,
+            "v6_st_t_ratio": 0.4,
+            "st_elevation_mm": {
+              "I": 1.5,
+              "II": 2.0,
+              "aVF": 1.5,
+              "V4": 2.0,
+              "V5": 2.0,
+              "V6": 1.8,
+              "aVR": -1.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 96.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 625.0,
+            "pr_ms": 152.0,
+            "qrs_ms": 86.0,
+            "qt_ms": 360.0,
+            "qtc_bazett_ms": 455.4,
+            "qtc_fridericia_ms": 421.1,
+            "qtc_hodges_ms": 423.0,
+            "axis_deg": 50.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "التهاب التامور الحاد (Acute Pericarditis)"
+        },
+        {
+          "id": "PER_02",
+          "title": "Acute Pericarditis (Diffuse STE + V6 ST/T ratio 0.35)",
+          "expected_code": "ACUTE_PERICARDITIS",
+          "detected_codes": [
+            "ACUTE_PERICARDITIS"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 34,
+            "sex": "female",
+            "hr_bpm": 92,
+            "pr_ms": 148,
+            "qrs_ms": 82,
+            "qt_ms": 365,
+            "axis_deg": 55,
+            "st_morphology_concave": true,
+            "pr_depression": true,
+            "v6_st_t_ratio": 0.35,
+            "st_elevation_mm": {
+              "I": 1.2,
+              "II": 1.8,
+              "III": 1.2,
+              "aVF": 1.5,
+              "V5": 1.8,
+              "V6": 1.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 92.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 652.2,
+            "pr_ms": 148.0,
+            "qrs_ms": 82.0,
+            "qt_ms": 365.0,
+            "qtc_bazett_ms": 452.0,
+            "qtc_fridericia_ms": 420.9,
+            "qtc_hodges_ms": 421.0,
+            "axis_deg": 55.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "التهاب التامور الحاد (Acute Pericarditis)"
+        },
+        {
+          "id": "PER_03",
+          "title": "Post-Viral Pericarditis (Diffuse STE 5 leads)",
+          "expected_code": "ACUTE_PERICARDITIS",
+          "detected_codes": [
+            "ACUTE_PERICARDITIS",
+            "LONG_QT"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 26,
+            "sex": "male",
+            "hr_bpm": 102,
+            "pr_ms": 144,
+            "qrs_ms": 88,
+            "qt_ms": 345,
+            "axis_deg": 60,
+            "st_morphology_concave": true,
+            "pr_depression": true,
+            "st_elevation_mm": {
+              "II": 1.5,
+              "aVF": 1.5,
+              "V4": 2.0,
+              "V5": 1.5,
+              "V6": 1.5
+            }
+          },
+          "computed_measurements": {
+            "hr_bpm": 102.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 588.2,
+            "pr_ms": 144.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 345.0,
+            "qtc_bazett_ms": 449.8,
+            "qtc_fridericia_ms": 411.8,
+            "qtc_hodges_ms": 418.5,
+            "axis_deg": 60.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "التهاب التامور الحاد (Acute Pericarditis)"
+        },
+        {
+          "id": "PER_04",
+          "title": "Cardiac Tamponade (Low voltage + Sinus Tach + Electrical Alternans — CRITICAL)",
+          "expected_code": "CARDIAC_TAMPONADE_SUSPECTED",
+          "detected_codes": [
+            "CARDIAC_TAMPONADE_SUSPECTED",
+            "LONG_QT"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 55,
+            "sex": "female",
+            "hr_bpm": 124,
+            "pr_ms": 148,
+            "qrs_ms": 84,
+            "qt_ms": 325,
+            "axis_deg": 45,
+            "max_limb_qrs_mm": 3.5,
+            "low_voltage": true,
+            "electrical_alternans": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 124.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 483.9,
+            "pr_ms": 148.0,
+            "qrs_ms": 84.0,
+            "qt_ms": 325.0,
+            "qtc_bazett_ms": 467.2,
+            "qtc_fridericia_ms": 414.0,
+            "qtc_hodges_ms": 437.0,
+            "axis_deg": 45.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "اشتباه اندحاس قلبي (Cardiac Tamponade) — حالة طارئة"
+        },
+        {
+          "id": "PER_05",
+          "title": "Malignant Pericardial Tamponade (Low voltage + Alternans — CRITICAL)",
+          "expected_code": "CARDIAC_TAMPONADE_SUSPECTED",
+          "detected_codes": [
+            "CARDIAC_TAMPONADE_SUSPECTED",
+            "LONG_QT"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 62,
+            "sex": "male",
+            "hr_bpm": 132,
+            "pr_ms": 142,
+            "qrs_ms": 86,
+            "qt_ms": 315,
+            "axis_deg": 50,
+            "max_limb_qrs_mm": 4.0,
+            "electrical_alternans": true,
+            "pericardial_effusion_suspected": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 132.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 454.5,
+            "pr_ms": 142.0,
+            "qrs_ms": 86.0,
+            "qt_ms": 315.0,
+            "qtc_bazett_ms": 467.2,
+            "qtc_fridericia_ms": 409.7,
+            "qtc_hodges_ms": 441.0,
+            "axis_deg": 50.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "اشتباه اندحاس قلبي (Cardiac Tamponade) — حالة طارئة"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "18_pericarditis_tamponade_img01",
+          "file_path": "images/18_pericarditis_tamponade/18_pericarditis_tamponade_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 447,
+          "caption": "Acute Pericarditis diffuse concave STE",
+          "extraction_method": "embedded",
+          "resolution": "901x441",
+          "size_kb": 200.1
+        },
+        {
+          "image_id": "18_pericarditis_tamponade_img02",
+          "file_path": "images/18_pericarditis_tamponade/18_pericarditis_tamponade_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 451,
+          "caption": "Pericarditis with PR depression",
+          "extraction_method": "embedded",
+          "resolution": "1354x217",
+          "size_kb": 418.9
+        },
+        {
+          "image_id": "18_pericarditis_tamponade_img03",
+          "file_path": "images/18_pericarditis_tamponade/18_pericarditis_tamponade_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 455,
+          "caption": "Pericardial effusion / Low voltage",
+          "extraction_method": "embedded",
+          "resolution": "971x565",
+          "size_kb": 387.8
+        },
+        {
+          "image_id": "18_pericarditis_tamponade_img04",
+          "file_path": "images/18_pericarditis_tamponade/18_pericarditis_tamponade_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 153,
+          "caption": "Acute Pericarditis",
+          "extraction_method": "embedded",
+          "resolution": "757x365",
+          "size_kb": 410.3
+        },
+        {
+          "image_id": "18_pericarditis_tamponade_img05",
+          "file_path": "images/18_pericarditis_tamponade/18_pericarditis_tamponade_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 113,
+          "caption": "Acute Pericarditis 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "760x1446",
+          "size_kb": 7.5
+        }
+      ]
+    },
+    "19_pulmonary_embolism": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "PE_01",
+          "title": "Acute PE — Classic S1Q3T3 + Sinus Tachycardia",
+          "expected_code": "PULMONARY_EMBOLISM",
+          "detected_codes": [
+            "LONG_QT",
+            "PULMONARY_EMBOLISM"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 54,
+            "sex": "female",
+            "hr_bpm": 118,
+            "pr_ms": 150,
+            "qrs_ms": 92,
+            "qt_ms": 335,
+            "axis_deg": 95,
+            "s1q3t3": true,
+            "rv_strain_twi_v1_v4": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 118.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 508.5,
+            "pr_ms": 150.0,
+            "qrs_ms": 92.0,
+            "qt_ms": 335.0,
+            "qtc_bazett_ms": 469.8,
+            "qtc_fridericia_ms": 419.7,
+            "qtc_hodges_ms": 436.5,
+            "axis_deg": 95.0,
+            "axis_classification": "Borderline Right Axis (Normal Extended)"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "PE_02",
+          "title": "Submassive PE — TWI V1-V4 + Sinus Tach 126 bpm",
+          "expected_code": "PULMONARY_EMBOLISM",
+          "detected_codes": [
+            "LONG_QT",
+            "PULMONARY_EMBOLISM"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 61,
+            "sex": "male",
+            "hr_bpm": 126,
+            "pr_ms": 146,
+            "qrs_ms": 96,
+            "qt_ms": 325,
+            "axis_deg": 100,
+            "rv_strain_twi_v1_v4": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 126.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 476.2,
+            "pr_ms": 146.0,
+            "qrs_ms": 96.0,
+            "qt_ms": 325.0,
+            "qtc_bazett_ms": 471.0,
+            "qtc_fridericia_ms": 416.2,
+            "qtc_hodges_ms": 440.5,
+            "axis_deg": 100.0,
+            "axis_classification": "Borderline Right Axis (Normal Extended)"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "PE_03",
+          "title": "Massive PE — S1Q3T3 + New RBBB + HR 130",
+          "expected_code": "PULMONARY_EMBOLISM",
+          "detected_codes": [
+            "VENTRICULAR_TACHYCARDIA",
+            "LONG_QT",
+            "PULMONARY_EMBOLISM",
+            "RBBB"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 58,
+            "sex": "male",
+            "hr_bpm": 130,
+            "pr_ms": 154,
+            "qrs_ms": 132,
+            "qt_ms": 320,
+            "axis_deg": 110,
+            "s1q3t3": true,
+            "qrs_morphology": "rbbb"
+          },
+          "computed_measurements": {
+            "hr_bpm": 130.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 461.5,
+            "pr_ms": 154.0,
+            "qrs_ms": 132.0,
+            "qt_ms": 320.0,
+            "qtc_bazett_ms": 471.0,
+            "qtc_fridericia_ms": 414.1,
+            "qtc_hodges_ms": 442.5,
+            "axis_deg": 110.0,
+            "axis_classification": "Right Axis Deviation (RAD)"
+          },
+          "arabic_summary": "تسارع قلب بمركب QRS عريض — تسارع بطيني (VT) حتى يثبت العكس"
+        },
+        {
+          "id": "PE_04",
+          "title": "Acute PE — S1Q3T3 at HR 108",
+          "expected_code": "PULMONARY_EMBOLISM",
+          "detected_codes": [
+            "LONG_QT",
+            "PULMONARY_EMBOLISM"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 47,
+            "sex": "female",
+            "hr_bpm": 108,
+            "pr_ms": 156,
+            "qrs_ms": 88,
+            "qt_ms": 350,
+            "axis_deg": 85,
+            "s1q3t3": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 108.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 555.6,
+            "pr_ms": 156.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 350.0,
+            "qtc_bazett_ms": 469.6,
+            "qtc_fridericia_ms": 425.7,
+            "qtc_hodges_ms": 434.0,
+            "axis_deg": 85.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        },
+        {
+          "id": "PE_05",
+          "title": "Acute PE — RV Strain Pattern V1-V4 at HR 112",
+          "expected_code": "PULMONARY_EMBOLISM",
+          "detected_codes": [
+            "LONG_QT",
+            "PULMONARY_EMBOLISM"
+          ],
+          "top_urgency": "URGENT",
+          "passed": true,
+          "input_ecg": {
+            "age": 66,
+            "sex": "male",
+            "hr_bpm": 112,
+            "pr_ms": 162,
+            "qrs_ms": 94,
+            "qt_ms": 340,
+            "axis_deg": 90,
+            "rv_strain_twi_v1_v4": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 112.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 535.7,
+            "pr_ms": 162.0,
+            "qrs_ms": 94.0,
+            "qt_ms": 340.0,
+            "qtc_bazett_ms": 464.5,
+            "qtc_fridericia_ms": 418.6,
+            "qtc_hodges_ms": 431.0,
+            "axis_deg": 90.0,
+            "axis_classification": "Normal Axis"
+          },
+          "arabic_summary": "إطالة في مسافة QTc"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "19_pulmonary_embolism_img01",
+          "file_path": "images/19_pulmonary_embolism/19_pulmonary_embolism_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 461,
+          "caption": "Pulmonary Embolism S1Q3T3 & RV strain",
+          "extraction_method": "embedded",
+          "resolution": "947x558",
+          "size_kb": 553.0
+        },
+        {
+          "image_id": "19_pulmonary_embolism_img02",
+          "file_path": "images/19_pulmonary_embolism/19_pulmonary_embolism_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 465,
+          "caption": "Acute PE T-wave inversions V1-V4",
+          "extraction_method": "embedded",
+          "resolution": "969x545",
+          "size_kb": 440.5
+        },
+        {
+          "image_id": "19_pulmonary_embolism_img03",
+          "file_path": "images/19_pulmonary_embolism/19_pulmonary_embolism_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 159,
+          "caption": "Pulmonary Embolism 12-lead",
+          "extraction_method": "embedded",
+          "resolution": "977x330",
+          "size_kb": 278.1
+        },
+        {
+          "image_id": "19_pulmonary_embolism_img04",
+          "file_path": "images/19_pulmonary_embolism/19_pulmonary_embolism_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 163,
+          "caption": "Acute RV strain / PE",
+          "extraction_method": "embedded",
+          "resolution": "875x355",
+          "size_kb": 399.6
+        },
+        {
+          "image_id": "19_pulmonary_embolism_img05",
+          "file_path": "images/19_pulmonary_embolism/19_pulmonary_embolism_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 131,
+          "caption": "Pulmonary Embolism S1Q3T3",
+          "extraction_method": "embedded",
+          "resolution": "1600x840",
+          "size_kb": 146.0
+        }
+      ]
+    },
+    "20_pacemaker_toxicity_reversal": {
+      "numeric_examples_count": 5,
+      "extracted_images_count": 5,
+      "numeric_examples": [
+        {
+          "id": "MISC_01",
+          "title": "Ventricular Paced Rhythm (VVI Pacemaker, HR 70)",
+          "expected_code": "PACEMAKER_RHYTHM",
+          "detected_codes": [
+            "PACEMAKER_RHYTHM"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 77,
+            "sex": "male",
+            "hr_bpm": 70,
+            "qrs_ms": 152,
+            "axis_deg": -50,
+            "pacing_spikes": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 70.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 857.1,
+            "pr_ms": null,
+            "qrs_ms": 152.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": -50.0,
+            "axis_classification": "Left Axis Deviation (LAD)"
+          },
+          "arabic_summary": "إيقاع منظم ضربات القلب (Pacemaker Rhythm)"
+        },
+        {
+          "id": "MISC_02",
+          "title": "Dual-Chamber Paced Rhythm (DDD Pacemaker, HR 68)",
+          "expected_code": "PACEMAKER_RHYTHM",
+          "detected_codes": [
+            "PACEMAKER_RHYTHM"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 74,
+            "sex": "female",
+            "hr_bpm": 68,
+            "pr_ms": 160,
+            "qrs_ms": 146,
+            "axis_deg": -45,
+            "pacing_spikes": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 68.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 882.4,
+            "pr_ms": 160.0,
+            "qrs_ms": 146.0,
+            "qt_ms": null,
+            "qtc_bazett_ms": null,
+            "qtc_fridericia_ms": null,
+            "qtc_hodges_ms": null,
+            "axis_deg": -45.0,
+            "axis_classification": "Left Axis Deviation (LAD)"
+          },
+          "arabic_summary": "إيقاع منظم ضربات القلب (Pacemaker Rhythm)"
+        },
+        {
+          "id": "MISC_03",
+          "title": "TCA Overdose (QRS 138 ms + terminal R in aVR 4.5 mm — CRITICAL)",
+          "expected_code": "TCA_TOXICITY",
+          "detected_codes": [
+            "VENTRICULAR_TACHYCARDIA",
+            "LONG_QT_CRITICAL",
+            "TCA_TOXICITY"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 29,
+            "sex": "female",
+            "hr_bpm": 134,
+            "pr_ms": 168,
+            "qrs_ms": 138,
+            "qt_ms": 380,
+            "axis_deg": 115,
+            "avr_terminal_r_mm": 4.5,
+            "avr_r_to_s_ratio": 1.1
+          },
+          "computed_measurements": {
+            "hr_bpm": 134.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 447.8,
+            "pr_ms": 168.0,
+            "qrs_ms": 138.0,
+            "qt_ms": 380.0,
+            "qtc_bazett_ms": 567.9,
+            "qtc_fridericia_ms": 496.7,
+            "qtc_hodges_ms": 509.5,
+            "axis_deg": 115.0,
+            "axis_classification": "Right Axis Deviation (RAD)"
+          },
+          "arabic_summary": "تسارع قلب بمركب QRS عريض — تسارع بطيني (VT) حتى يثبت العكس"
+        },
+        {
+          "id": "MISC_04",
+          "title": "Sodium-Channel Blocker Toxicity (QRS 124 ms + aVR R 3.5 mm — CRITICAL)",
+          "expected_code": "TCA_TOXICITY",
+          "detected_codes": [
+            "VENTRICULAR_TACHYCARDIA",
+            "LONG_QT_CRITICAL",
+            "TCA_TOXICITY"
+          ],
+          "top_urgency": "CRITICAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 36,
+            "sex": "male",
+            "hr_bpm": 122,
+            "pr_ms": 172,
+            "qrs_ms": 124,
+            "qt_ms": 390,
+            "axis_deg": 105,
+            "avr_terminal_r_mm": 3.5,
+            "avr_r_to_s_ratio": 0.85
+          },
+          "computed_measurements": {
+            "hr_bpm": 122.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 491.8,
+            "pr_ms": 172.0,
+            "qrs_ms": 124.0,
+            "qt_ms": 390.0,
+            "qtc_bazett_ms": 556.1,
+            "qtc_fridericia_ms": 494.1,
+            "qtc_hodges_ms": 498.5,
+            "axis_deg": 105.0,
+            "axis_classification": "Right Axis Deviation (RAD)"
+          },
+          "arabic_summary": "تسارع قلب بمركب QRS عريض — تسارع بطيني (VT) حتى يثبت العكس"
+        },
+        {
+          "id": "MISC_05",
+          "title": "RA-LA Limb Lead Reversal (Negative P/QRS in I + normal precordial R)",
+          "expected_code": "LEAD_REVERSAL_RA_LA",
+          "detected_codes": [
+            "LEAD_REVERSAL_RA_LA"
+          ],
+          "top_urgency": "ABNORMAL",
+          "passed": true,
+          "input_ecg": {
+            "age": 42,
+            "sex": "male",
+            "hr_bpm": 74,
+            "pr_ms": 158,
+            "qrs_ms": 88,
+            "qt_ms": 385,
+            "axis_deg": 140,
+            "negative_p_qrs_lead_i": true,
+            "normal_precordial_r_progression": true
+          },
+          "computed_measurements": {
+            "hr_bpm": 74.0,
+            "hr_method": "direct_hr_bpm",
+            "rr_ms": 810.8,
+            "pr_ms": 158.0,
+            "qrs_ms": 88.0,
+            "qt_ms": 385.0,
+            "qtc_bazett_ms": 427.6,
+            "qtc_fridericia_ms": 412.9,
+            "qtc_hodges_ms": 409.5,
+            "axis_deg": 140.0,
+            "axis_classification": "Right Axis Deviation (RAD)"
+          },
+          "arabic_summary": "اشتباه تبديل أسلاك الأطراف (RA-LA Lead Reversal)"
+        }
+      ],
+      "extracted_images": [
+        {
+          "image_id": "20_pacemaker_toxicity_reversal_img01",
+          "file_path": "images/20_pacemaker_toxicity_reversal/20_pacemaker_toxicity_reversal_img01.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 545,
+          "caption": "Ventricular / Dual-chamber Pacemaker rhythm",
+          "extraction_method": "embedded",
+          "resolution": "916x504",
+          "size_kb": 473.2
+        },
+        {
+          "image_id": "20_pacemaker_toxicity_reversal_img02",
+          "file_path": "images/20_pacemaker_toxicity_reversal/20_pacemaker_toxicity_reversal_img02.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 621,
+          "caption": "Drug toxicity (Digoxin / TCA)",
+          "extraction_method": "embedded",
+          "resolution": "907x503",
+          "size_kb": 389.9
+        },
+        {
+          "image_id": "20_pacemaker_toxicity_reversal_img03",
+          "file_path": "images/20_pacemaker_toxicity_reversal/20_pacemaker_toxicity_reversal_img03.png",
+          "source_book": "ECG Masters' Collection Vol. 1",
+          "source_page": 637,
+          "caption": "Limb lead reversal (RA-LA swap)",
+          "extraction_method": "embedded",
+          "resolution": "938x463",
+          "size_kb": 397.1
+        },
+        {
+          "image_id": "20_pacemaker_toxicity_reversal_img04",
+          "file_path": "images/20_pacemaker_toxicity_reversal/20_pacemaker_toxicity_reversal_img04.png",
+          "source_book": "ECG Masters' Collection Vol. 2",
+          "source_page": 177,
+          "caption": "Pacemaker ECG",
+          "extraction_method": "embedded",
+          "resolution": "979x576",
+          "size_kb": 523.2
+        },
+        {
+          "image_id": "20_pacemaker_toxicity_reversal_img05",
+          "file_path": "images/20_pacemaker_toxicity_reversal/20_pacemaker_toxicity_reversal_img05.png",
+          "source_book": "Goldberger's Clinical Electrocardiography (2017)",
+          "source_page": 227,
+          "caption": "Digitalis / TCA toxicity",
+          "extraction_method": "embedded",
+          "resolution": "1600x374",
+          "size_kb": 86.2
+        }
+      ]
+    }
+  }
+}
