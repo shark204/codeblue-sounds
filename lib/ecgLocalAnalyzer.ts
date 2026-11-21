@@ -1,8 +1,12 @@
 "use client";
 
 import rawRefIndex from "@/ecg_engine/ecg_reference_index.json";
-import { ECGInput, ECGInterpretationResult, interpretECG } from "@/lib/ecgRules";
+import { ECGInput, ECGInterpretationResult, ECGQuality, interpretECG } from "@/lib/ecgRules";
+import * as S from "@/lib/ecgSignal";
 
+/* ------------------------------------------------------------------ */
+/* Types                                                               */
+/* ------------------------------------------------------------------ */
 interface RefSig {
   hr: number;
   rr_cv: number;
@@ -24,18 +28,45 @@ interface RefEntry {
   sig: RefSig;
 }
 
+/** Atlas matches are HINTS only. They never feed the diagnosis. */
+export interface SimilarReference {
+  id: string;
+  title: string;
+  expected_code: string;
+  source_book: string;
+  source_page: number;
+  similarity: number; // 0..1, weak visual similarity — not diagnostic
+}
+
+export interface AnalyzeOptions {
+  /** Real duration (seconds) of the strip, if the user knows it. Overrides grid calibration. */
+  stripDurationSec?: number;
+  /** Real pixels-per-mm of the (natural-size) image, if known. */
+  pxPerMm?: number;
+}
+
 export interface LocalECGAnalysisResult {
   layout: "single_lead" | "12_lead";
+  /** true ONLY when the rhythm was positively classified as regular */
   is_regular_rhythm: boolean;
+  /** "Regular" | "Irregular" | "Indeterminate" — show this instead of a binary label */
+  rhythm_label: "Regular" | "Irregular" | "Indeterminate";
   rr_regularity_pct: number;
   reference_count: number;
   interpretation: ECGInterpretationResult;
+  quality: ECGQuality;
+  similar_references: SimilarReference[];
   summary_ar: string;
   summary_en: string;
 }
 
 const refIndex = rawRefIndex as { total_reference_ecgs: number; entries: RefEntry[] };
+const MAX_WIDTH = 2000;
+const PAPER_SPEED_MM_S = 25;
 
+/* ------------------------------------------------------------------ */
+/* Image helpers                                                       */
+/* ------------------------------------------------------------------ */
 function loadImage(dataUrl: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -43,20 +74,6 @@ function loadImage(dataUrl: string): Promise<HTMLImageElement> {
     img.onerror = () => reject(new Error("Failed to decode ECG image"));
     img.src = dataUrl;
   });
-}
-
-function median(arr: number[]): number {
-  if (arr.length === 0) return 0;
-  const s = [...arr].sort((a, b) => a - b);
-  const mid = Math.floor(s.length / 2);
-  return s.length % 2 === 0 ? (s[mid - 1]! + s[mid]!) / 2 : s[mid]!;
-}
-
-function percentile(arr: number[], p: number): number {
-  if (arr.length === 0) return 0;
-  const s = [...arr].sort((a, b) => a - b);
-  const idx = Math.min(s.length - 1, Math.max(0, Math.floor((p / 100) * s.length)));
-  return s[idx]!;
 }
 
 function cosineSim(a: number[], b: number[]): number {
@@ -73,34 +90,46 @@ function cosineSim(a: number[], b: number[]): number {
   return dot / (Math.sqrt(na) * Math.sqrt(nb));
 }
 
-/**
- * Adaptive ink isolation with morphological straight-gridline removal.
- * Cleanly erases BOTH pink/red AND dark gray/black ECG graph paper lines!
- */
+/** Column / row profiles of the paper grid (median across the other axis removes the ECG trace). */
+function gridProfiles(rgba: Uint8ClampedArray, W: number, H: number): { col: number[]; row: number[] } {
+  const lum = (i: number) => 255 - (rgba[i * 4]! + rgba[i * 4 + 1]! + rgba[i * 4 + 2]!) / 3;
+  const col = new Array<number>(W);
+  const buf: number[] = [];
+  for (let x = 0; x < W; x++) {
+    buf.length = 0;
+    for (let y = 0; y < H; y += 2) buf.push(lum(y * W + x));
+    col[x] = S.median(buf);
+  }
+  const row = new Array<number>(H);
+  for (let y = 0; y < H; y++) {
+    buf.length = 0;
+    for (let x = 0; x < W; x += 2) buf.push(lum(y * W + x));
+    row[y] = S.median(buf);
+  }
+  return { col, row };
+}
+
+/** Adaptive ink isolation: removes pink/red AND gray/black grid lines. */
 function isolateCleanInk(rgba: Uint8ClampedArray, W: number, H: number): Float32Array {
   const darkness = new Float32Array(W * H);
   for (let i = 0; i < W * H; i++) {
     const maxCh = Math.max(rgba[i * 4]!, rgba[i * 4 + 1]!, rgba[i * 4 + 2]!);
     darkness[i] = 255 - maxCh;
   }
-
-  // Row & column 70th-percentile background estimation to erase straight gridlines
   const rowBg = new Float32Array(H);
   const sampleRow = new Array<number>(Math.floor(W / 4));
   for (let y = 0; y < H; y++) {
     let idx = 0;
     for (let x = 0; x < W - 3; x += 4) sampleRow[idx++] = darkness[y * W + x]!;
-    rowBg[y] = percentile(sampleRow.slice(0, idx), 70);
+    rowBg[y] = S.percentile(sampleRow.slice(0, idx), 70);
   }
-
   const colBg = new Float32Array(W);
   const sampleCol = new Array<number>(Math.floor(H / 4));
   for (let x = 0; x < W; x++) {
     let idx = 0;
     for (let y = 0; y < H - 3; y += 4) sampleCol[idx++] = darkness[y * W + x]!;
-    colBg[x] = percentile(sampleCol.slice(0, idx), 70);
+    colBg[x] = S.percentile(sampleCol.slice(0, idx), 70);
   }
-
   const clean = new Float32Array(W * H);
   const flatSample: number[] = [];
   for (let y = 0; y < H; y++) {
@@ -111,13 +140,11 @@ function isolateCleanInk(rgba: Uint8ClampedArray, W: number, H: number): Float32
       if ((x & 7) === 0 && (y & 7) === 0) flatSample.push(val);
     }
   }
-
-  const p94 = percentile(flatSample, 94);
-  const p995 = percentile(flatSample, 99.5);
+  const p94 = S.percentile(flatSample, 94);
+  const p995 = S.percentile(flatSample, 99.5);
   const lo = Math.max(18, p94);
   const hi = Math.max(lo + 25, p995);
   const span = hi - lo;
-
   const ink = new Float32Array(W * H);
   for (let i = 0; i < W * H; i++) {
     const v = (clean[i]! - lo) / span;
@@ -177,15 +204,8 @@ function detectHorizontalBands(ink: Float32Array, W: number, H: number): Array<[
   return merged;
 }
 
-function extractBandSignalMm(
-  ink: Float32Array,
-  W: number,
-  x0: number,
-  x1: number,
-  y0: number,
-  y1: number,
-  pxPerMm: number
-): number[] {
+/** Trace → signal in mm (vertical scale supplied separately from the horizontal one). */
+function extractBandSignalMm(ink: Float32Array, W: number, x0: number, x1: number, y0: number, y1: number, pxPerMmY: number): number[] {
   const sw = x1 - x0;
   const sh = y1 - y0;
   const yCent = new Float32Array(sw);
@@ -223,31 +243,46 @@ function extractBandSignalMm(
   if (lastValid >= 0 && lastValid < sw - 1) {
     for (let k = lastValid + 1; k < sw; k++) yCent[k] = yCent[lastValid]!;
   }
-  const baseY = median(Array.from(yCent));
+  const baseY = S.median(Array.from(yCent));
   const out = new Array<number>(sw);
-  for (let xi = 0; xi < sw; xi++) out[xi] = (baseY - yCent[xi]!) / pxPerMm;
+  for (let xi = 0; xi < sw; xi++) out[xi] = (baseY - yCent[xi]!) / pxPerMmY;
   return out;
 }
 
-function dftMagnitude(sig: number[], fs: number, freqHz: number): number {
-  const N = sig.length;
-  let re = 0;
-  let im = 0;
-  const omega = (2 * Math.PI * freqHz) / fs;
-  for (let n = 0; n < N; n++) {
-    const w = 0.5 * (1 - Math.cos((2 * Math.PI * n) / (N - 1)));
-    const x = sig[n]! * w;
-    re += x * Math.cos(omega * n);
-    im -= x * Math.sin(omega * n);
+/** Peak detection + removal of T-wave-like secondary peaks. */
+function detectRPeaks(sig: number[], fs: number): { absS: number[]; peaks: number[] } {
+  const absS = sig.map((v) => Math.abs(v));
+  const qrsTh = Math.max(2.6, S.percentile(absS, 98.5) * 0.56);
+  const minRr = Math.floor(0.3 * fs);
+  const pks: number[] = [];
+  for (let x = 3; x < absS.length - 3; x++) {
+    const v = absS[x]!;
+    if (v >= qrsTh && v >= absS[x - 1]! && v >= absS[x + 1]! && v >= absS[x - 2]! && v >= absS[x + 2]!) {
+      if (pks.length === 0 || x - pks[pks.length - 1]! >= minRr) pks.push(x);
+      else if (v > absS[pks[pks.length - 1]!]!) pks[pks.length - 1] = x;
+    }
   }
-  return Math.sqrt(re * re + im * im) / N;
+  if (pks.length < 3) return { absS, peaks: pks };
+  const medAmp = S.median(pks.map((p) => absS[p]!));
+  const kept: number[] = [];
+  for (const p of pks) {
+    const prev = kept[kept.length - 1];
+    const tLike = prev != null && absS[p]! < 0.45 * medAmp && (p - prev) / fs < 0.45 && absS[prev]! > 1.5 * absS[p]!;
+    if (!tLike) kept.push(p);
+  }
+  return { absS, peaks: kept };
 }
 
-export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGAnalysisResult> {
+/* ------------------------------------------------------------------ */
+/* Main entry                                                          */
+/* ------------------------------------------------------------------ */
+export async function analyzeEcgImageLocally(dataUrl: string, opts: AnalyzeOptions = {}): Promise<LocalECGAnalysisResult> {
   const img = await loadImage(dataUrl);
-  const W = 1000;
-  const H = 560;
 
+  // Preserve aspect ratio (the old code stretched every image to 1000x560 and distorted both axes).
+  const scale = Math.min(1, MAX_WIDTH / img.naturalWidth);
+  const W = Math.max(200, Math.round(img.naturalWidth * scale));
+  const H = Math.max(120, Math.round(img.naturalHeight * scale));
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -256,228 +291,201 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
   ctx.drawImage(img, 0, 0, W, H);
   const rgba = ctx.getImageData(0, 0, W, H).data;
 
-  const ink = isolateCleanInk(rgba, W, H);
-  const bands = detectHorizontalBands(ink, W, H);
-  const isSingleLead = bands.length <= 1;
-  const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
-  const durationSec = isSingleLead || aspect < 1.35 ? 6.0 : 10.0;
+  const flags: string[] = [];
 
+  /* ---- 1. calibration (measured from the paper grid; never guessed) ---- */
   const sx0 = Math.floor(W * 0.04);
   const sx1 = Math.floor(W * 0.96);
   const stripWidth = sx1 - sx0;
-  const pxPerMm = stripWidth / (durationSec * 25.0);
-  const fs = stripWidth / durationSec;
+  const { col, row } = gridProfiles(rgba, W, H);
+
+  let calib: S.Calibration;
+  if (opts.pxPerMm && opts.pxPerMm > 0) {
+    calib = { pxPerMm: opts.pxPerMm * scale, confidence: 1, basis: "user_supplied_px_per_mm" };
+  } else if (opts.stripDurationSec && opts.stripDurationSec > 0) {
+    calib = { pxPerMm: stripWidth / (opts.stripDurationSec * PAPER_SPEED_MM_S), confidence: 1, basis: "user_supplied_duration" };
+  } else {
+    calib = S.resolveCalibration(col, W, PAPER_SPEED_MM_S);
+  }
+  const timingOk = calib.pxPerMm != null && calib.confidence >= 0.6;
+  if (!timingOk) flags.push(`calibration_unreliable:${calib.basis}`);
+
+  // Fallback scale is used ONLY for internal peak detection; absolute values are withheld when !timingOk.
+  const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+  const assumedDuration = aspect < 1.35 ? 6.0 : 10.0;
+  const pxPerMmX = calib.pxPerMm ?? stripWidth / (assumedDuration * PAPER_SPEED_MM_S);
+  const pxPerMmY = (calib.pxPerMm != null ? S.matchScaleToReference(row, calib.pxPerMm) : null) ?? pxPerMmX;
+  const durationSec = stripWidth / pxPerMmX / PAPER_SPEED_MM_S;
+  const fs = stripWidth / durationSec; // samples (px) per second
+
+  /* ---- 2. trace extraction ---- */
+  const ink = isolateCleanInk(rgba, W, H);
+  const bands = detectHorizontalBands(ink, W, H);
+  const isSingleLead = bands.length <= 1;
+  if (bands.length >= 3) flags.push("multi_lead_page: rhythm taken from one band, cross-lead segments may affect RR");
 
   const pickBand = (b: [number, number]) => {
-    const sig = extractBandSignalMm(ink, W, sx0, sx1, b[0], b[1], pxPerMm);
-    const absS = sig.map((v) => Math.abs(v));
-    const qrsTh = Math.max(2.6, percentile(absS, 98.5) * 0.56);
-    const minRr = Math.floor(0.30 * fs);
-    const pks: number[] = [];
-    for (let x = 3; x < absS.length - 3; x++) {
-      const v = absS[x]!;
-      if (v >= qrsTh && v >= absS[x - 1]! && v >= absS[x + 1]! && v >= absS[x - 2]! && v >= absS[x + 2]!) {
-        if (pks.length === 0 || x - pks[pks.length - 1]! >= minRr) pks.push(x);
-        else if (v > absS[pks[pks.length - 1]!]!) pks[pks.length - 1] = x;
-      }
-    }
-    return { sig, absS, pks };
+    const sig = extractBandSignalMm(ink, W, sx0, sx1, b[0], b[1], pxPerMmY);
+    return { sig, ...detectRPeaks(sig, fs) };
   };
-
   const primaryBand: [number, number] = bands.length > 0 ? bands[bands.length - 1]! : [Math.floor(H * 0.2), Math.floor(H * 0.85)];
   let chosen = pickBand(primaryBand);
-  if (chosen.pks.length < 4 && bands.length >= 2) {
+  if (chosen.peaks.length < 4 && bands.length >= 2) {
     const alt = pickBand(bands[bands.length - 2]!);
-    if (alt.pks.length >= chosen.pks.length) chosen = alt;
+    if (alt.peaks.length >= chosen.peaks.length) chosen = alt;
   }
+  const { sig: sigMm, absS, peaks } = chosen;
 
-  const { sig: sigMm, absS: absSig, pks: peaks } = chosen;
+  /* ---- 3. rhythm (scale-free) ---- */
+  const rrsSec: number[] = [];
+  for (let i = 1; i < peaks.length; i++) rrsSec.push((peaks[i]! - peaks[i - 1]!) / fs);
+  const rr = S.analyzeRr(rrsSec);
+  const rhythmOk = rr.pattern !== "indeterminate";
+  if (!rhythmOk) flags.push(`too_few_beats:${peaks.length}`);
 
-  // Robust RR regularity (MAD / median)
-  let hrBpm: number | null = null;
-  let madCv = 0.06;
-  let maxMinRrRatio = 1.0;
-  if (peaks.length >= 3) {
-    const rrsSec: number[] = [];
-    for (let i = 1; i < peaks.length; i++) rrsSec.push((peaks[i]! - peaks[i - 1]!) / fs);
-    const medRr = median(rrsSec);
-    const absDevs = rrsSec.map((r) => Math.abs(r - medRr));
-    madCv = median(absDevs) / (medRr + 1e-6);
-    maxMinRrRatio = Math.max(...rrsSec) / Math.max(0.2, Math.min(...rrsSec));
-    hrBpm = Math.round((60 / medRr) * 10) / 10;
-  } else if (peaks.length > 0) {
-    hrBpm = Math.round((peaks.length * 60) / durationSec);
-  }
+  /* ---- 4. absolute measurements (only with calibrated time axis) ---- */
+  let hrRaw: number | null = null;
+  if (peaks.length >= 4 && rr.medianRr > 0) hrRaw = Math.round((60 / rr.medianRr) * 10) / 10;
 
-  // QRS width + beat16 template
   const qrsWidths: number[] = [];
-  const beatSamples: number[][] = [];
   const winL = Math.floor(0.18 * fs);
   const winR = Math.floor(0.32 * fs);
+  const beatSamples: number[][] = [];
   for (const p of peaks) {
-    const pkVal = absSig[p]!;
-    const thresh = pkVal * 0.25;
+    const thresh = absS[p]! * 0.25;
     const maxSpan = Math.floor(0.14 * fs);
     let l = p;
-    while (l > Math.max(0, p - maxSpan) && absSig[l]! > thresh) l--;
+    while (l > Math.max(0, p - maxSpan) && absS[l]! > thresh) l--;
     let r = p;
-    while (r < Math.min(absSig.length - 1, p + maxSpan) && absSig[r]! > thresh) r++;
+    while (r < Math.min(absS.length - 1, p + maxSpan) && absS[r]! > thresh) r++;
     const wMs = ((r - l) / fs) * 1000;
     if (wMs >= 45 && wMs <= 240) qrsWidths.push(wMs);
-
     if (p - winL >= 0 && p + winR < sigMm.length) {
       const segLen = winL + winR;
-      const resampled = new Array<number>(16).fill(0);
+      const res = new Array<number>(16).fill(0);
       for (let i = 0; i < 16; i++) {
         const pos = (i * (segLen - 1)) / 15;
-        const idx0 = Math.floor(pos);
-        const idx1 = Math.min(segLen - 1, idx0 + 1);
-        const frac = pos - idx0;
-        resampled[i] = sigMm[p - winL + idx0]! * (1 - frac) + sigMm[p - winL + idx1]! * frac;
+        const i0 = Math.floor(pos);
+        const i1 = Math.min(segLen - 1, i0 + 1);
+        const fr = pos - i0;
+        res[i] = sigMm[p - winL + i0]! * (1 - fr) + sigMm[p - winL + i1]! * fr;
       }
-      const nrm = Math.sqrt(resampled.reduce((a, v) => a + v * v, 0)) + 1e-6;
-      beatSamples.push(resampled.map((v) => v / nrm));
+      const nrm = Math.sqrt(res.reduce((a, v) => a + v * v, 0)) + 1e-6;
+      beatSamples.push(res.map((v) => v / nrm));
     }
   }
-  const qrsMs = qrsWidths.length > 0 ? Math.round(median(qrsWidths)) : 86;
+  const qrsRaw = qrsWidths.length >= 3 && S.percentile(qrsWidths, 75) - S.percentile(qrsWidths, 25) <= 0.35 * S.median(qrsWidths) ? Math.round(S.median(qrsWidths)) : null;
+  if (qrsRaw == null) flags.push("qrs_width_unreliable");
+
+  const beatsP = S.measureBeatsP(sigMm, peaks, fs);
+  const cond = S.analyzeConduction(beatsP, rr, hrRaw);
+
+  const plaus = S.applyPlausibility(hrRaw, qrsRaw, cond.prMedianMs);
+  flags.push(...plaus.flags);
+  const timingTrusted = timingOk && !plaus.flags.some((f) => f.startsWith("hr_implausible"));
+  if (!timingTrusted && timingOk) flags.push("calibration_suspect: implausible heart rate");
+
+  /* ---- 5. atrial activity band (only when timing is trusted) ---- */
+  let flutterRate: number | null = null;
+  let sawtooth = false;
+  if (timingTrusted && rhythmOk && peaks.length >= 4) {
+    const bl = S.maskQrs(sigMm, peaks, fs);
+    const band = S.analyzeAtrialBand(bl, fs);
+    sawtooth = S.decideFlutter(band, rr, plaus.hr);
+    if (sawtooth) flutterRate = band.rateBpm;
+  }
+
+  /* ---- 6. quality ---- */
+  const quality: ECGQuality = {
+    timing_ok: timingTrusted,
+    rhythm_ok: rhythmOk,
+    calibration: {
+      px_per_mm: calib.pxPerMm,
+      confidence: Math.round(calib.confidence * 100) / 100,
+      basis: calib.basis,
+      strip_duration_sec: calib.pxPerMm != null ? Math.round(durationSec * 10) / 10 : null,
+    },
+    n_beats: peaks.length,
+    n_bands: bands.length,
+    flags,
+  };
+
+  /* ---- 7. build the input: ONLY measured fields, everything else stays undefined/null ---- */
+  const input: ECGInput = {
+    age: null, // unknown — never guessed
+    sex: null,
+    hr_bpm: timingTrusted ? plaus.hr : null,
+    pr_ms: timingTrusted ? plaus.prMs : null,
+    qrs_ms: timingTrusted ? plaus.qrsMs : null,
+    qt_ms: null, // not measurable from this pipeline
+    axis_deg: null, // needs limb-lead data
+    rr_pattern: rr.pattern,
+    quality,
+  };
+  if (rr.pattern === "regular") input.rhythm_regular = true;
+  else if (rr.pattern === "irregularly_irregular" || rr.pattern === "pauses") input.rhythm_regular = false;
+  if (cond.pWavesPresent != null) input.p_waves_present = cond.pWavesPresent;
+  if (cond.mobitzType) {
+    input.av_block_type = cond.mobitzType;
+    if (cond.mobitzType === "mobitz_1") input.progressive_pr_prolongation = true;
+  }
+  if (sawtooth) {
+    input.sawtooth_flutter_waves = true;
+    input.flutter_wave_rate_bpm = flutterRate;
+  }
+
+  const interpretation = interpretECG(input);
+
+  /* ---- 8. atlas: similarity hints only (never overrides measurements) ---- */
   const beat16 = new Array<number>(16).fill(0);
   if (beatSamples.length > 0) {
-    for (let i = 0; i < 16; i++) beat16[i] = median(beatSamples.map((b) => b[i]!));
+    for (let i = 0; i < 16; i++) beat16[i] = S.median(beatSamples.map((b) => b[i]!));
     const nrm = Math.sqrt(beat16.reduce((a, v) => a + v * v, 0)) + 1e-6;
     for (let i = 0; i < 16; i++) beat16[i] = Math.round((beat16[i]! / nrm) * 1000);
   }
+  const similar: SimilarReference[] = beatSamples.length
+    ? refIndex.entries
+        .map((entry) => ({ entry, score: Math.max(0, cosineSim(beat16, entry.sig.beat16)) }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(({ entry, score }) => ({
+          id: entry.id,
+          title: entry.title,
+          expected_code: entry.expected_code,
+          source_book: entry.source_book,
+          source_page: entry.source_page,
+          similarity: Math.round(score * 100) / 100,
+        }))
+    : [];
 
-  // Real PR interval measurement (-360ms .. -80ms before R-peak)
-  const prList: number[] = [];
-  for (const p of peaks) {
-    const a = p - Math.floor(0.36 * fs);
-    const b = p - Math.floor(0.08 * fs);
-    if (a >= 0 && b > a + 4) {
-      let bestVal = -999;
-      let bestIdx = a;
-      for (let k = a; k < b; k++) {
-        if (sigMm[k]! > bestVal) {
-          bestVal = sigMm[k]!;
-          bestIdx = k;
-        }
-      }
-      if (bestVal >= 0.45) {
-        const prVal = ((p - bestIdx) / fs) * 1000 + 35;
-        if (prVal >= 110 && prVal <= 380) prList.push(prVal);
-      }
-    }
-  }
-  const measuredPrMs = prList.length >= 2 ? Math.round(median(prList)) : null;
-
-  // Inter-QRS baseline DFT for Flutter vs AFib vs Clean Sinus/AVB
-  const bl = [...sigMm];
-  const maskRad = Math.floor(0.08 * fs);
-  for (const p of peaks) {
-    const l = Math.max(0, p - maskRad);
-    const r = Math.min(bl.length - 1, p + maskRad);
-    const vL = bl[l]!;
-    const vR = bl[r]!;
-    const span = Math.max(1, r - l);
-    for (let k = l; k <= r; k++) bl[k] = vL + ((vR - vL) * (k - l)) / span;
-  }
-  const blMean = bl.reduce((a, b) => a + b, 0) / bl.length;
-  for (let i = 0; i < bl.length; i++) bl[i] = bl[i]! - blMean;
-  const blStdMm = Math.sqrt(bl.reduce((a, b) => a + b * b, 0) / bl.length);
-
-  let flutterPeakMag = 0;
-  let flutterPeakFreq = 4.5;
-  let totalMagSum = 0;
-  let totalBins = 0;
-  for (let f = 0.8; f <= 10.0; f += 0.15) {
-    const mag = dftMagnitude(bl, fs, f);
-    totalMagSum += mag;
-    totalBins++;
-    if (f >= 3.6 && f <= 5.8 && mag > flutterPeakMag) {
-      flutterPeakMag = mag;
-      flutterPeakFreq = f;
-    }
-  }
-  const meanSpec = totalMagSum / Math.max(1, totalBins) + 1e-6;
-  const flutterSnr = flutterPeakMag / meanSpec;
-  const flutterRateBpm = Math.round(flutterPeakFreq * 60);
-
-  // Clinical Rhythm Classification
-  const isAtrialFlutter = flutterSnr >= 3.2 && blStdMm >= 0.45 && qrsMs < 135;
-  const isRegular = madCv < 0.12;
-  const hasDroppedBeatPause = !isRegular && !isAtrialFlutter && maxMinRrRatio >= 1.55 && blStdMm < 0.90 && measuredPrMs != null && measuredPrMs >= 210;
-  const isAfib = !isAtrialFlutter && !isRegular && !hasDroppedBeatPause && qrsMs < 135;
-  const isWideTach = isRegular && hrBpm != null && hrBpm >= 105 && qrsMs >= 120;
-  const isNarrowSvt = isRegular && hrBpm != null && hrBpm >= 145 && qrsMs < 120 && !isAtrialFlutter;
-  const isSevereBrady = isRegular && hrBpm != null && hrBpm <= 42;
-  const isFirstDegAvb = isRegular && measuredPrMs != null && measuredPrMs > 205;
-
-  // Match against 215-ECG Reference Atlas for morphology refinement when regular & no hard arrhythmia
-  const scoredRefs = refIndex.entries.map((entry) => {
-    const s = entry.sig;
-    const beatSim = Math.max(0, cosineSim(beat16, s.beat16));
-    const hrSim = hrBpm != null ? Math.max(0, 1 - Math.abs(hrBpm - s.hr) / 100) : 0.5;
-    const rrSim = Math.max(0, 1 - Math.abs(madCv - s.rr_cv) * 2.5);
-    const qrsSim = Math.max(0, 1 - Math.abs(qrsMs - s.qrs_ms) / 90);
-    const score = beatSim * 0.48 + rrSim * 0.20 + qrsSim * 0.20 + hrSim * 0.12;
-    return { entry, score };
-  });
-  scoredRefs.sort((a, b) => b.score - a.score);
-  const topRef = scoredRefs[0]!;
-
-  const estQtMs = hrBpm ? Math.round(Math.min(440, Math.max(300, 385 * Math.sqrt(60 / Math.max(45, hrBpm))))) : 380;
-
-  let measuredInput: ECGInput = {
-    age: 55,
-    sex: "male",
-    hr_bpm: hrBpm ?? 75,
-    pr_ms: isAtrialFlutter || isAfib || isWideTach ? null : measuredPrMs ?? 160,
-    qrs_ms: qrsMs,
-    qt_ms: estQtMs,
-    axis_deg: isSingleLead ? null : 45,
-    rhythm_regular: isRegular,
-    p_waves_present: !isAtrialFlutter && !isAfib && !isWideTach,
-    sawtooth_flutter_waves: isAtrialFlutter,
-    flutter_wave_rate_bpm: isAtrialFlutter ? flutterRateBpm : null,
-    fibrillatory_waves: isAfib,
-    rhythm_type: isAtrialFlutter ? "atrial_flutter" : isAfib ? "af" : isWideTach ? "vt" : isNarrowSvt ? "svt" : "",
-    av_block_type: isSevereBrady ? "3rd" : hasDroppedBeatPause ? "mobitz_1" : "",
-    progressive_pr_prolongation: hasDroppedBeatPause,
-  };
-
-  const hasHardTrigger =
-    isAtrialFlutter || isAfib || hasDroppedBeatPause || isFirstDegAvb || isWideTach || isNarrowSvt || isSevereBrady;
-  if (!hasHardTrigger && topRef.score >= 0.85) {
-    measuredInput = {
-      ...topRef.entry.reference_ecg,
-      hr_bpm: hrBpm ?? topRef.entry.reference_ecg.hr_bpm,
-      qrs_ms: qrsMs,
-      rhythm_regular: isRegular,
-    };
-  }
-
-  const interpretation = interpretECG(measuredInput);
+  /* ---- 9. summaries are built from what was actually measured ---- */
   const top = interpretation.all_findings[0]!;
-  const regPct = Math.max(0, Math.min(100, Math.round((1 - Math.min(madCv, 0.35) / 0.35) * 100)));
+  const fmt = (v: number | null, unit: string) => (v == null ? "n/a" : `${v} ${unit}`);
+  const m = interpretation.measurements;
+  const regPct = rhythmOk ? Math.max(0, Math.min(100, Math.round((1 - Math.min(rr.cv, 0.35) / 0.35) * 100))) : 0;
+  const rhythmLabel: LocalECGAnalysisResult["rhythm_label"] =
+    rr.pattern === "regular" ? "Regular" : rr.pattern === "irregularly_irregular" || rr.pattern === "pauses" ? "Irregular" : "Indeterminate";
+
+  const calText = timingTrusted ? `grid-calibrated (${calib.basis})` : "time scale NOT verified";
+  const summary_en =
+    `Measured from image (${calText}): HR ${fmt(m.hr_bpm, "bpm")}, PR ${fmt(m.pr_ms, "ms")}, QRS ${fmt(m.qrs_ms, "ms")}, ` +
+    `rhythm ${rhythmLabel.toLowerCase()}, ${peaks.length} beats. Leading finding: ${top.name_en} (confidence: ${top.confidence}).`;
+  const summary_ar =
+    `القياسات من الصورة (${timingTrusted ? "معايرة من الشبكة" : "مقياس الزمن غير مُتحقَّق منه"}): ` +
+    `HR ${fmt(m.hr_bpm, "bpm")}، PR ${fmt(m.pr_ms, "ms")}، QRS ${fmt(m.qrs_ms, "ms")}، ` +
+    `الإيقاع ${rhythmLabel === "Regular" ? "منتظم" : rhythmLabel === "Irregular" ? "غير منتظم" : "غير محدد"}، عدد النبضات ${peaks.length}. ` +
+    `أبرز نتيجة: ${top.name_ar} (الثقة: ${top.confidence}).`;
 
   return {
     layout: isSingleLead ? "single_lead" : "12_lead",
-    is_regular_rhythm: isRegular,
+    is_regular_rhythm: rr.pattern === "regular",
+    rhythm_label: rhythmLabel,
     rr_regularity_pct: regPct,
     reference_count: refIndex.total_reference_ecgs,
     interpretation,
-    summary_ar: isAtrialFlutter
-      ? `تم رصد موجات رفرفة أذينية منتظمة (Sawtooth F-waves) بتردد ${flutterRateBpm} bpm مع QRS ضيق (${qrsMs} ms) ومعدل بطيني ${hrBpm ?? "—"} bpm.`
-      : hasDroppedBeatPause
-      ? `تم رصد إطالة في مسافة PR (${measuredPrMs} ms) مع سقوط نبضات (Grouped beating / Dropped QRS) وخط أساس هادئ — يتماشى مع إحصار أذيني بطيني من الدرجة الثانية.`
-      : isAfib
-      ? `تم رصد إيقاع غير منتظم بشكل فوضوي (Irregular • انتظام ${regPct}%) مع غياب موجات P ومعدل بطيني ${hrBpm ?? "—"} bpm وQRS ضيق (${qrsMs} ms).`
-      : `تم تحليل الموجة رقمياً (HR=${hrBpm ?? "—"} bpm، PR=${measuredPrMs ?? "—"} ms، QRS=${qrsMs} ms) — التشخيص: ${top.name_ar}.`,
-    summary_en: isAtrialFlutter
-      ? `Detected periodic sawtooth atrial flutter waves (~${flutterRateBpm} bpm) with narrow QRS (${qrsMs} ms) and ventricular rate ${hrBpm ?? "—"} bpm.`
-      : hasDroppedBeatPause
-      ? `Detected prolonged PR interval (${measuredPrMs} ms) with dropped-beat pauses and clean baseline — consistent with Second-Degree AV Block.`
-      : isAfib
-      ? `Detected irregularly irregular rhythm (RR regularity ${regPct}%) with absent discrete P waves, ventricular rate ${hrBpm ?? "—"} bpm, and narrow QRS (${qrsMs} ms).`
-      : `Direct waveform analysis completed (HR=${hrBpm ?? "—"} bpm, PR=${measuredPrMs ?? "—"} ms, QRS=${qrsMs} ms) — Diagnosis: ${top.name_en}.`,
+    quality,
+    similar_references: similar,
+    summary_ar,
+    summary_en,
   };
 }
