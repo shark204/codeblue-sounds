@@ -44,6 +44,17 @@ export default function SoundsLabPage() {
     return () => cancelAnimationFrame(id);
   }, []);
 
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("codeblue_theme", theme);
+      localStorage.removeItem("sky:mode-override");
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.classList.toggle("dark", theme === "dark");
+      document.documentElement.classList.toggle("light", theme === "light");
+    } catch {}
+  }, [theme]);
+
   const handleToggleTheme = () => {
     toggleTheme();
     const next = theme === "dark" ? "light" : "dark";
@@ -119,13 +130,13 @@ export default function SoundsLabPage() {
             <img
               src="/icon.png"
               alt="Code Blue"
-              className="w-8 h-8 rounded-xl border border-cyan-400/30 shadow-lg shadow-cyan-500/20"
+              className="w-8 h-8 rounded-xl border border-rose-500/40 shadow-lg shadow-rose-900/30"
             />
             <div className="leading-tight">
               <div className={`font-extrabold text-sm md:text-base tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>
                 Code Blue
               </div>
-              <div className={`text-[10.5px] font-mono ${isLight ? "text-cyan-700" : "text-cyan-300/80"}`}>
+              <div className={`text-[10.5px] font-mono ${isLight ? "text-[#9f1239]" : "text-[#f47292]"}`}>
                 codeblue-ecg&amp;sounds
               </div>
             </div>
@@ -161,8 +172,8 @@ export default function SoundsLabPage() {
               onClick={() => setLocale(isAr ? "en" : "ar")}
               className={`px-3 py-1.5 rounded-xl border font-bold transition ${
                 isLight
-                  ? "bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border-cyan-200"
-                  : "bg-white/5 hover:bg-white/10 text-cyan-200 border-white/10"
+                  ? "bg-rose-50 hover:bg-rose-100 text-[#9f1239] border-rose-200"
+                  : "bg-rose-950/40 hover:bg-rose-900/50 text-rose-200 border-rose-400/25"
               }`}
             >
               {isAr ? "EN" : "AR"}
@@ -202,15 +213,27 @@ export default function SoundsLabPage() {
                     isLight ? "text-slate-600" : "text-slate-300"
                   }`}
                 >
-                  {isAr
-                    ? "محاكي تفاعلي ثلاثي الأبعاد لأصوات القلب واللغط القلبي وتخطيط الـ ECG المباشر وأصوات الصدر والتنفس السريرية."
-                    : "Interactive 3D simulator for heart murmurs, 4-chamber rhythm sync, live ECG strips, and clinical breath auscultation."}
+                  {isAr ? (
+                    <>
+                      محاكي تفاعلي ثلاثي الأبعاد لأصوات القلب واللغط القلبي وتخطيط الـ ECG{" "}
+                      <span className={isLight ? "text-[#9f1239] font-extrabold" : "text-[#fb7185] font-extrabold"}>
+                        وأصوات الصدر والتنفس السريرية
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      Interactive 3D simulator for heart murmurs, 4-chamber rhythm sync,{" "}
+                      <span className={isLight ? "text-[#9f1239] font-extrabold" : "text-[#fb7185] font-extrabold"}>
+                        live ECG strips &amp; clinical breath auscultation
+                      </span>
+                    </>
+                  )}
                 </p>
                 <div className="pt-1">
                   <button
                     type="button"
                     onClick={() => launchMode("heart")}
-                    className="px-7 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 to-teal-300 hover:from-cyan-300 hover:to-teal-200 text-slate-950 font-black text-sm sm:text-base shadow-[0_0_30px_rgba(34,211,238,0.45)] transition transform hover:scale-[1.03] active:scale-[0.99] cursor-pointer"
+                    className="px-7 py-3 rounded-2xl bg-gradient-to-r from-[#881337] via-[#be123c] to-[#e11d48] hover:from-[#9f1239] hover:via-[#e11d48] hover:to-[#f43f5e] text-white font-black text-sm sm:text-base shadow-[0_0_30px_rgba(190,18,60,0.45)] transition transform hover:scale-[1.03] active:scale-[0.99] cursor-pointer"
                   >
                     {isAr ? "ابدأ المحاكاة الآن" : "Start Simulation Now"}
                   </button>
@@ -221,7 +244,7 @@ export default function SoundsLabPage() {
               <div className="pt-1 space-y-2.5">
                 <div
                   className={`text-xs font-extrabold uppercase tracking-wider ${
-                    isLight ? "text-cyan-700" : "text-cyan-300/90"
+                    isLight ? "text-[#9f1239]" : "text-[#fb7185]"
                   }`}
                 >
                   {isAr ? "ماذا تقدم المنصة؟" : "What Does the Platform Offer?"}
@@ -298,10 +321,10 @@ export default function SoundsLabPage() {
             {/* Right / Transparent PNG Hero Visual (Non-clickable) */}
             <div className="lg:col-span-6 flex items-center justify-center">
               <img
-                src="/hero-sounds.png?v=2"
+                src="/hero-sounds.png?v=3"
                 alt="Heart & ECG Simulator Preview"
                 draggable={false}
-                className="w-full max-w-[540px] max-h-[68vh] h-auto object-contain select-none pointer-events-none drop-shadow-[0_20px_45px_rgba(34,211,238,0.28)]"
+                className={`w-full max-w-[540px] max-h-[68vh] h-auto object-contain select-none pointer-events-none ${isLight ? "drop-shadow-[0_0_28px_rgba(255,255,255,0.95)]" : "drop-shadow-[0_18px_40px_rgba(190,18,60,0.22)]"}`}
               />
             </div>
           </div>
