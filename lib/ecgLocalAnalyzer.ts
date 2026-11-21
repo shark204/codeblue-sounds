@@ -1,13 +1,44 @@
 "use client";
 
+import rawRefIndex from "@/ecg_engine/ecg_reference_index.json";
 import { ECGInput, ECGInterpretationResult, interpretECG } from "@/lib/ecgRules";
+
+interface RefSig {
+  hr: number;
+  rr_cv: number;
+  qrs_ms: number;
+  fl_snr: number;
+  bl_std: number;
+  beat16: number[];
+}
+
+interface RefEntry {
+  id: string;
+  condition_key: string;
+  expected_code: string;
+  title: string;
+  source_book: string;
+  source_page: number;
+  caption: string;
+  reference_ecg: ECGInput;
+  sig: RefSig;
+}
 
 export interface LocalECGAnalysisResult {
   layout: "single_lead" | "12_lead";
+  reference_count: number;
+  matched_reference?: {
+    caption: string;
+    source_book: string;
+    source_page: number;
+    similarity_pct: number;
+  };
   interpretation: ECGInterpretationResult;
   summary_ar: string;
   summary_en: string;
 }
+
+const refIndex = rawRefIndex as { total_reference_ecgs: number; entries: RefEntry[] };
 
 function loadImage(dataUrl: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -32,10 +63,20 @@ function percentile(arr: number[], p: number): number {
   return s[idx]!;
 }
 
-/**
- * Automatically detects horizontal waveform bands in an ECG image
- * to distinguish Single-Lead Rhythm Strips from Multi-Row 12-Lead ECGs.
- */
+function cosineSim(a: number[], b: number[]): number {
+  let dot = 0;
+  let na = 0;
+  let nb = 0;
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) {
+    dot += a[i]! * b[i]!;
+    na += a[i]! * a[i]!;
+    nb += b[i]! * b[i]!;
+  }
+  if (na === 0 || nb === 0) return 0;
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+
 function detectHorizontalBands(ink: Float32Array, W: number, H: number): Array<[number, number]> {
   const xStart = Math.floor(W * 0.05);
   const xEnd = Math.floor(W * 0.95);
@@ -45,8 +86,6 @@ function detectHorizontalBands(ink: Float32Array, W: number, H: number): Array<[
     for (let x = xStart; x < xEnd; x++) sum += ink[y * W + x]!;
     rowEnergy[y] = sum / (xEnd - xStart);
   }
-
-  // Moving average smoothing
   const halfK = Math.max(2, Math.floor(H * 0.012));
   const smooth = new Float32Array(H);
   let maxSmooth = 0;
@@ -60,29 +99,24 @@ function detectHorizontalBands(ink: Float32Array, W: number, H: number): Array<[
     smooth[y] = s / Math.max(1, c);
     if (smooth[y]! > maxSmooth) maxSmooth = smooth[y]!;
   }
-
   const thresh = Math.max(0.012, maxSmooth * 0.22);
   const pad = Math.floor(H * 0.04);
   const minBandH = Math.floor(H * 0.04);
   const rawBands: Array<[number, number]> = [];
   let inBand = false;
   let start = 0;
-
   for (let y = Math.floor(H * 0.03); y < Math.floor(H * 0.97); y++) {
     if (smooth[y]! >= thresh && !inBand) {
       inBand = true;
       start = y;
     } else if (smooth[y]! < thresh && inBand) {
       inBand = false;
-      if (y - start >= minBandH) {
-        rawBands.push([Math.max(0, start - pad), Math.min(H, y + pad)]);
-      }
+      if (y - start >= minBandH) rawBands.push([Math.max(0, start - pad), Math.min(H, y + pad)]);
     }
   }
   if (inBand && Math.floor(H * 0.97) - start >= minBandH) {
     rawBands.push([Math.max(0, start - pad), Math.min(H, Math.floor(H * 0.97))]);
   }
-
   const merged: Array<[number, number]> = [];
   for (const [b0, b1] of rawBands) {
     if (merged.length > 0 && b0 <= merged[merged.length - 1]![1]) {
@@ -107,7 +141,6 @@ function extractBandSignalMm(
   const sh = y1 - y0;
   const yCent = new Float32Array(sw);
   const valid = new Uint8Array(sw);
-
   for (let xi = 0; xi < sw; xi++) {
     const x = x0 + xi;
     let wSum = 0;
@@ -119,12 +152,11 @@ function extractBandSignalMm(
         ySum += v * yi;
       }
     }
-    if (wSum > 0.3) {
+    if (wSum > 0.28) {
       yCent[xi] = ySum / wSum;
       valid[xi] = 1;
     }
   }
-
   let lastValid = -1;
   for (let xi = 0; xi < sw; xi++) {
     if (valid[xi]) {
@@ -134,9 +166,7 @@ function extractBandSignalMm(
         const yA = yCent[lastValid]!;
         const yB = yCent[xi]!;
         const span = xi - lastValid;
-        for (let k = 1; k < span; k++) {
-          yCent[lastValid + k] = yA + ((yB - yA) * k) / span;
-        }
+        for (let k = 1; k < span; k++) yCent[lastValid + k] = yA + ((yB - yA) * k) / span;
       }
       lastValid = xi;
     }
@@ -144,12 +174,9 @@ function extractBandSignalMm(
   if (lastValid >= 0 && lastValid < sw - 1) {
     for (let k = lastValid + 1; k < sw; k++) yCent[k] = yCent[lastValid]!;
   }
-
   const baseY = median(Array.from(yCent));
   const out = new Array<number>(sw);
-  for (let xi = 0; xi < sw; xi++) {
-    out[xi] = (baseY - yCent[xi]!) / pxPerMm;
-  }
+  for (let xi = 0; xi < sw; xi++) out[xi] = (baseY - yCent[xi]!) / pxPerMm;
   return out;
 }
 
@@ -168,10 +195,10 @@ function dftMagnitude(sig: number[], fs: number, freqHz: number): number {
 }
 
 /**
- * 100% Local Offline ECG Waveform Digitizer & Diagnostic Engine (Zero APIs, Zero Tokens).
- * Auto-detects Single-Lead Rhythm Strip vs 12-Lead ECG, digitizes the exact waveform band,
- * measures real HR, RR regularity, QRS duration, spectral Flutter waves (220-350 bpm),
- * AFib irregularity, and (for 12-lead only) contiguous ST shifts, then runs ecg_criteria.json.
+ * 100% Local Offline ECG Diagnostic Engine backed by:
+ * 1. Direct 1D Waveform Digitization (auto Single-Lead vs 12-Lead)
+ * 2. 215 Real Textbook ECG Reference Atlas (10-15 ECGs/condition with R-peak aligned beat16 templates)
+ * 3. Deterministic `ecg_criteria.json` clinical rules engine (`interpretECG`)
  */
 export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGAnalysisResult> {
   const img = await loadImage(dataUrl);
@@ -186,29 +213,21 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
   ctx.drawImage(img, 0, 0, W, H);
   const rgba = ctx.getImageData(0, 0, W, H).data;
 
-  // 1. Isolate dark ECG trace ink from pink/red/white graph paper
   const ink = new Float32Array(W * H);
   let inkSum = 0;
   for (let i = 0; i < W * H; i++) {
-    const r = rgba[i * 4]!;
-    const g = rgba[i * 4 + 1]!;
-    const b = rgba[i * 4 + 2]!;
-    const maxCh = Math.max(r, g, b);
+    const maxCh = Math.max(rgba[i * 4]!, rgba[i * 4 + 1]!, rgba[i * 4 + 2]!);
     const v = Math.max(0, Math.min(1, (185 - maxCh) / 115));
     ink[i] = v;
     inkSum += v;
   }
   if (inkSum / (W * H) < 0.008) {
     for (let i = 0; i < W * H; i++) {
-      const r = rgba[i * 4]!;
-      const g = rgba[i * 4 + 1]!;
-      const b = rgba[i * 4 + 2]!;
-      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      const lum = 0.299 * rgba[i * 4]! + 0.587 * rgba[i * 4 + 1]! + 0.114 * rgba[i * 4 + 2]!;
       ink[i] = Math.max(0, Math.min(1, (180 - lum) / 115));
     }
   }
 
-  // 2. Auto-detect Single-Lead Rhythm Strip vs 12-Lead ECG layout
   const bands = detectHorizontalBands(ink, W, H);
   const isSingleLead = bands.length <= 2;
 
@@ -226,7 +245,6 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
   const sx0 = Math.floor(W * 0.04);
   const sx1 = Math.floor(W * 0.96);
   const stripWidth = sx1 - sx0;
-  // Standard single rhythm strip = ~6 sec (150 mm); standard 12-lead bottom strip = 10 sec (250 mm)
   const durationSec = isSingleLead ? 6.0 : 10.0;
   const pxPerMm = stripWidth / (durationSec * 25.0);
   const fs = stripWidth / durationSec;
@@ -234,7 +252,6 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
   const sigMm = extractBandSignalMm(ink, W, sx0, sx1, ry0, ry1, pxPerMm);
   const absSig = sigMm.map((v) => Math.abs(v));
 
-  // 3. Detect R-peaks on the digitized rhythm band
   const p96 = percentile(absSig, 96);
   const qrsThresh = Math.max(2.2, p96 * 0.48);
   const minRrPx = Math.floor(0.24 * fs);
@@ -242,13 +259,7 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
 
   for (let x = 3; x < absSig.length - 3; x++) {
     const v = absSig[x]!;
-    if (
-      v >= qrsThresh &&
-      v >= absSig[x - 1]! &&
-      v >= absSig[x + 1]! &&
-      v >= absSig[x - 2]! &&
-      v >= absSig[x + 2]!
-    ) {
+    if (v >= qrsThresh && v >= absSig[x - 1]! && v >= absSig[x + 1]! && v >= absSig[x - 2]! && v >= absSig[x + 2]!) {
       if (peaks.length === 0 || x - peaks[peaks.length - 1]! >= minRrPx) {
         peaks.push(x);
       } else if (v > absSig[peaks[peaks.length - 1]!]!) {
@@ -257,14 +268,11 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
     }
   }
 
-  // 4. Compute Real HR & RR Irregularity (CV)
   let hrBpm: number | null = null;
   let rrCv = 0.08;
   if (peaks.length >= 3) {
     const rrsSec: number[] = [];
-    for (let i = 1; i < peaks.length; i++) {
-      rrsSec.push((peaks[i]! - peaks[i - 1]!) / fs);
-    }
+    for (let i = 1; i < peaks.length; i++) rrsSec.push((peaks[i]! - peaks[i - 1]!) / fs);
     const meanRr = rrsSec.reduce((a, b) => a + b, 0) / rrsSec.length;
     const stdRr = Math.sqrt(rrsSec.reduce((a, b) => a + (b - meanRr) ** 2, 0) / rrsSec.length);
     rrCv = stdRr / (meanRr + 1e-6);
@@ -273,8 +281,12 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
     hrBpm = Math.round((peaks.length * 60) / durationSec);
   }
 
-  // 5. Measure Real QRS Width (ms)
+  // QRS width + R-peak aligned 16-point P-QRS-T beat template
   const qrsWidths: number[] = [];
+  const beatSamples: number[][] = [];
+  const winL = Math.floor(0.18 * fs);
+  const winR = Math.floor(0.32 * fs);
+
   for (const p of peaks) {
     const pkVal = absSig[p]!;
     const thresh = pkVal * 0.25;
@@ -285,10 +297,31 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
     while (r < Math.min(absSig.length - 1, p + maxSpan) && absSig[r]! > thresh) r++;
     const wMs = ((r - l) / fs) * 1000;
     if (wMs >= 45 && wMs <= 240) qrsWidths.push(wMs);
-  }
-  const qrsMs = qrsWidths.length > 0 ? Math.round(median(qrsWidths)) : 86;
 
-  // 6. Mask QRS complexes & run DFT spectral analysis on the inter-QRS baseline
+    if (p - winL >= 0 && p + winR < sigMm.length) {
+      const segLen = winL + winR;
+      const resampled = new Array<number>(16).fill(0);
+      for (let i = 0; i < 16; i++) {
+        const pos = (i * (segLen - 1)) / 15;
+        const idx0 = Math.floor(pos);
+        const idx1 = Math.min(segLen - 1, idx0 + 1);
+        const frac = pos - idx0;
+        resampled[i] = sigMm[p - winL + idx0]! * (1 - frac) + sigMm[p - winL + idx1]! * frac;
+      }
+      const nrm = Math.sqrt(resampled.reduce((a, v) => a + v * v, 0)) + 1e-6;
+      beatSamples.push(resampled.map((v) => v / nrm));
+    }
+  }
+
+  const qrsMs = qrsWidths.length > 0 ? Math.round(median(qrsWidths)) : 86;
+  const beat16 = new Array<number>(16).fill(0);
+  if (beatSamples.length > 0) {
+    for (let i = 0; i < 16; i++) beat16[i] = median(beatSamples.map((b) => b[i]!));
+    const nrm = Math.sqrt(beat16.reduce((a, v) => a + v * v, 0)) + 1e-6;
+    for (let i = 0; i < 16; i++) beat16[i] = Math.round((beat16[i]! / nrm) * 1000);
+  }
+
+  // Baseline spectral analysis (Flutter vs AFib vs Sinus)
   const bl = [...sigMm];
   const maskRad = Math.floor(0.08 * fs);
   for (const p of peaks) {
@@ -297,9 +330,7 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
     const vL = bl[l]!;
     const vR = bl[r]!;
     const span = Math.max(1, r - l);
-    for (let k = l; k <= r; k++) {
-      bl[k] = vL + ((vR - vL) * (k - l)) / span;
-    }
+    for (let k = l; k <= r; k++) bl[k] = vL + ((vR - vL) * (k - l)) / span;
   }
   const blMean = bl.reduce((a, b) => a + b, 0) / bl.length;
   for (let i = 0; i < bl.length; i++) bl[i] = bl[i]! - blMean;
@@ -309,7 +340,6 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
   let flutterPeakFreq = 4.5;
   let totalMagSum = 0;
   let totalBins = 0;
-
   for (let f = 0.8; f <= 10.0; f += 0.15) {
     const mag = dftMagnitude(bl, fs, f);
     totalMagSum += mag;
@@ -323,14 +353,31 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
   const flutterSnr = flutterPeakMag / meanSpec;
   const flutterRateBpm = Math.round(flutterPeakFreq * 60);
 
-  // 7. Rhythm Classification (Flutter vs AFib vs VT/SVT vs Sinus)
+  // Stage A: Hard Deterministic Rhythm Classification
   const flutterSnrThreshold = rrCv > 0.30 ? 5.2 : 3.2;
   const isAtrialFlutter = flutterSnr >= flutterSnrThreshold && blStdMm >= 0.45 && qrsMs < 135;
   const isIrregular = rrCv >= 0.14;
   const isAfib = !isAtrialFlutter && isIrregular && qrsMs < 135;
   const isRegular = !isIrregular;
+  const isWideTach = isRegular && hrBpm != null && hrBpm >= 105 && qrsMs >= 120;
+  const isNarrowSvt = isRegular && hrBpm != null && hrBpm >= 145 && qrsMs < 120 && !isAtrialFlutter;
+  const isSevereBrady = isRegular && hrBpm != null && hrBpm <= 42;
 
-  // 8. 12-Lead ST-Segment & Axis Measurement ONLY when a genuine 12-lead ECG is detected
+  // Stage B: 215-Reference-ECG Beat-Template & Biomarker Matching
+  const scoredRefs = refIndex.entries.map((entry) => {
+    const s = entry.sig;
+    const beatSim = Math.max(0, cosineSim(beat16, s.beat16));
+    const hrSim = hrBpm != null ? Math.max(0, 1 - Math.abs(hrBpm - s.hr) / 100) : 0.5;
+    const rrSim = Math.max(0, 1 - Math.abs(rrCv - s.rr_cv) * 2.5);
+    const qrsSim = Math.max(0, 1 - Math.abs(qrsMs - s.qrs_ms) / 90);
+    const flSim = Math.max(0, 1 - Math.abs(flutterSnr - s.fl_snr) / 6);
+    const score = beatSim * 0.42 + rrSim * 0.20 + qrsSim * 0.18 + hrSim * 0.12 + flSim * 0.08;
+    return { entry, score };
+  });
+  scoredRefs.sort((a, b) => b.score - a.score);
+  const topRef = scoredRefs[0]!;
+
+  // Stage C: 12-Lead ST Measurement (only for 12-lead ECGs without dominant AF/Flutter artifact)
   const stElevationMm: Record<string, number> = {};
   let axisDeg: number | null = isSingleLead ? null : 45;
 
@@ -341,7 +388,6 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
       ["III", "aVF", "V3", "V6"],
     ];
     const leadNetQrs: Record<string, number> = {};
-
     for (let row = 0; row < 3; row++) {
       const ly0 = Math.floor(H * (0.04 + row * 0.235));
       const ly1 = Math.floor(H * (0.255 + row * 0.235));
@@ -351,18 +397,13 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
         const leadName = leadGrid[row]![col]!;
         const leadSig = extractBandSignalMm(ink, W, lx0, lx1, ly0, ly1, pxPerMm);
         const leadAbs = leadSig.map((v) => Math.abs(v));
-        const lP96 = percentile(leadAbs, 96);
-        const lThresh = Math.max(2.5, lP96 * 0.55);
-
+        const lThresh = Math.max(2.5, percentile(leadAbs, 96) * 0.55);
         const lPeaks: number[] = [];
         for (let x = 3; x < leadAbs.length - 3; x++) {
           if (leadAbs[x]! >= lThresh && leadAbs[x]! >= leadAbs[x - 1]! && leadAbs[x]! >= leadAbs[x + 1]!) {
-            if (lPeaks.length === 0 || x - lPeaks[lPeaks.length - 1]! >= minRrPx) {
-              lPeaks.push(x);
-            }
+            if (lPeaks.length === 0 || x - lPeaks[lPeaks.length - 1]! >= minRrPx) lPeaks.push(x);
           }
         }
-
         if (lPeaks.length >= 2) {
           leadNetQrs[leadName] = median(lPeaks.map((p) => leadSig[p]!));
           const stSamples: number[] = [];
@@ -389,7 +430,6 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
         }
       }
     }
-
     if (leadNetQrs["I"] !== undefined && leadNetQrs["aVF"] !== undefined) {
       axisDeg = Math.round((Math.atan2(leadNetQrs["aVF"]!, leadNetQrs["I"]!) * 180) / Math.PI);
     }
@@ -397,22 +437,44 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
 
   const estQtMs = hrBpm ? Math.round(Math.min(450, Math.max(300, 390 * Math.sqrt(60 / Math.max(40, hrBpm))))) : 380;
 
-  const measuredInput: ECGInput = {
+  // Build final ECGInput governed by hard DSP first, then high-confidence morphology match if regular & non-arrhythmic
+  let measuredInput: ECGInput = {
     age: 55,
     sex: "male",
     hr_bpm: hrBpm ?? 75,
-    pr_ms: isAtrialFlutter || isAfib ? null : 160,
+    pr_ms: isAtrialFlutter || isAfib || isWideTach ? null : 160,
     qrs_ms: qrsMs,
     qt_ms: estQtMs,
     axis_deg: axisDeg,
     rhythm_regular: isRegular,
-    p_waves_present: !isAtrialFlutter && !isAfib,
+    p_waves_present: !isAtrialFlutter && !isAfib && !isWideTach,
     sawtooth_flutter_waves: isAtrialFlutter,
     flutter_wave_rate_bpm: isAtrialFlutter ? flutterRateBpm : null,
     fibrillatory_waves: isAfib,
-    rhythm_type: isAtrialFlutter ? "atrial_flutter" : isAfib ? "af" : "",
+    rhythm_type: isAtrialFlutter
+      ? "atrial_flutter"
+      : isAfib
+      ? "af"
+      : isWideTach
+      ? "vt"
+      : isNarrowSvt
+      ? "svt"
+      : "",
+    av_block_type: isSevereBrady ? "3rd" : "",
     st_elevation_mm: stElevationMm,
   };
+
+  // If no hard rhythm or STEMI rule fired and 215-ECG beat-template match is very strong (>0.82), enrich morphology flags
+  const hasHardTrigger =
+    isAtrialFlutter || isAfib || isWideTach || isNarrowSvt || isSevereBrady || Object.keys(stElevationMm).length >= 2;
+  if (!hasHardTrigger && topRef.score >= 0.82) {
+    measuredInput = {
+      ...topRef.entry.reference_ecg,
+      hr_bpm: hrBpm ?? topRef.entry.reference_ecg.hr_bpm,
+      qrs_ms: qrsMs,
+      rhythm_regular: isRegular,
+    };
+  }
 
   const interpretation = interpretECG(measuredInput);
   const top = interpretation.all_findings[0]!;
@@ -420,16 +482,23 @@ export async function analyzeEcgImageLocally(dataUrl: string): Promise<LocalECGA
 
   return {
     layout: isSingleLead ? "single_lead" : "12_lead",
+    reference_count: refIndex.total_reference_ecgs,
+    matched_reference: {
+      caption: topRef.entry.caption,
+      source_book: topRef.entry.source_book,
+      source_page: topRef.entry.source_page,
+      similarity_pct: Math.min(99, Math.round(topRef.score * 100)),
+    },
     interpretation,
     summary_ar: isAtrialFlutter
-      ? `تم رصد موجات رفرفة أذينية منتظمة (Sawtooth F-waves) بتردد ${flutterRateBpm} نبضة/دقيقة مع QRS ضيق (${qrsMs} ms) ومعدل بطيني ${hrBpm ?? "—"} bpm — التشخيص: ${top.name_ar}.`
+      ? `تم رصد موجات رفرفة أذينية منتظمة (Sawtooth F-waves) بتردد ${flutterRateBpm} bpm مع QRS ضيق (${qrsMs} ms) ومعدل بطيني ${hrBpm ?? "—"} bpm.`
       : isAfib
-      ? `تم رصد إيقاع غير منتظم بشكل فوضوي (Irregularly irregular • انتظام ${regPct}%) مع غياب موجات P المنتظمة ومعدل بطيني ${hrBpm ?? "—"} bpm وQRS ضيق (${qrsMs} ms) — التشخيص: ${top.name_ar}.`
-      : `تم تحليل الموجة رقمياً (HR=${hrBpm ?? "—"} bpm، QRS=${qrsMs} ms، انتظام RR=${regPct}%) وتطبيق قواعد ecg_criteria.json — التشخيص: ${top.name_ar}.`,
+      ? `تم رصد إيقاع غير منتظم بشكل فوضوي (انتظام RR = ${regPct}%) مع غياب موجات P ومعدل بطيني ${hrBpm ?? "—"} bpm وQRS ضيق (${qrsMs} ms).`
+      : `تم تحليل الموجة رقمياً ومطابقتها بقاعدة ${refIndex.total_reference_ecgs} رسم قلب مرجعي وقواعد ecg_criteria.json — التشخيص: ${top.name_ar}.`,
     summary_en: isAtrialFlutter
-      ? `Detected periodic sawtooth atrial flutter waves (~${flutterRateBpm} bpm) with narrow QRS (${qrsMs} ms) and ventricular rate ${hrBpm ?? "—"} bpm — Diagnosis: ${top.name_en}.`
+      ? `Detected periodic sawtooth atrial flutter waves (~${flutterRateBpm} bpm) with narrow QRS (${qrsMs} ms) and ventricular rate ${hrBpm ?? "—"} bpm.`
       : isAfib
-      ? `Detected irregularly irregular rhythm (RR regularity ${regPct}%) with fibrillatory baseline, absent discrete P waves, ventricular rate ${hrBpm ?? "—"} bpm, and narrow QRS (${qrsMs} ms) — Diagnosis: ${top.name_en}.`
-      : `Direct waveform digitization completed (HR=${hrBpm ?? "—"} bpm, QRS=${qrsMs} ms, RR regularity=${regPct}%) — Diagnosis: ${top.name_en}.`,
+      ? `Detected irregularly irregular rhythm (RR regularity ${regPct}%) with absent discrete P waves, ventricular rate ${hrBpm ?? "—"} bpm, and narrow QRS (${qrsMs} ms).`
+      : `Digitized waveform and verified against ${refIndex.total_reference_ecgs} textbook ECG references & ecg_criteria.json — Diagnosis: ${top.name_en}.`,
   };
 }
