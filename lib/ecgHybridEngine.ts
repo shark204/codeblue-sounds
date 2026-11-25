@@ -7,6 +7,12 @@ import {
   interpretECG,
 } from "@/lib/ecgRules";
 import { evaluateVitalsContext } from "@/lib/ecgVitalsRules";
+import {
+  MeasurementProvenanceMap,
+  SourceConflictWarning,
+  detectPixelRuleVsAiConflict,
+  evaluateRuleWithProvenance,
+} from "@/lib/ecgMeasurementUncertainty";
 import { detectCompositeConductionSyndrome, lookupClinicalEntry } from "@/lib/ecgClinicalLibrary";
 import {
   FUSION_CONSTANTS,
@@ -83,6 +89,7 @@ export interface WizardFeatures {
   lafb?: boolean;
   lpfb?: boolean;
   ai_predictions?: { label: string; code: string | null; prob: number; uncertainty?: number }[];
+  measurement_provenance?: Partial<MeasurementProvenanceMap>;
 }
 
 export const INITIAL_WIZARD_FEATURES: WizardFeatures = {
@@ -191,6 +198,7 @@ export interface HybridDiagnosisResult {
   matchedCases: MatchedCaseResult[];
   aggregatedPitfalls: (CasePitfall & { from_diagnosis: string })[];
   lookAlikeWarnings: { code: string; label_en: string; label_ar: string }[];
+  sourceConflict?: SourceConflictWarning | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -821,6 +829,9 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
     aiPreds.some((p) => p && typeof p.prob === "number" && p.prob >= FUSION_CONSTANTS.MIN_AI_PROB) ||
     false;
 
+  const prov = f.measurement_provenance || {};
+  const pixelRuleFindings: { code: string; name_en: string; name_ar: string }[] = [];
+
   for (const rf of rulesResult.all_findings) {
     if (
       (rf.code === "INSUFFICIENT_DATA" || rf.code === "NO_ABNORMALITY_IN_ASSESSED_PARAMETERS") &&
@@ -828,23 +839,47 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
     ) {
       continue;
     }
-    const ruleStrength = rf.confidence === "high" ? 0.85 : rf.confidence === "moderate" ? 0.65 : 0.45;
+    let adjUrgency: UrgencyLevel = rf.urgency;
+    let adjStrength = rf.confidence === "high" ? 0.85 : rf.confidence === "moderate" ? 0.65 : 0.45;
+    let adjNameEn = rf.name_en;
+    let adjNameAr = rf.name_ar;
+    let adjExpEn = rf.explanation_en;
+    let adjExpAr = rf.explanation_ar;
+
+    const { uRes, usedPixelEstimate } = evaluateRuleWithProvenance(rf.code, prov, f);
+    if (usedPixelEstimate) pixelRuleFindings.push({ code: rf.code, name_en: rf.name_en, name_ar: rf.name_ar });
+
+    if (uRes && uRes.status === "possible") {
+      // Never delete "possible" findings; downgrade non-dangerous to low-confidence ABNORMAL (no red banner),
+      // and keep dangerous "possible" conditions visible as URGENT (unverified urgent)
+      adjUrgency = uRes.unverifiedUrgent ? "URGENT" : "ABNORMAL";
+      adjStrength = uRes.unverifiedUrgent ? 0.50 : 0.35;
+      adjNameEn = uRes.unverifiedUrgent ? `Possible ${rf.name_en} (Unverified Urgent)` : `Possible ${rf.name_en}`;
+      adjNameAr = uRes.unverifiedUrgent ? `احتمال طارئ غير مؤكد: ${rf.name_ar}` : `محتمل: ${rf.name_ar}`;
+      if (uRes.note_en) adjExpEn = `${rf.explanation_en} [${uRes.note_en}]`;
+      if (uRes.note_ar) adjExpAr = `${rf.explanation_ar} [${uRes.note_ar}]`;
+    } else if (uRes && uRes.note_en) {
+      adjExpEn = `${rf.explanation_en} [${uRes.note_en}]`;
+      adjExpAr = `${rf.explanation_ar} [${uRes.note_ar}]`;
+    }
+
+    const urgMeta = URGENCY_LABELS[adjUrgency];
     const ruleAvailability = computeRuleAvailability(rf.code, f);
     candidates.push({
       code: rf.code,
-      urgency: rf.urgency,
-      priority: rf.priority,
-      urgency_label_en: rf.urgency_label_en,
-      urgency_label_ar: rf.urgency_label_ar,
-      name_en: rf.name_en,
-      name_ar: rf.name_ar,
+      urgency: adjUrgency,
+      priority: URGENCY_PRIORITY[adjUrgency],
+      urgency_label_en: urgMeta.en,
+      urgency_label_ar: urgMeta.ar,
+      name_en: adjNameEn,
+      name_ar: adjNameAr,
       evidence: rf.evidence,
-      explanation_en: rf.explanation_en,
-      explanation_ar: rf.explanation_ar,
+      explanation_en: adjExpEn,
+      explanation_ar: adjExpAr,
       immediate_action_en: rf.immediate_action_en,
       immediate_action_ar: rf.immediate_action_ar,
       source: "rules",
-      strength: ruleStrength,
+      strength: adjStrength,
       availability: ruleAvailability,
     });
   }
@@ -944,6 +979,11 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
   const conditionalChecks = buildConditionalChecks(f, ruleCodes);
   const topActive = combined.find((x) => !x.isDemoted) ?? combined[0];
 
+  const sourceConflict = detectPixelRuleVsAiConflict(
+    pixelRuleFindings,
+    aiPreds.filter((p) => p && typeof p.prob === "number" && p.code).map((p) => ({ code: String(p.code), label: p.label, prob: p.prob }))
+  );
+
   return {
     rulesResult,
     finalUrgency: topActive?.urgency || rulesResult.overall_urgency,
@@ -953,5 +993,6 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
     matchedCases,
     aggregatedPitfalls: aggregatedPitfalls.slice(0, 5),
     lookAlikeWarnings,
+    sourceConflict,
   };
 }

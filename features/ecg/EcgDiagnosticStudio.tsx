@@ -30,6 +30,7 @@ import {
   analyzeEcgImageLocally,
 } from "@/lib/ecgImageEngine";
 import { EcgResultsPanel, EcgGradCamPanel } from "@/features/ecg/EcgDiagnosisView";
+import { makeProvenanced } from "@/lib/ecgMeasurementUncertainty";
 import { useAtlasLocale } from "@/lib/atlasI18n";
 import { useUIStore } from "@/stores/uiStore";
 
@@ -146,7 +147,7 @@ export function EcgDiagnosticStudio() {
               ai_diagnoses: aiList,
               elapsed_sec: typeof j.elapsed_sec === "number" ? j.elapsed_sec : undefined,
             });
-            // If the ECG image has no printed computer header text, estimate HR/intervals from the waveform pixels locally
+            // Full automatic waveform estimation fallback with per-field provenance & P95 uncertainty
             let fallbackM: { hr_bpm?: number | null; pr_ms?: number | null; qrs_ms?: number | null; qt_ms?: number | null } = {};
             if ((bm.hr_bpm == null || bm.qrs_ms == null || bm.qt_ms == null) && dataUrl.startsWith("data:image/")) {
               try {
@@ -162,15 +163,27 @@ export function EcgDiagnosticStudio() {
                 // ignore local fallback error
               }
             }
+            const nextHr = bm.hr_bpm ?? fallbackM.hr_bpm ?? null;
+            const nextPr = bm.pr_ms ?? fallbackM.pr_ms ?? null;
+            const nextQrs = bm.qrs_ms ?? fallbackM.qrs_ms ?? null;
+            const nextQt = bm.qt_ms ?? fallbackM.qt_ms ?? null;
+            const nextAx = bm.axis_deg ?? null;
             setFeatures((prev) => ({
               ...prev,
               paper_speed_mm_s: detSpeed,
               gain_mm_mv: detGain,
-              hr_bpm: bm.hr_bpm ?? fallbackM.hr_bpm ?? prev.hr_bpm,
-              pr_ms: bm.pr_ms ?? fallbackM.pr_ms ?? prev.pr_ms,
-              qrs_ms: bm.qrs_ms ?? fallbackM.qrs_ms ?? prev.qrs_ms,
-              qt_ms: bm.qt_ms ?? fallbackM.qt_ms ?? prev.qt_ms,
-              axis_deg: bm.axis_deg ?? prev.axis_deg,
+              hr_bpm: nextHr ?? prev.hr_bpm,
+              pr_ms: nextPr ?? prev.pr_ms,
+              qrs_ms: nextQrs ?? prev.qrs_ms,
+              qt_ms: nextQt ?? prev.qt_ms,
+              axis_deg: nextAx ?? prev.axis_deg,
+              measurement_provenance: {
+                hr_bpm: makeProvenanced(nextHr, bm.hr_bpm != null ? "device_ocr" : "pixel_estimate", "hr_bpm"),
+                pr_ms: makeProvenanced(nextPr, bm.pr_ms != null ? "device_ocr" : "pixel_estimate", "pr_ms"),
+                qrs_ms: makeProvenanced(nextQrs, bm.qrs_ms != null ? "device_ocr" : "pixel_estimate", "qrs_ms"),
+                qt_ms: makeProvenanced(nextQt, bm.qt_ms != null ? "device_ocr" : "pixel_estimate", "qt_ms"),
+                axis_deg: makeProvenanced(nextAx, bm.axis_deg != null ? "device_ocr" : "pixel_estimate", "axis_deg"),
+              },
               ai_predictions: j.low_confidence ? [] : aiList,
             }));
             const hasOcrNum = bm.hr_bpm != null || bm.pr_ms != null || bm.qrs_ms != null || bm.qt_ms != null || bm.axis_deg != null;
@@ -476,7 +489,18 @@ export function EcgDiagnosticStudio() {
                       type="number"
                       placeholder={fld.ph}
                       value={(features[fld.key as keyof WizardFeatures] as number | null) ?? ""}
-                      onChange={(e) => { setMeasurementSource("manual"); setFeatures((p) => ({ ...p, [fld.key]: parseOptNum(e.target.value) })); }}
+                      onChange={(e) => {
+                          const v = parseOptNum(e.target.value);
+                          setMeasurementSource("manual");
+                          setFeatures((p) => ({
+                            ...p,
+                            [fld.key]: v,
+                            measurement_provenance: {
+                              ...(p.measurement_provenance || {}),
+                              [fld.key]: makeProvenanced(v, "manual", fld.key as "hr_bpm" | "pr_ms" | "qrs_ms" | "qt_ms" | "axis_deg"),
+                            },
+                          }));
+                        }}
                       className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-mono focus:outline-none focus:border-cyan-400 ${isLight ? "bg-white/85 border-slate-300 text-slate-900" : "bg-[#0a1224]/75 border-white/15 text-white"}`}
                     />
                   </label>

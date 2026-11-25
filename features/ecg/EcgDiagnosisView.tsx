@@ -52,6 +52,7 @@ export function EcgResultsPanel({
   // Strictly Top-2 diagnoses ONLY (Primary + Secondary Differential — never 3rd/4th)
   const activeOnly = result.primaryFindings.filter((f) => !("isDemoted" in f && f.isDemoted));
   const primary = activeOnly[0] ?? result.primaryFindings[0];
+  const isInsufficient = primary?.code === "INSUFFICIENT_DATA";
   const secondary = activeOnly[1] ?? null;
 
   const isAfibCase = [primary, secondary].some(
@@ -132,7 +133,7 @@ export function EcgResultsPanel({
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/15">
                     {sourceLabel(primary.source)}
                   </span>
-                  {concordancePill(primary)}
+                  {!isInsufficient && concordancePill(primary)}
                 </div>
                 <div className="font-black text-base sm:text-lg leading-snug mt-1">
                   {isAr ? primary.name_ar : primary.name_en}
@@ -154,7 +155,8 @@ export function EcgResultsPanel({
             {isAr ? primary.explanation_ar : primary.explanation_en}
           </p>
 
-          {/* Full Inline Inv & TTT Panels directly beneath Primary Diagnosis */}
+          {/* Full Inline Inv & TTT Panels directly beneath Primary Diagnosis (hidden on INSUFFICIENT_DATA) */}
+          {!isInsufficient && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
             <div className="rounded-xl bg-black/25 border border-cyan-300/35 px-3.5 py-2.5 space-y-1">
               <div className="text-[11px] font-black text-cyan-200 flex items-center gap-1.5">
@@ -174,6 +176,22 @@ export function EcgResultsPanel({
               <p className="text-[12px] leading-relaxed opacity-95">
                 {isAr ? primaryInvTtt.ttt_ar : primaryInvTtt.ttt_en}
               </p>
+            </div>
+          </div>
+          )}
+        </div>
+      )}
+
+      {/* Explicit Source Conflict Banner (Requirement 5: never silently outvote) */}
+      {result.sourceConflict && (
+        <div className="rounded-xl border border-amber-400/60 bg-amber-500/15 backdrop-blur-xl px-4 py-2.5 flex items-start gap-2.5 text-amber-100">
+          <AlertTriangle className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
+          <div className="text-xs leading-relaxed">
+            <div className="font-black text-amber-200">
+              {isAr ? "تعارض بين التقدير الآلي والذكاء البصري — تحقق من القياس" : "Conflict — Verify Measurement"}
+            </div>
+            <div className="opacity-95 mt-0.5">
+              {isAr ? result.sourceConflict.messageAr : result.sourceConflict.messageEn}
             </div>
           </div>
         </div>

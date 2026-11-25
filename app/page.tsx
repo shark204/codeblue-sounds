@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import {
   Activity,
+  Flame,
+  ShieldCheck,
   ArrowLeft,
   Heart,
   HeartPulse,
@@ -255,9 +257,9 @@ export default function SoundsLabPage() {
                     <div className="w-9 h-9 mb-1.5 rounded-2xl bg-rose-500/15 border border-rose-400/35 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform duration-300">
                       <HeartPulse className="w-5 h-5" />
                     </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "أصوات ولغط القلب" : "Heart Sounds"}</div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "أصوات القلب والصدر" : "Heart & Breath Sounds"}</div>
                     <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "S1/S2 وS3/S4 واضطرابات الصمامات" : "S1–S4 & valve murmurs"}
+                      {isAr ? "النفخات، التنفس، والمحاكاة ثلاثية الأبعاد" : "Murmurs, Breath & 3D Sync"}
                     </div>
                   </div>
 
@@ -266,11 +268,11 @@ export default function SoundsLabPage() {
                     className={`group select-none cursor-default rounded-tr-[64px] rounded-tl-xl rounded-br-xl rounded-bl-md border backdrop-blur-xl px-4 py-3.5 pr-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border-cyan-400/60 hover:shadow-[0_18px_36px_rgba(34,211,238,0.24)] ${petalBase}`}
                   >
                     <div className="w-9 h-9 mb-1.5 rounded-2xl bg-cyan-500/15 border border-cyan-400/35 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform duration-300">
-                      <Activity className="w-5 h-5" />
+                      <Flame className="w-5 h-5" />
                     </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "محرك تشخيص ECG الهجين" : "Hybrid ECG Engine"}</div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "ذكاء ECG البصري وGrad-CAM" : "Visual ECG AI & Grad-CAM"}</div>
                     <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "قواعد + حالات مرجعية + فخاخ سريرية" : "Rules + Reference Cases + Pitfalls"}
+                      {isAr ? "خرائط حرارة تحدد موضع الخلل بالتخطيط" : "Live heatmaps & waveform focus"}
                     </div>
                   </div>
 
@@ -279,11 +281,11 @@ export default function SoundsLabPage() {
                     className={`group select-none cursor-default rounded-bl-[64px] rounded-tl-xl rounded-br-xl rounded-tr-md border backdrop-blur-xl px-4 py-3.5 pl-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:translate-y-1 hover:scale-[1.03] hover:border-emerald-400/60 hover:shadow-[0_18px_36px_rgba(16,185,129,0.22)] ${petalBase}`}
                   >
                     <div className="w-9 h-9 mb-1.5 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                      <Wind className="w-5 h-5" />
+                      <Activity className="w-5 h-5" />
                     </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "أصوات الصدر والتنفس" : "Chest & Breath"}</div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "الدمج الهجين بالفايتلز والقواعد" : "Vitals × ECG Hybrid Fusion"}</div>
                     <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "Wheezes وCrackles وStridor" : "Wheezes, Crackles & Stridor"}
+                      {isAr ? "معادلة معايرة وطبقات أمان للطوارئ" : "Calibrated fusion & safety tiers"}
                     </div>
                   </div>
 
@@ -292,11 +294,11 @@ export default function SoundsLabPage() {
                     className={`group select-none cursor-default rounded-br-[64px] rounded-tr-xl rounded-bl-xl rounded-tl-md border backdrop-blur-xl px-4 py-3.5 pr-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:translate-y-1 hover:scale-[1.03] hover:border-violet-400/60 hover:shadow-[0_18px_36px_rgba(139,92,246,0.22)] ${petalBase}`}
                   >
                     <div className="w-9 h-9 mb-1.5 rounded-2xl bg-violet-500/15 border border-violet-400/35 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform duration-300">
-                      <Stethoscope className="w-5 h-5" />
+                      <ShieldCheck className="w-5 h-5" />
                     </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "حركة القلب 4 حجرات" : "4-Chamber 3D Sync"}</div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "الفحوصات والعلاج والفخاخ" : "Bedside Inv, TTT & Pitfalls"}</div>
                     <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "تزامن إيقاعي مع بطاقة سريرية" : "Rhythmic chambers & cards"}
+                      {isAr ? "خطة عمل فورية مع كشف الفخاخ السريرية" : "Instant workup, action & red flags"}
                     </div>
                   </div>
                 </div>

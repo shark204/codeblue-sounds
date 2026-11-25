@@ -314,6 +314,23 @@ export const ECG_CLINICAL_LIBRARY: Record<string, EcgClinicalEntry> = {
       "عوّض البوتاسيوم (>4.0) والمغنيسيوم (>2.0)، عالج الإقفار أو نقص الأكسجين، ويمكن استخدام حاصر بيتا إذا كانت الأعراض مزعجة.",
   }),
 
+  SHORT_QT: mk({
+    title_en: "Short QTc Interval (< 350 ms)",
+    title_ar: "قِصَر فترة QTc (< 350 مللي ثانية)",
+    explanation_en:
+      "Shortened ventricular repolarization (QTc <350 ms; congenital SQTS typically ≤330–340 ms) caused by hypercalcemia, digoxin effect, hyperkalemia, acidosis, hyperthermia, or congenital Short QT Syndrome (risk of paroxysmal AFib or VF).",
+    explanation_ar:
+      "قِصَر في فترة إعادة استقطاب البطينين (QTc <350 مللي ثانية) ينتج عن ارتفاع الكالسيوم بالدم، تأثير الديجوكسين، ارتفاع البوتاسيوم، الحموضة، أو متلازمة قِصَر QT الخلقية (التي تحمل خطر الرجفان الأذيني أو البطيني).",
+    inv_en:
+      "Measure serum ionized/total Ca2+, BMP (K+/Mg2+), digoxin level (if applicable), VBG/pH, and verify QT manually on leads II and V5 (auto-estimators frequently underestimate T-wave end).",
+    inv_ar:
+      "قياس الكالسيوم المتأين/الكلي بالدم، شوارد (K+/Mg2+)، مستوى الديجوكسين إن وُجد، غازات الدم، والتحقق يدوياً من نهاية موجة T في II وV5 (التقدير الآلي غالباً يقصر QT).",
+    ttt_en:
+      "Treat the reversible cause first (IV fluids/bisphosphonates for hypercalcemia; hold digoxin if toxic). If QTc ≤340 ms without a reversible cause or with syncope/family SCD, refer urgently to Electrophysiology (EP).",
+    ttt_ar:
+      "عالج السبب القابل للعكس أولاً (محاليل وعلاج ارتفاع الكالسيوم؛ إيقاف الديجوكسين عند السمية). إذا كان QTc ≤340 مللي ثانية بدون سبب واضح أو مع إغماء/موت مفاجئ عائلي: تحويل عاجل لكهرباء القلب.",
+  }),
+
   LONG_QT: mk({
     title_en: "Prolonged QT / QTc Interval",
     title_ar: "استطالة فترة QT / QTc",
@@ -386,7 +403,8 @@ export function lookupClinicalEntry(code: string, labelHint?: string): EcgClinic
   if (hint.includes("LVH") || hint.includes("HYPERTROPHY")) return ECG_CLINICAL_LIBRARY.LVH_STRAIN;
   if (hint.includes("PACEMAKER") || hint.includes("PACED")) return ECG_CLINICAL_LIBRARY.PACEMAKER_RHYTHM;
   if (hint.includes("PVC") || hint.includes("BIGEMINY")) return ECG_CLINICAL_LIBRARY.PVC_BIGEMINY;
-  if (hint.includes("QT")) return ECG_CLINICAL_LIBRARY.LONG_QT;
+  if (hint.includes("SHORT_QT") || hint.includes("SHORT QT")) return ECG_CLINICAL_LIBRARY.SHORT_QT;
+  if (hint.includes("LONG_QT") || hint.includes("PROLONGED_QT") || hint.includes("QT")) return ECG_CLINICAL_LIBRARY.LONG_QT;
   if (hint.includes("NORMAL_SINUS")) return ECG_CLINICAL_LIBRARY.NORMAL_SINUS_RHYTHM;
   return null;
 }

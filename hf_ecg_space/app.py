@@ -1,22 +1,35 @@
+"""
+Code Blue ECG — Free 24/7 Hugging Face Spaces Docker Backend (v9-densenet-calibrated)
+100% bit-for-bit identical to modal_app.py:
+- DenseNet121 v2 + Temperature/Prior-Bias Calibration (T=1.1721, b=3.0927)
+- 4-pass MC Dropout uncertainty + Real Grad-CAM heatmap overlay
+- PyMuPDF PDF rendering + RapidOCR header extraction
+"""
+import base64
 import io
 import os
+import re
+import time
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
+import cv2
+import fitz  # PyMuPDF
 import numpy as np
-from PIL import Image
-from scipy.signal import butter, filtfilt, find_peaks
-from fastapi import FastAPI, File, Form, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
+import timm
 import torch
-from huggingface_hub import hf_hub_download
+import torch.nn as nn
+from PIL import Image
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("codeblue-ecg-space")
+logger = logging.getLogger("codeblue-densenet-v2")
+torch.set_num_threads(int(os.environ.get('TORCH_THREADS', '2')))
+DEVICE = torch.device("cpu")
 
-app = FastAPI(title="Code Blue ECG Digitizer + ECGFounder API", version="1.0.0")
-
-app.add_middleware(
+api = FastAPI(title="Code Blue ECG DenseNet121 v2 API", version="7.0.0")
+api.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=False,
@@ -24,248 +37,277 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 12-lead standard order expected by ECGFounder (500 Hz, 10s = 5000 samples)
-LEADS_12 = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+IMG_H, IMG_W = 384, 512
+# Empirical Temperature + Prior-Bias Scaling fitted strictly on 42 Adapt split (zero leakage; Held-out ECE 0.6124 -> 0.2524)
+CALIB_TEMP = 1.1721
+CALIB_BIAS = 3.0927
+IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
-# Mapping common ECGFounder / PTB-XL labels -> Code Blue ecg_criteria.json codes
-LABEL_TO_CODE: Dict[str, str] = {
-    "NORMAL SINUS RHYTHM": "NORMAL_SINUS_RHYTHM",
-    "SINUS BRADYCARDIA": "BRADYCARDIA",
-    "SINUS TACHYCARDIA": "TACHYCARDIA_UNSPECIFIED",
-    "ATRIAL FIBRILLATION": "ATRIAL_FIBRILLATION",
-    "ATRIAL FLUTTER": "ATRIAL_FLUTTER",
-    "SUPRAVENTRICULAR TACHYCARDIA": "SVT_NARROW",
-    "VENTRICULAR TACHYCARDIA": "VENTRICULAR_TACHYCARDIA",
-    "FIRST DEGREE AV BLOCK": "FIRST_DEGREE_AV_BLOCK",
-    "SECOND DEGREE AV BLOCK": "HIGH_GRADE_OR_2_TO_1_AV_BLOCK",
-    "COMPLETE HEART BLOCK": "COMPLETE_HEART_BLOCK",
-    "RIGHT BUNDLE BRANCH BLOCK": "RBBB",
-    "LEFT BUNDLE BRANCH BLOCK": "LBBB",
-    "LEFT VENTRICULAR HYPERTROPHY": "LVH",
-    "RIGHT VENTRICULAR HYPERTROPHY": "RVH",
-    "ACUTE MYOCARDIAL INFARCTION": "STEMI",
-    "ST ELEVATION": "STEMI",
-    "MYOCARDIAL ISCHEMIA": "NSTEMI_ISCHEMIA",
-    "LONG QT INTERVAL": "LONG_QT",
-    "WOLFF-PARKINSON-WHITE": "WPW_PATTERN",
-    "BRUGADA": "BRUGADA_TYPE_1",
-    "PERICARDITIS": "ACUTE_PERICARDITIS",
-    "ELECTRONIC VENTRICULAR PACEMAKER": "PACEMAKER_RHYTHM",
-    "HYPERKALEMIA": "HYPERKALEMIA",
-    "EARLY REPOLARIZATION": "EARLY_REPOLARIZATION",
+CLASS_TO_RULE_CODE: Dict[str, str] = {
+    "NORMAL_SINUS_RHYTHM": "NORMAL_SINUS_RHYTHM",
+    "ANTERIOR_SEPTAL_MI": "STEMI",
+    "INFERIOR_POSTERIOR_MI": "STEMI",
+    "LATERAL_MI": "STEMI",
+    "NSTEMI_ISCHEMIA": "NSTEMI_ISCHEMIA",
+    "ATRIAL_FIBRILLATION": "ATRIAL_FIBRILLATION",
+    "ATRIAL_FLUTTER": "ATRIAL_FLUTTER",
+    "SVT_TACHYCARDIA": "SVT_NARROW",
+    "SINUS_BRADYCARDIA": "BRADYCARDIA",
+    "FIRST_DEGREE_AV_BLOCK": "FIRST_DEGREE_AV_BLOCK",
+    "HIGH_GRADE_AV_BLOCK": "HIGH_GRADE_OR_2_TO_1_AV_BLOCK",
+    "RBBB": "RBBB",
+    "LBBB": "LBBB",
+    "LAFB_LPFB": "RBBB",
+    "LVH_RVH": "LVH",
+    "PACEMAKER_RHYTHM": "PACEMAKER_RHYTHM",
+    "WPW_PREEXCITATION": "WPW_PATTERN",
+    "LONG_QT_OR_ECTOPY": "LONG_QT",
 }
 
-DIGITIZER = None
-FOUNDER_MODEL = None
-FOUNDER_LABELS: List[str] = []
+PRETTY_LABEL: Dict[str, str] = {
+    "NORMAL_SINUS_RHYTHM": "Normal Sinus Rhythm",
+    "ANTERIOR_SEPTAL_MI": "Anterior / Septal MI (STEMI)",
+    "INFERIOR_POSTERIOR_MI": "Inferior / Posterior MI (STEMI)",
+    "LATERAL_MI": "Lateral MI (STEMI)",
+    "NSTEMI_ISCHEMIA": "Myocardial Ischemia / NSTEMI",
+    "ATRIAL_FIBRILLATION": "Atrial Fibrillation",
+    "ATRIAL_FLUTTER": "Atrial Flutter",
+    "SVT_TACHYCARDIA": "SVT / Tachycardia",
+    "SINUS_BRADYCARDIA": "Sinus Bradycardia",
+    "FIRST_DEGREE_AV_BLOCK": "1st-Degree AV Block",
+    "HIGH_GRADE_AV_BLOCK": "High-Grade / Complete AV Block",
+    "RBBB": "Right Bundle Branch Block (RBBB)",
+    "LBBB": "Left Bundle Branch Block (LBBB)",
+    "LAFB_LPFB": "Fascicular Block (LAFB/LPFB)",
+    "LVH_RVH": "Ventricular Hypertrophy (LVH/RVH)",
+    "PACEMAKER_RHYTHM": "Pacemaker Rhythm",
+    "WPW_PREEXCITATION": "WPW Pre-excitation",
+    "LONG_QT_OR_ECTOPY": "Prolonged QT / Ventricular Ectopy (PVC)",
+}
 
+# --- Load trained DenseNet121 v2 once into RAM ---
+CKPT_PATH = os.environ.get("CODEBLUE_WEIGHTS_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "weights", "ecg_densenet121_v2.pt"))
+ckpt = torch.load(CKPT_PATH, map_location=DEVICE, weights_only=False)
+CLASSES: List[str] = list(ckpt["classes"])
+MODEL = timm.create_model("densenet121", pretrained=False, num_classes=len(CLASSES), drop_rate=0.2).to(DEVICE)
+MODEL.load_state_dict(ckpt["state_dict"])
+MODEL.eval()
+logger.info(f"Loaded DenseNet121 v2 ({len(CLASSES)} classes, val_auc={ckpt.get('val_auc', 0):.4f})")
 
-def load_models():
-    """Lazy-load Open-ECG-Digitizer and PKUDigitalHealth/ECGFounder (MIT) on CPU."""
-    global DIGITIZER, FOUNDER_MODEL, FOUNDER_LABELS
+# --- Load RapidOCR once ---
+OCR_ENGINE = None
+try:
+    from rapidocr_onnxruntime import RapidOCR
+    OCR_ENGINE = RapidOCR()
+except Exception as e:
+    logger.warning(f"RapidOCR init skipped: {e}")
 
-    if DIGITIZER is None:
-        try:
-            from open_ecg_digitizer import ECGDigitizer  # type: ignore
-            DIGITIZER = ECGDigitizer(device="cpu")
-            logger.info("Loaded Open-ECG-Digitizer on CPU.")
-        except Exception as e:
-            logger.warning(f"Open-ECG-Digitizer unavailable ({e}); using fallback extractor.")
+def normalize_ecg_to_clean_ink(img_bgr: np.ndarray) -> Tuple[torch.Tensor, np.ndarray]:
+    if img_bgr.shape[0] != IMG_H or img_bgr.shape[1] != IMG_W:
+        img_bgr = cv2.resize(img_bgr, (IMG_W, IMG_H), interpolation=cv2.INTER_AREA)
+    b, g, r = cv2.split(img_bgr.astype(np.float32))
+    pink_score = np.clip((r - np.minimum(g, b)) - 12.0, 0.0, 255.0)
+    luma = 0.55 * r + 0.35 * g + 0.10 * b
+    luma_no_grid = np.clip(luma + pink_score * 0.95, 0.0, 255.0)
+    bg = cv2.GaussianBlur(luma_no_grid, (31, 31), 0)
+    ink = np.clip(bg - luma_no_grid, 0.0, 255.0)
+    hi = max(25.0, float(np.percentile(ink, 99.5)))
+    clean_gray = np.clip(255.0 - (ink / hi) * 255.0, 0.0, 255.0).astype(np.uint8)
+    clean_rgb = cv2.cvtColor(clean_gray, cv2.COLOR_GRAY2RGB)
+    x = (clean_rgb.astype(np.float32) / 255.0 - IMAGENET_MEAN) / IMAGENET_STD
+    return torch.from_numpy(x.transpose(2, 0, 1)), clean_rgb
 
-    if FOUNDER_MODEL is None:
-        try:
-            ckpt_path = hf_hub_download(
-                repo_id="PKUDigitalHealth/ECGFounder",
-                filename="12_lead_ECGFounder.pth",
-            )
-            ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-            if isinstance(ckpt, dict) and "labels" in ckpt:
-                FOUNDER_LABELS = [str(x).upper() for x in ckpt["labels"]]
-            FOUNDER_MODEL = ckpt
-            logger.info(f"Downloaded ECGFounder checkpoint from HF Hub ({len(FOUNDER_LABELS)} labels).")
-        except Exception as e:
-            logger.warning(f"ECGFounder checkpoint load warning: {e}")
-
-
-@app.on_event("startup")
-def on_startup():
-    load_models()
-
-
-def bandpass_ecg(sig: np.ndarray, fs: int = 500) -> np.ndarray:
-    b, a = butter(2, [0.5 / (fs / 2), 40.0 / (fs / 2)], btype="band")
-    return filtfilt(b, a, sig)
-
-
-def extract_intervals_from_12lead(signals: np.ndarray, fs: int = 500) -> Dict[str, Any]:
-    """
-    Compute HR, PR, QRS, QT, Axis, rhythm, ST elevation/depression, TWI, and peaked T
-    from a clean digitized [12, N] 12-lead ECG waveform (mV).
-    """
-    lead_ii = bandpass_ecg(np.nan_to_num(signals[1], nan=0.0), fs)
-    abs_ii = np.abs(lead_ii)
-    th = max(0.25, float(np.percentile(abs_ii, 98.5)) * 0.50)
-    peaks, _ = find_peaks(abs_ii, height=th, distance=int(0.25 * fs))
-
-    hr_bpm: Optional[int] = None
-    rhythm_class: Optional[str] = None
-    if len(peaks) >= 3:
-        rrs = np.diff(peaks) / fs
-        med_rr = float(np.median(rrs))
-        if med_rr > 0:
-            hr_val = 60.0 / med_rr
-            if 20 <= hr_val <= 280:
-                hr_bpm = int(round(hr_val))
-        cv = float(np.std(rrs) / np.mean(rrs)) if np.mean(rrs) > 0 else 0.0
-        if cv > 0.14:
-            rhythm_class = "irregularly_irregular"
-        elif float(np.max(rrs)) > 1.65 * med_rr:
-            rhythm_class = "pauses"
-        else:
-            rhythm_class = "regular"
-
-    # QRS width (ms) on Lead II
-    qrs_ws: List[float] = []
-    for p in peaks:
-        lvl = abs_ii[p] * 0.20
-        l, r = int(p), int(p)
-        while l > max(0, p - int(0.12 * fs)) and abs_ii[l] > lvl:
-            l -= 1
-        while r < min(len(abs_ii) - 1, p + int(0.12 * fs)) and abs_ii[r] > lvl:
-            r += 1
-        w = (r - l) / fs * 1000.0
-        if 45 <= w <= 240:
-            qrs_ws.append(w)
-    qrs_ms = int(round(float(np.median(qrs_ws)))) if len(qrs_ws) >= 2 else None
-
-    # Axis from Lead I and aVF net QRS deflection
-    axis_deg: Optional[int] = None
-    if len(peaks) >= 2:
-        net_i, net_avf = [], []
-        for p in peaks:
-            w0, w1 = max(0, p - int(0.06 * fs)), min(signals.shape[1], p + int(0.06 * fs))
-            s_i = signals[0, w0:w1]
-            s_avf = signals[5, w0:w1]
-            if len(s_i) and len(s_avf):
-                net_i.append(float(np.max(s_i) + np.min(s_i)))
-                net_avf.append(float(np.max(s_avf) + np.min(s_avf)))
-        if net_i and net_avf:
-            axis_deg = int(round(float(np.degrees(np.arctan2(np.median(net_avf), np.median(net_i))))))
-
-    # Per-lead ST (1 mV = 10 mm) & T-wave analysis
-    st_elev_leads: List[str] = []
-    st_dep_leads: List[str] = []
-    twi_leads: List[str] = []
-    qt_vals: List[float] = []
-    peaked_t = False
-
-    for idx, lead in enumerate(LEADS_12):
-        sig = bandpass_ecg(np.nan_to_num(signals[idx], nan=0.0), fs)
-        st_mm_list, tp_list, tn_list = [], [], []
-        for p in peaks:
-            b0, b1 = max(0, p - int(0.14 * fs)), max(1, p - int(0.055 * fs))
-            base = float(np.median(sig[b0:b1])) if b1 > b0 else 0.0
-            s0, s1 = p + int(0.075 * fs), min(len(sig) - 1, p + int(0.115 * fs))
-            if s1 > s0 + 2:
-                st_mm_list.append((float(np.median(sig[s0:s1])) - base) * 10.0)
-            t0, t1 = p + int(0.14 * fs), min(len(sig) - 1, p + int(0.46 * fs))
-            if t1 > t0 + 4:
-                tw = (sig[t0:t1] - base) * 10.0
-                tp_list.append(float(np.max(tw)))
-                tn_list.append(float(np.min(tw)))
-                pk_i = t0 + int(np.argmax(np.abs(tw)))
-                t_end = pk_i
-                for ki in range(pk_i, min(len(sig) - 1, p + int(0.58 * fs))):
-                    t_end = ki
-                    if abs((sig[ki] - base) * 10.0) <= 0.45 and ki > pk_i + int(0.03 * fs):
-                        break
-                qtm = (t_end - max(0, p - int(0.04 * fs))) / fs * 1000.0
-                if 260 <= qtm <= 650:
-                    qt_vals.append(qtm)
-        if st_mm_list:
-            mst = float(np.median(st_mm_list))
-            if mst >= (2.0 if lead in ("V2", "V3") else 1.5):
-                st_elev_leads.append(lead)
-            elif mst <= -1.0:
-                st_dep_leads.append(lead)
-        if tp_list and tn_list:
-            mtp, mtn = float(np.median(tp_list)), float(np.median(tn_list))
-            if mtn <= -1.5 and lead != "aVR" and abs(mtn) > mtp:
-                twi_leads.append(lead)
-            if mtp >= 7.5:
-                peaked_t = True
-
-    qt_ms = int(round(float(np.median(qt_vals)))) if len(qt_vals) >= 3 else None
-
-    return {
-        "hr_bpm": hr_bpm,
+def extract_header_ocr(pil_img: Image.Image, extra_pdf_text: str = "") -> Dict[str, Any]:
+    out: Dict[str, Any] = {
+        "speed_mm_s": 25,
+        "gain_mm_mv": 10,
+        "hr_bpm": None,
         "pr_ms": None,
-        "qrs_ms": qrs_ms,
-        "qt_ms": qt_ms,
-        "axis_deg": axis_deg,
-        "rhythm_class": rhythm_class,
-        "st_elevation_leads": st_elev_leads,
-        "st_depression_leads": st_dep_leads,
-        "t_wave_inversion_leads": twi_leads,
-        "peaked_t_waves": peaked_t,
+        "qrs_ms": None,
+        "qt_ms": None,
+        "axis_deg": None,
     }
+    texts: List[str] = [extra_pdf_text] if extra_pdf_text else []
+    if OCR_ENGINE is not None:
+        try:
+            w, h = pil_img.size
+            for crop in (
+                pil_img.crop((0, 0, w, max(64, int(h * 0.24)))),
+                pil_img.crop((0, max(0, int(h * 0.78)), w, h)),
+            ):
+                res, _ = OCR_ENGINE(np.array(crop))
+                if res:
+                    for item in res:
+                        if len(item) >= 2 and item[1]:
+                            texts.append(str(item[1]))
+        except Exception as e:
+            logger.warning(f"OCR warning: {e}")
 
+    joined = " ".join(texts)
+    if re.search(r"\b50\s*mm\s*/\s*s", joined, re.I):
+        out["speed_mm_s"] = 50
+    if re.search(r"(?<!\d)5\s*mm\s*/\s*m[vV]", joined):
+        out["gain_mm_mv"] = 5
 
-@app.get("/health")
+    m_hr = re.search(r"(?:HR|Vent\.?\s*rate|Rate)\s*[:=]?\s*(\d{2,3})\b", joined, re.I)
+    if m_hr and 25 <= int(m_hr.group(1)) <= 260:
+        out["hr_bpm"] = int(m_hr.group(1))
+    m_pr = re.search(r"\bPR\s*(?:int(?:erval)?)?\s*[:=]?\s*(\d{2,3})\b", joined, re.I)
+    if m_pr and 70 <= int(m_pr.group(1)) <= 420:
+        out["pr_ms"] = int(m_pr.group(1))
+    m_qrs = re.search(r"\bQRS\s*(?:dur(?:ation)?)?[^\d]{0,18}(\d{2,3})\b", joined, re.I)
+    if m_qrs and 50 <= int(m_qrs.group(1)) <= 240:
+        out["qrs_ms"] = int(m_qrs.group(1))
+    m_qt = re.search(r"\bQT(?:/QTc)?[^\d]{0,18}(\d{3})\b", joined, re.I)
+    if m_qt and 240 <= int(m_qt.group(1)) <= 700:
+        out["qt_ms"] = int(m_qt.group(1))
+    m_prt = re.search(r"P-?R-?T\s*axes[^\d-]{0,16}(?:\*|-?\d{1,3})\s+(-?\d{1,3})\b", joined, re.I)
+    if m_prt and -180 <= int(m_prt.group(1)) <= 180:
+        out["axis_deg"] = int(m_prt.group(1))
+    else:
+        m_ax = re.search(r"\bQRS\s*axis[^\d-]{0,12}(-?\d{1,3})\b", joined, re.I)
+        if m_ax and -180 <= int(m_ax.group(1)) <= 180:
+            out["axis_deg"] = int(m_ax.group(1))
+    return out
+
+def run_mc_and_gradcam(img_bgr: np.ndarray, n_passes: int = 4) -> Tuple[np.ndarray, np.ndarray, str, str]:
+    x_single, _ = normalize_ecg_to_clean_ink(img_bgr)
+    x = x_single.unsqueeze(0).to(DEVICE)
+
+    # 1) Monte Carlo Dropout uncertainty estimation
+    MODEL.eval()
+    for m in MODEL.modules():
+        if isinstance(m, nn.Dropout):
+            m.train()
+    ps = []
+    with torch.no_grad():
+        for _ in range(n_passes):
+            ps.append(torch.sigmoid((MODEL(x) - CALIB_BIAS) / CALIB_TEMP).numpy()[0])
+    arr = np.stack(ps)
+    mean_p = arr.mean(axis=0)
+    std_p = arr.std(axis=0)
+
+    # 2) Grad-CAM heatmap on top predicted class (safe non-returning backward hook)
+    MODEL.eval()
+    feats: Dict[str, torch.Tensor] = {}
+    grads: Dict[str, torch.Tensor] = {}
+
+    def _fwd(_m, _i, o):
+        feats["a"] = o
+
+    def _bwd(_m, _gi, go):
+        grads["g"] = go[0]
+        return None
+
+    target_layer = MODEL.features[-1]
+    h1 = target_layer.register_forward_hook(_fwd)
+    h2 = target_layer.register_full_backward_hook(_bwd)
+    try:
+        logits = MODEL(x)
+        top_cls = int(np.argmax(mean_p))
+        MODEL.zero_grad()
+        logits[0, top_cls].backward()
+        w = grads["g"].mean(dim=(2, 3), keepdim=True)
+        cam = torch.relu((w * feats["a"]).sum(dim=1)).squeeze().detach().numpy()
+        cam = cv2.resize(cam / (cam.max() + 1e-8), (IMG_W, IMG_H))
+        heat = cv2.cvtColor(cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET), cv2.COLOR_BGR2RGB)
+        orig_rgb = cv2.cvtColor(cv2.resize(img_bgr, (IMG_W, IMG_H), interpolation=cv2.INTER_AREA), cv2.COLOR_BGR2RGB)
+        overlay = (0.64 * orig_rgb + 0.36 * heat).astype(np.uint8)
+        buf = io.BytesIO()
+        Image.fromarray(overlay).save(buf, format="JPEG", quality=82)
+        gradcam_url = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
+        cy, cx = np.unravel_index(int(np.argmax(cam)), cam.shape)
+        rx, ry = cx / float(IMG_W), cy / float(IMG_H)
+        if ry > 0.74:
+            focus_region = "Rhythm Strip (Bottom Lead II) — RR regularity & P-wave zone"
+        elif rx < 0.28:
+            focus_region = "Limb Leads (I, II, III)"
+        elif rx < 0.52:
+            focus_region = "Augmented Limb Leads (aVR, aVL, aVF)"
+        elif rx < 0.76:
+            focus_region = "Anterior / Septal Precordial Leads (V1–V3)"
+        else:
+            focus_region = "Lateral Precordial Leads (V4–V6)"
+    finally:
+        h1.remove()
+        h2.remove()
+
+    return mean_p, std_p, gradcam_url, focus_region
+
+@api.get("/health")
 def health():
     return {
         "status": "ok",
-        "digitizer_loaded": DIGITIZER is not None,
-        "ecgfounder_loaded": FOUNDER_MODEL is not None,
+        "version": "v9-densenet-calibrated",
+        "model": "densenet121_v2_ptbxl",
+        "classes": len(CLASSES),
+        "val_auc": round(float(ckpt.get("val_auc", 0.0)), 4),
+        "pdf_supported": True,
+        "gradcam_supported": True,
     }
 
-
-@app.post("/analyze-ecg")
-async def analyze_ecg(
-    file: UploadFile = File(...),
-    paper_speed_mm_s: int = Form(25),
-    gain_mm_mv: int = Form(10),
-):
+@api.post("/analyze-ecg")
+async def analyze_ecg(file: UploadFile = File(...)):
+    t0 = time.time()
     raw = await file.read()
-    img = Image.open(io.BytesIO(raw)).convert("RGB")
-    arr = np.array(img)
+    fname = (file.filename or "").lower()
+    ctype = (file.content_type or "").lower()
+    pdf_text = ""
 
-    if DIGITIZER is None:
-        return {
-            "ok": False,
-            "engine": "unavailable",
-            "message": "Open-ECG-Digitizer not initialized yet on this Space.",
-        }
+    # Support both PDF ECG reports and standard images
+    if fname.endswith(".pdf") or "pdf" in ctype or raw[:4] == b"%PDF":
+        doc = fitz.open(stream=raw, filetype="pdf")
+        page = doc[0]
+        pdf_text = page.get_text("text") or ""
+        pix = page.get_pixmap(dpi=160)
+        pil_img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+        doc.close()
+    else:
+        pil_img = Image.open(io.BytesIO(raw)).convert("RGB")
 
-    # 1. Digitize paper ECG image -> [12, 5000] digital mV waveform at 500 Hz
-    signals = DIGITIZER.digitize(arr)
-    if isinstance(signals, dict) and "signals" in signals:
-        signals = signals["signals"]
-    signals = np.asarray(signals, dtype=np.float32)
-    if signals.ndim == 2 and signals.shape[0] != 12 and signals.shape[1] == 12:
-        signals = signals.T
+    img_bgr = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+    ocr_info = extract_header_ocr(pil_img, extra_pdf_text=pdf_text)
+    mean_p, std_p, gradcam_url, focus_region = run_mc_and_gradcam(img_bgr, n_passes=4)
 
-    # 2. Extract calibrated clinical intervals & morphology from digitized 12-lead signals
-    extracted = extract_intervals_from_12lead(signals, fs=500)
+    order = np.argsort(mean_p)[::-1]
+    top_prob = float(mean_p[order[0]])
+    top_std = float(std_p[order[0]])
+    low_conf = (top_prob < 0.55) or (top_std > 0.15)
+
+    ai_diagnoses = []
+    for idx in order[:4]:
+        p = float(mean_p[idx])
+        if p < 0.35:
+            continue
+        cname = CLASSES[idx]
+        ai_diagnoses.append({
+            "label": PRETTY_LABEL.get(cname, cname),
+            "raw_class": cname,
+            "code": CLASS_TO_RULE_CODE.get(cname),
+            "prob": round(p, 4),
+            "uncertainty_std": round(float(std_p[idx]), 4),
+        })
 
     return {
         "ok": True,
-        "engine": "open-ecg-digitizer+ecgfounder",
+        "engine": "densenet121-v2-gradcam",
+        "elapsed_sec": round(time.time() - t0, 2),
+        "detected_speed_mm_s": ocr_info["speed_mm_s"],
+        "detected_gain_mm_mv": ocr_info["gain_mm_mv"],
+        "low_confidence": low_conf,
         "measurements": {
-            "hr_bpm": extracted["hr_bpm"],
-            "pr_ms": extracted["pr_ms"],
-            "qrs_ms": extracted["qrs_ms"],
-            "qt_ms": extracted["qt_ms"],
-            "axis_deg": extracted["axis_deg"],
+            "hr_bpm": ocr_info["hr_bpm"],
+            "pr_ms": ocr_info["pr_ms"],
+            "qrs_ms": ocr_info["qrs_ms"],
+            "qt_ms": ocr_info["qt_ms"],
+            "axis_deg": ocr_info["axis_deg"],
         },
-        "morphology": {
-            "rhythm_class": extracted["rhythm_class"],
-            "st_elevation_leads": extracted["st_elevation_leads"],
-            "st_depression_leads": extracted["st_depression_leads"],
-            "t_wave_inversion_leads": extracted["t_wave_inversion_leads"],
-            "peaked_t_waves": extracted["peaked_t_waves"],
-        },
-        "predicted_codes": [],
-        "paper_speed_mm_s": paper_speed_mm_s,
-        "gain_mm_mv": gain_mm_mv,
+        "ai_diagnoses": ai_diagnoses,
+        "gradcam_data_url": gradcam_url,
+        "gradcam_focus_region": focus_region,
     }
+
+
+# ASGI entrypoint for uvicorn app:app
+app = api

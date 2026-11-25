@@ -44,10 +44,10 @@ image = (
 
 @app.function(
     image=image,
-    cpu=4.0,
-    memory=4096,
+    cpu=2.0,
+    memory=2048,
     timeout=90,
-    scaledown_window=300,
+    scaledown_window=30,
 )
 @modal.asgi_app()
 def fastapi_app():
@@ -63,7 +63,7 @@ def fastapi_app():
 
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("codeblue-densenet-v2")
-    torch.set_num_threads(4)
+    torch.set_num_threads(2)
     DEVICE = torch.device("cpu")
 
     api = FastAPI(title="Code Blue ECG DenseNet121 v2 API", version="7.0.0")
@@ -277,7 +277,7 @@ def fastapi_app():
     def health():
         return {
             "status": "ok",
-            "version": "v9-densenet-calibrated",
+            "version": "v9-densenet-calibrated-eco",
             "model": "densenet121_v2_ptbxl",
             "classes": len(CLASSES),
             "val_auc": round(float(ckpt.get("val_auc", 0.0)), 4),
