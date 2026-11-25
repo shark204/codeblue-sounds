@@ -819,7 +819,7 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
   const hasRealOtherSignal =
     adjustments.length > 0 ||
     aiPreds.some((p) => p && typeof p.prob === "number" && p.prob >= FUSION_CONSTANTS.MIN_AI_PROB) ||
-    (matchedCases.length > 0 && matchedCases[0].similarity >= 0.35);
+    false;
 
   for (const rf of rulesResult.all_findings) {
     if (
@@ -899,30 +899,9 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
     });
   }
 
-  // Stream D: 40-Case Clinical Knowledge Base (top strong match contributes to consensus or rescues empty findings)
-  if (matchedCases.length > 0 && matchedCases[0].similarity >= 0.35) {
-    const top = matchedCases[0];
-    const mappedUrg: UrgencyLevel =
-      top.urgency === "emergent" ? "CRITICAL" : top.urgency === "urgent" ? "URGENT" : top.urgency === "routine" ? "NORMAL" : "ABNORMAL";
-    const urgMeta = URGENCY_LABELS[mappedUrg];
-    candidates.push({
-      code: top.diagnosis_codes[0] || "CASE_MATCH",
-      urgency: mappedUrg,
-      priority: URGENCY_PRIORITY[mappedUrg],
-      urgency_label_en: urgMeta.en,
-      urgency_label_ar: urgMeta.ar,
-      name_en: top.final_diagnosis,
-      name_ar: top.final_diagnosis,
-      evidence: top.matched_features,
-      explanation_en: top.teaching_points[0] || "Strong feature match with verified clinical reference case.",
-      explanation_ar: top.teaching_points[0] || "تطابق قوي للخصائص مع حالة سريرية مرجعية موثّقة.",
-      immediate_action_en: top.next_steps[0] || "Correlate with full 12-lead ECG and patient hemodynamics.",
-      immediate_action_ar: top.next_steps[0] || "اربط النتيجة بالتخطيط الكامل 12-lead والحالة السريرية للمريض.",
-      source: "case_kb",
-      strength: Math.min(0.85, top.similarity),
-      availability: 0.85,
-    });
-  }
+  // NOTE (Anti-Double-Counting): The 40-Case Reference KB is intentionally EXCLUDED from Noisy-OR fusion
+  // because it matches on overlapping ECG features. It is surfaced strictly in `matchedCases` & `aggregatedPitfalls`
+  // as separate educational reference cases and clinical pitfalls.
 
   // Fallback if all streams empty
   if (candidates.length === 0) {

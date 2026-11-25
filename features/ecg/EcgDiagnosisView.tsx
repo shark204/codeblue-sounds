@@ -22,6 +22,7 @@ interface Props {
   cardCls: string;
   onEditInputs: () => void;
   onApplyCheck: (checkId: string, flagKey: keyof WizardFeatures) => void;
+  measurementSource?: "device_ocr" | "auto_waveform" | "manual" | null;
 }
 
 export function EcgResultsPanel({
@@ -31,6 +32,7 @@ export function EcgResultsPanel({
   cardCls,
   onEditInputs,
   onApplyCheck,
+  measurementSource,
 }: Props) {
   // Compact anchored floating popover for Secondary Diagnosis Inv / TTT (NOT full-screen zoom)
   const [secondaryPopover, setSecondaryPopover] = useState<"inv" | "ttt" | null>(null);
@@ -70,9 +72,39 @@ export function EcgResultsPanel({
   const sourceLabel = (src: string) => {
     if (src === "context_override") return isAr ? "سياق المريض والفايتلز" : "Vitals & Context";
     if (src === "ai_model") return isAr ? "الذكاء الاصطناعي البصري" : "Visual AI";
-    if (src === "case_kb") return isAr ? "قاعدة الحالات" : "Case KB";
+    if (src === "case_kb") return isAr ? "حالة مرجعية" : "Reference Case";
     return isAr ? "محرك القواعد" : "Rules Engine";
   };
+
+  const concordancePill = (f: typeof primary) => {
+    if (!f || !("concordanceLevel" in f)) return null;
+    const cls =
+      f.concordanceLevel === "strong"
+        ? "bg-emerald-500/20 text-emerald-200 border-emerald-400/40"
+        : f.concordanceLevel === "moderate"
+          ? "bg-amber-500/20 text-amber-200 border-amber-400/40"
+          : "bg-slate-700/60 text-slate-200 border-slate-500/40";
+    return (
+      <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${cls}`}>
+        {isAr ? f.concordanceLabelAr : f.concordanceLabelEn}
+      </span>
+    );
+  };
+
+  const measurementSourceBadge =
+    measurementSource === "device_ocr"
+      ? isAr
+        ? "قراءة الجهاز — تُراجع سريرياً"
+        : "Device Reading — Verify Clinically"
+      : measurementSource === "auto_waveform"
+        ? isAr
+          ? "تقدير آلي من الموجة"
+          : "Auto Waveform Estimate"
+        : measurementSource === "manual"
+          ? isAr
+            ? "إدخال يدوي"
+            : "Manual Entry"
+          : null;
 
   return (
     <div className="space-y-3">
@@ -100,6 +132,7 @@ export function EcgResultsPanel({
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/15">
                     {sourceLabel(primary.source)}
                   </span>
+                  {concordancePill(primary)}
                 </div>
                 <div className="font-black text-base sm:text-lg leading-snug mt-1">
                   {isAr ? primary.name_ar : primary.name_en}
@@ -175,8 +208,16 @@ export function EcgResultsPanel({
         </div>
       )}
 
-      {/* Computed Measurements Strip */}
-      <div className={`rounded-2xl border p-2.5 ${cardCls}`}>
+      {/* Computed Measurements Strip with explicit Device/Auto source disclaimer */}
+      <div className={`rounded-2xl border p-2.5 space-y-2 ${cardCls}`}>
+        {measurementSourceBadge && (
+          <div className="flex items-center justify-between text-[10.5px] px-1">
+            <span className="font-bold text-slate-400">{isAr ? "مصدر القياسات:" : "Measurement Source:"}</span>
+            <span className="px-2 py-0.5 rounded-md font-mono font-bold bg-amber-500/15 text-amber-200 border border-amber-400/30">
+              {measurementSourceBadge}
+            </span>
+          </div>
+        )}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
           {[
             { label: "HR", val: m.hr_bpm ? `${m.hr_bpm} bpm` : "—" },
@@ -302,6 +343,7 @@ export function EcgResultsPanel({
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
                         {sourceLabel(secondary.source)}
                       </span>
+                      {concordancePill(secondary)}
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-800/80 text-slate-200">
                         {secondary.urgency}
                       </span>

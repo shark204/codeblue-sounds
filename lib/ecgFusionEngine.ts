@@ -27,6 +27,8 @@ export const FUSION_CONSTANTS = {
   DEFAULT_AI_UNCERTAINTY: 0.1,
   /** Minimum per-rule availability floor when OCR misses required numeric header fields */
   MIN_OCR_AVAILABILITY_FLOOR: 0.2,
+  /** Minimum effective confidence for an AI-only CRITICAL prediction to enter Tier 1 Safety Floor (prevents pos_weight alarm fatigue) */
+  AI_CRITICAL_TIER1_THRESHOLD: 0.65,
   /** Upper bound for Confidence and RankScore */
   MAX_SCORE: 1.0,
 } as const;
@@ -84,6 +86,10 @@ export interface FusedECGFinding extends ECGFinding {
   nStrongSources: number;
   /** Whether this finding was clinically demoted into Tier 3 */
   isDemoted: boolean;
+  /** Clinical analytical concordance level displayed to students instead of uncalibrated percentages */
+  concordanceLevel: "strong" | "moderate" | "preliminary";
+  concordanceLabelEn: string;
+  concordanceLabelAr: string;
   /** Full per-source breakdown for transparent medical education */
   sourceBreakdown: SourceContribution[];
 }
@@ -319,10 +325,21 @@ export function computeNoisyOrScore(sources: { strength: number; availability: n
   return { confidence, rankScore, nStrong };
 }
 
-export function assignClinicalTier(urgency: UrgencyLevel, isDemoted: boolean): 1 | 2 | 3 {
+export function assignClinicalTier(
+  urgency: UrgencyLevel,
+  isDemoted: boolean,
+  hasNonAiSupport = true,
+  fusionConfidence = 1.0
+): 1 | 2 | 3 {
   if (isDemoted) return 3; // Tier 3: Look-alike warnings (never competes with Tier 1 or Tier 2)
-  if (urgency === "CRITICAL") return 1; // Tier 1: Clinical Safety Floor
-  return 2; // Tier 2: Active URGENT / ABNORMAL / NORMAL findings
+  if (urgency === "CRITICAL") {
+    // Deterministic rules or Vitals emergencies enter Tier 1 immediately;
+    // AI-only critical predictions must exceed AI_CRITICAL_TIER1_THRESHOLD to prevent pos_weight alarm fatigue
+    if (hasNonAiSupport || fusionConfidence >= FUSION_CONSTANTS.AI_CRITICAL_TIER1_THRESHOLD) {
+      return 1;
+    }
+  }
+  return 2; // Tier 2: Active URGENT / ABNORMAL / NORMAL findings (and weak uncorroborated AI criticals)
 }
 
 const SOURCE_TEXT_PRIORITY: Record<FusionSourceKind, number> = {
@@ -434,7 +451,8 @@ export function fuseHybridFindings(
       !hasContextRescue &&
       (group.some((c) => demotedCodes.has(c.code)) || demotedParents.has(parent));
 
-    const tier = assignClinicalTier(urgencyLeader.urgency, isDemoted);
+    const hasNonAiSupport = group.some((c) => c.source === "rules" || c.source === "context_override");
+    const tier = assignClinicalTier(urgencyLeader.urgency, isDemoted, hasNonAiSupport, confidence);
 
     // Merge transparent Evidence List (source breakdown + unique raw evidence strings)
     const evidenceSet = new Set<string>();
@@ -447,15 +465,24 @@ export function fuseHybridFindings(
       }
     }
 
-    const confPct = Math.round(confidence * 100);
-    const consensusBadgeEn =
-      nStrong >= 2 ? ` [Multi-source consensus: ${nStrong} sources]` : "";
-    const consensusBadgeAr =
-      nStrong >= 2 ? ` [اتفاق ${nStrong} مصادر مستقلة]` : "";
-
-    // Strip any stale "(AI XX%)" suffix from display title so unified fusion confidence is shown cleanly
+    // Strip any stale "(AI XX%)" suffix; display clinical concordance badge rather than uncalibrated %
     const cleanNameEn = displayLeader.name_en.replace(/\s*\(AI\s+\d+%\)\s*$/i, "");
     const cleanNameAr = displayLeader.name_ar.replace(/\s*\(توقع الذكاء الاصطناعي\s+\d+%\)\s*$/i, "");
+
+    const concordanceLevel: "strong" | "moderate" | "preliminary" =
+      confidence >= 0.75 || nStrong >= 2 ? "strong" : confidence >= 0.45 ? "moderate" : "preliminary";
+    const concordanceLabelEn =
+      concordanceLevel === "strong"
+        ? "Strong Concordance"
+        : concordanceLevel === "moderate"
+          ? "Moderate Concordance"
+          : "Preliminary Finding";
+    const concordanceLabelAr =
+      concordanceLevel === "strong"
+        ? "توافق تشخيصي قوي"
+        : concordanceLevel === "moderate"
+          ? "توافق تشخيصي متوسط"
+          : "مؤشر تشخيصي مبدئي";
 
     fused.push({
       code: displayLeader.code,
@@ -463,14 +490,14 @@ export function fuseHybridFindings(
       priority: tier,
       urgency_label_en: urgencyLeader.urgency_label_en,
       urgency_label_ar: urgencyLeader.urgency_label_ar,
-      name_en: `${cleanNameEn} (${confPct}%)`,
-      name_ar: `${cleanNameAr} (${confPct}%)`,
+      name_en: cleanNameEn,
+      name_ar: cleanNameAr,
       evidence: Array.from(evidenceSet),
-      explanation_en: `${explanationLeader.explanation_en}${consensusBadgeEn}`,
-      explanation_ar: `${explanationLeader.explanation_ar}${consensusBadgeAr}`,
+      explanation_en: explanationLeader.explanation_en,
+      explanation_ar: explanationLeader.explanation_ar,
       immediate_action_en: explanationLeader.immediate_action_en,
       immediate_action_ar: explanationLeader.immediate_action_ar,
-      confidence: confidence >= 0.7 ? "high" : confidence >= 0.45 ? "moderate" : "low",
+      confidence: concordanceLevel === "strong" ? "high" : concordanceLevel === "moderate" ? "moderate" : "low",
       source: explanationLeader.source,
       canonicalParent: parent,
       fusionConfidence: Number(confidence.toFixed(4)),
@@ -478,6 +505,9 @@ export function fuseHybridFindings(
       tier,
       nStrongSources: nStrong,
       isDemoted,
+      concordanceLevel,
+      concordanceLabelEn,
+      concordanceLabelAr,
       sourceBreakdown: contributions,
     });
   }

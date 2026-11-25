@@ -85,6 +85,7 @@ export function EcgDiagnosticStudio() {
   const [highContrast, setHighContrast] = useState<boolean>(false);
   const [gradcamUrl, setGradcamUrl] = useState<string | null>(null);
   const [gradcamFocusRegion, setGradcamFocusRegion] = useState<string | null>(null);
+  const [measurementSource, setMeasurementSource] = useState<"device_ocr" | "auto_waveform" | "manual" | null>(null);
 
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [analyzingImg, setAnalyzingImg] = useState<boolean>(false);
@@ -172,6 +173,9 @@ export function EcgDiagnosticStudio() {
               axis_deg: bm.axis_deg ?? prev.axis_deg,
               ai_predictions: j.low_confidence ? [] : aiList,
             }));
+            const hasOcrNum = bm.hr_bpm != null || bm.pr_ms != null || bm.qrs_ms != null || bm.qt_ms != null || bm.axis_deg != null;
+            const hasFallbackNum = fallbackM.hr_bpm != null || fallbackM.qrs_ms != null || fallbackM.qt_ms != null;
+            setMeasurementSource(hasOcrNum ? "device_ocr" : hasFallbackNum ? "auto_waveform" : null);
             setImgAnalysis(null);
             return;
           }
@@ -184,6 +188,7 @@ export function EcgDiagnosticStudio() {
       setBackendSource("local");
       const res = await analyzeEcgImageLocally(dataUrl, { paperSpeedMmS: 25, gainMmMv: 10 });
       setImgAnalysis(res);
+      setMeasurementSource("auto_waveform");
       const m = res.interpretation.measurements;
       const morph = res.extracted_morphology;
       const rrPat = res.extracted_input.rr_pattern;
@@ -266,6 +271,7 @@ export function EcgDiagnosticStudio() {
     setBackendSource(null);
     setGradcamUrl(null);
     setGradcamFocusRegion(null);
+    setMeasurementSource(null);
   };
 
   const parseOptNum = (val: string): number | null => {
@@ -470,7 +476,7 @@ export function EcgDiagnosticStudio() {
                       type="number"
                       placeholder={fld.ph}
                       value={(features[fld.key as keyof WizardFeatures] as number | null) ?? ""}
-                      onChange={(e) => setFeatures((p) => ({ ...p, [fld.key]: parseOptNum(e.target.value) }))}
+                      onChange={(e) => { setMeasurementSource("manual"); setFeatures((p) => ({ ...p, [fld.key]: parseOptNum(e.target.value) })); }}
                       className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-mono focus:outline-none focus:border-cyan-400 ${isLight ? "bg-white/85 border-slate-300 text-slate-900" : "bg-[#0a1224]/75 border-white/15 text-white"}`}
                     />
                   </label>
@@ -816,6 +822,7 @@ export function EcgDiagnosticStudio() {
                   cardCls={cardCls}
                   onEditInputs={() => setShowResults(false)}
                   onApplyCheck={handleApplyCheck}
+                  measurementSource={measurementSource}
                 />
               )
             )}
