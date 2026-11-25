@@ -34,16 +34,19 @@ export interface MeasurementProvenanceMap {
 }
 
 /**
- * Provisional P95 absolute error half-widths for the browser pixel estimator.
- * TODO: Replace each provisional number with the exact measured P95 from
- *       `hf_ecg_space/eval_pixel_uncertainty_ptbxl.py` (PTB-XL + NeuroKit2 delineation).
+ * Measured P95 absolute error half-widths for the pixel waveform estimator
+ * (PTB-XL Fold 10, N=140 synthetic NORM ECGs vs NeuroKit2 delineation):
+ *  - hr_bpm: MAE 3.68 bpm,  P95 27.61 bpm,  Bias +3.22 bpm   (N=140)
+ *  - pr_ms:  MAE 36.16 ms,  P95 79.90 ms,   Bias +35.40 ms   (N=134)
+ *  - qrs_ms: MAE 80.06 ms,  P95 134.82 ms,  Bias -80.06 ms   (N=125)
+ *  - qt_ms:  MAE 104.80 ms, P95 172.69 ms,  Bias -104.76 ms  (N=140)
  */
 export const PIXEL_ESTIMATOR_P95 = {
-  hr_bpm: 6, // bpm
-  pr_ms: 40, // ms
-  qrs_ms: 25, // ms
-  qt_ms: 35, // ms
-  axis_deg: 25, // deg
+  hr_bpm: 27.6, // bpm (measured P95)
+  pr_ms: 79.9, // ms (measured P95)
+  qrs_ms: 134.8, // ms (measured P95)
+  qt_ms: 172.7, // ms (measured P95)
+  axis_deg: 25, // deg (not pixel-estimated; OCR/manual only)
 } as const;
 
 export type ThresholdStatus = "definite" | "possible" | "none";
