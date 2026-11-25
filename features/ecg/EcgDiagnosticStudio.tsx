@@ -205,14 +205,24 @@ export function EcgDiagnosticStudio() {
       const m = res.interpretation.measurements;
       const morph = res.extracted_morphology;
       const rrPat = res.extracted_input.rr_pattern;
+      const offHr = m.hr_bpm != null ? Math.round(m.hr_bpm) : null;
+      const offPr = m.pr_ms != null ? Math.round(m.pr_ms) : null;
+      const offQrs = m.qrs_ms != null ? Math.round(m.qrs_ms) : null;
+      const offQt = m.qt_ms != null ? Math.round(m.qt_ms) : null;
       setFeatures((prev) => ({
         ...prev,
         paper_speed_mm_s: 25,
         gain_mm_mv: 10,
-        hr_bpm: m.hr_bpm != null ? Math.round(m.hr_bpm) : prev.hr_bpm,
-        pr_ms: m.pr_ms != null ? Math.round(m.pr_ms) : prev.pr_ms,
-        qrs_ms: m.qrs_ms != null ? Math.round(m.qrs_ms) : prev.qrs_ms,
-        qt_ms: m.qt_ms != null ? Math.round(m.qt_ms) : prev.qt_ms,
+        hr_bpm: offHr ?? prev.hr_bpm,
+        pr_ms: offPr ?? prev.pr_ms,
+        qrs_ms: offQrs ?? prev.qrs_ms,
+        qt_ms: offQt ?? prev.qt_ms,
+        measurement_provenance: {
+          hr_bpm: makeProvenanced(offHr, "pixel_estimate", "hr_bpm"),
+          pr_ms: makeProvenanced(offPr, "pixel_estimate", "pr_ms"),
+          qrs_ms: makeProvenanced(offQrs, "pixel_estimate", "qrs_ms"),
+          qt_ms: makeProvenanced(offQt, "pixel_estimate", "qt_ms"),
+        },
         rhythm_class:
           rrPat === "regular" || rrPat === "irregularly_irregular" || rrPat === "pauses"
             ? rrPat
@@ -361,7 +371,7 @@ export function EcgDiagnosticStudio() {
         {/* Main 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
           {/* LEFT: Auto-Analyzing ECG Image Uploader + Auto-Filled Printed Header Numbers */}
-          <div className="lg:col-span-4 space-y-2.5 lg:max-h-[calc(100vh-110px)] lg:overflow-y-auto lg:pr-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-900/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-rose-400/50 hover:[&::-webkit-scrollbar-thumb]:bg-rose-400/80">
+          <div className="lg:col-span-4 space-y-2.5">
             <div className={`rounded-2xl border p-3 space-y-2 ${cardCls}`}>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-xs font-extrabold">
@@ -386,7 +396,7 @@ export function EcgDiagnosticStudio() {
 
               {activeImage ? (
                 <div className="space-y-2">
-                  <div className="relative w-full h-44 sm:h-48 overflow-auto rounded-xl border border-slate-700/70 bg-black/60">
+                  <div className="relative w-full overflow-auto rounded-xl border border-slate-700/70 bg-black/60">
                     <img
                       src={activeImage.dataUrl}
                       alt={activeImage.name}

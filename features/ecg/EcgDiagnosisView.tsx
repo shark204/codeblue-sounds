@@ -462,11 +462,11 @@ export function EcgGradCamPanel({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-black/45 flex items-center justify-center h-48">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-black/45">
         <img
           src={gradcamUrl}
           alt="ECG Grad-CAM Heatmap"
-          className="w-full h-full object-contain"
+          className="w-full h-auto object-contain"
         />
       </div>
 

@@ -584,14 +584,7 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
     f.asymptomatic_nocturnal &&
     !hasDangerousSymptomsOrInstability &&
     (f.rhythm_class === "pauses" ||
-      hasAnyCode(
-        "COMPLETE_HEART_BLOCK",
-        "HIGH_GRADE_OR_2_TO_1_AV_BLOCK",
-        "HIGH_GRADE_AV_BLOCK",
-        "PAUSES_POSSIBLE_AV_BLOCK",
-        "BRADYCARDIA",
-        "SINUS_BRADYCARDIA"
-      ))
+      hasAnyCode("COMPLETE_HEART_BLOCK", "HIGH_GRADE_OR_2_TO_1_AV_BLOCK", "HIGH_GRADE_AV_BLOCK", "PAUSES_POSSIBLE_AV_BLOCK", "BRADYCARDIA", "SINUS_BRADYCARDIA"))
   ) {
     demotedCodes.add("COMPLETE_HEART_BLOCK");
     demotedCodes.add("HIGH_GRADE_OR_2_TO_1_AV_BLOCK");
@@ -802,8 +795,7 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
 
   // Stream A: Patient Vitals & Clinical Context Adjustments
   for (const adj of adjustments) {
-    const urgMeta = URGENCY_LABELS[adj.urgency];
-    const ctxStrength = adj.urgency === "CRITICAL" ? 0.85 : adj.urgency === "URGENT" ? 0.72 : 0.65;
+    const urgMeta = URGENCY_LABELS[adj.urgency]; const ctxStrength = adj.urgency === "CRITICAL" ? 0.85 : adj.urgency === "URGENT" ? 0.72 : 0.65;
     candidates.push({
       code: adj.code,
       urgency: adj.urgency,
@@ -850,14 +842,21 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
     if (usedPixelEstimate) pixelRuleFindings.push({ code: rf.code, name_en: rf.name_en, name_ar: rf.name_ar });
 
     if (uRes && uRes.status === "possible") {
-      // Never delete "possible" findings; downgrade non-dangerous to low-confidence ABNORMAL (no red banner),
-      // and keep dangerous "possible" conditions visible as URGENT (unverified urgent)
       adjUrgency = uRes.unverifiedUrgent ? "URGENT" : "ABNORMAL";
       adjStrength = uRes.unverifiedUrgent ? 0.50 : 0.35;
       adjNameEn = uRes.unverifiedUrgent ? `Possible ${rf.name_en} (Unverified Urgent)` : `Possible ${rf.name_en}`;
       adjNameAr = uRes.unverifiedUrgent ? `احتمال طارئ غير مؤكد: ${rf.name_ar}` : `محتمل: ${rf.name_ar}`;
       if (uRes.note_en) adjExpEn = `${rf.explanation_en} [${uRes.note_en}]`;
       if (uRes.note_ar) adjExpAr = `${rf.explanation_ar} [${uRes.note_ar}]`;
+    } else if (usedPixelEstimate) {
+      // Even if (value - P95) crosses a threshold, a pixel_estimate alone is never verified clinical truth:
+      // cap strength at 0.42 (Preliminary Finding) and cap urgency at URGENT (never red CRITICAL without manual/OCR/AI)
+      if (adjUrgency === "CRITICAL") adjUrgency = "URGENT";
+      adjStrength = Math.min(adjStrength, 0.42);
+      adjNameEn = `${rf.name_en} (Auto Estimate — Verify)`;
+      adjNameAr = `${rf.name_ar} (تقدير آلي — يُراجع)`;
+      if (uRes?.note_en) adjExpEn = `${rf.explanation_en} [${uRes.note_en}]`;
+      if (uRes?.note_ar) adjExpAr = `${rf.explanation_ar} [${uRes.note_ar}]`;
     } else if (uRes && uRes.note_en) {
       adjExpEn = `${rf.explanation_en} [${uRes.note_en}]`;
       adjExpAr = `${rf.explanation_ar} [${uRes.note_ar}]`;

@@ -246,14 +246,14 @@ export function evaluateRuleWithProvenance(
   const pQrs = prov.qrs_ms ?? makeProvenanced(raw.qrs_ms, "manual", "qrs_ms");
   const pQt = prov.qt_ms ?? makeProvenanced(raw.qt_ms, "manual", "qt_ms");
 
-  if ((code === "SHORT_QT" || code === "PROLONGED_QTC" || code === "MARKEDLY_PROLONGED_QTC" || code === "LONG_QT") && pQt.value != null && pHr.value != null) {
+  if ((code === "SHORT_QT" || code === "PROLONGED_QTC" || code === "MARKEDLY_PROLONGED_QTC" || code === "LONG_QT_CRITICAL" || code === "LONG_QT") && pQt.value != null && pHr.value != null) {
     const useFrid = pHr.value > 100 || pHr.value < 50;
     const { qtcMs, errorMs } = propagateQtcErrorMs(pQt.value, pQt.error_ms, pHr.value, pHr.error_ms, useFrid ? "fridericia" : "bazett");
     const src: MeasurementSource = pQt.source === "pixel_estimate" || pHr.source === "pixel_estimate" ? "pixel_estimate" : pQt.source;
     const st =
       code === "SHORT_QT"
         ? evalLessThan(qtcMs, errorMs, 350)
-        : code === "MARKEDLY_PROLONGED_QTC"
+        : code === "MARKEDLY_PROLONGED_QTC" || code === "LONG_QT_CRITICAL"
           ? evalGreaterThan(qtcMs, errorMs, 500)
           : evalGreaterThan(qtcMs, errorMs, 460);
     return { uRes: classifyMeasurementRule(code, st, src, errorMs), usedPixelEstimate: src === "pixel_estimate" };
@@ -261,11 +261,17 @@ export function evaluateRuleWithProvenance(
   if (code === "FIRST_DEGREE_AV_BLOCK" && pPr.value != null) {
     return { uRes: classifyMeasurementRule(code, evalGreaterThan(pPr.value, pPr.error_ms, 200), pPr.source, pPr.error_ms), usedPixelEstimate: pPr.source === "pixel_estimate" };
   }
-  if (code === "WIDE_QRS_TACHYCARDIA" && pQrs.value != null) {
+  if ((code === "WIDE_QRS_TACHYCARDIA" || code === "VENTRICULAR_TACHYCARDIA") && pQrs.value != null) {
     return { uRes: classifyMeasurementRule(code, evalGreaterThan(pQrs.value, pQrs.error_ms, 120), pQrs.source, pQrs.error_ms), usedPixelEstimate: pQrs.source === "pixel_estimate" };
+  }
+  if (code === "MARKED_BRADYCARDIA" && pHr.value != null) {
+    return { uRes: classifyMeasurementRule(code, evalLessThan(pHr.value, pHr.error_ms, 40), pHr.source, pHr.error_ms), usedPixelEstimate: pHr.source === "pixel_estimate" };
   }
   if ((code === "BRADYCARDIA" || code === "SINUS_BRADYCARDIA") && pHr.value != null) {
     return { uRes: classifyMeasurementRule(code, evalLessThan(pHr.value, pHr.error_ms, 60), pHr.source, pHr.error_ms), usedPixelEstimate: pHr.source === "pixel_estimate" };
+  }
+  if (code === "TACHYCARDIA_UNSPECIFIED" && pHr.value != null) {
+    return { uRes: classifyMeasurementRule(code, evalGreaterThan(pHr.value, pHr.error_ms, 100), pHr.source, pHr.error_ms), usedPixelEstimate: pHr.source === "pixel_estimate" };
   }
   return { uRes: null, usedPixelEstimate: false };
 }

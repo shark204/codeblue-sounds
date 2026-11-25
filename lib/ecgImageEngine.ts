@@ -406,8 +406,19 @@ function measureSegmentMorphology(sig: number[], peaks: number[], fs: number, ga
       }
     }
 
-    const t0 = Math.floor(p + 0.14 * fs);
-    const t1 = Math.min(sig.length - 1, Math.floor(p + 0.48 * fs));
+    // RR-adaptive T-wave search window: prevents overlapping the next beat's P/QRS in tachycardia (e.g. HR 125)
+    const pIdx = peaks.indexOf(p);
+    const nextRrSec =
+      pIdx >= 0 && pIdx < peaks.length - 1
+        ? (peaks[pIdx + 1]! - p) / fs
+        : pIdx > 0
+          ? (p - peaks[pIdx - 1]!) / fs
+          : 0.85;
+    const tSearchEndSec = Math.min(0.46, Math.max(0.24, nextRrSec * 0.54));
+    const qtEndLimitSec = Math.min(0.58, Math.max(0.28, nextRrSec * 0.68));
+
+    const t0 = Math.floor(p + 0.13 * fs);
+    const t1 = Math.min(sig.length - 1, Math.floor(p + tSearchEndSec * fs));
     if (t1 > t0 + 3) {
       let maxT = -999;
       let minT = 999;
@@ -429,16 +440,39 @@ function measureSegmentMorphology(sig: number[], peaks: number[], fs: number, ga
         brugadaBeats += 1;
       }
 
-      const qOnset = Math.max(0, Math.floor(p - 0.04 * fs));
-      const qtEndLimit = Math.min(sig.length - 1, Math.floor(p + 0.60 * fs));
+      // Clinical Tangent Method (steepest T-downslope extrapolated to baseline) with RR-bounded window
+      const qOnset = Math.max(0, Math.floor(p - 0.038 * fs));
+      const qtEndLimit = Math.min(sig.length - 1, Math.floor(p + qtEndLimitSec * fs));
+      const tPeakRel = (sig[tPeakIdx]! - baseline) * gainScale;
       let tEnd = tPeakIdx;
-      for (let i = tPeakIdx; i <= qtEndLimit; i++) {
-        const rel = Math.abs((sig[i]! - baseline) * gainScale);
-        tEnd = i;
-        if (rel <= 0.5 && i > tPeakIdx + Math.floor(0.03 * fs)) break;
+      if (Math.abs(tPeakRel) >= 0.6) {
+        let bestSlope = 0;
+        let bestIdx = tPeakIdx;
+        const slopeSearchEnd = Math.min(qtEndLimit - 1, tPeakIdx + Math.floor(0.16 * fs));
+        for (let i = tPeakIdx + 1; i <= slopeSearchEnd; i++) {
+          const cur = (sig[i]! - baseline) * gainScale;
+          const prev = (sig[i - 1]! - baseline) * gainScale;
+          const d = tPeakRel >= 0 ? prev - cur : cur - prev;
+          if (d > bestSlope) {
+            bestSlope = d;
+            bestIdx = i;
+          }
+        }
+        if (bestSlope > 0.05) {
+          const yAtBest = Math.abs((sig[bestIdx]! - baseline) * gainScale);
+          const stepsToZero = Math.min(Math.floor(0.12 * fs), Math.max(1, yAtBest / bestSlope));
+          tEnd = Math.min(qtEndLimit, Math.round(bestIdx + stepsToZero));
+        }
+      } else {
+        for (let i = tPeakIdx; i <= qtEndLimit; i++) {
+          const rel = Math.abs((sig[i]! - baseline) * gainScale);
+          tEnd = i;
+          if (rel <= 0.35 && i > tPeakIdx + Math.floor(0.03 * fs)) break;
+        }
       }
       const qtMs = ((tEnd - qOnset) / fs) * 1000;
-      if (qtMs >= 260 && qtMs <= 650) qtVals.push(qtMs);
+      const maxPhysQt = Math.min(620, nextRrSec * 680);
+      if (qtMs >= 260 && qtMs <= maxPhysQt) qtVals.push(qtMs);
     }
 
     // Strict Pacing Spike: narrow tall impulse (>=3.8mm) before QRS with sharp drop on BOTH sides
