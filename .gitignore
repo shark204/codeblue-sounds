@@ -10,3 +10,8 @@ desktop.ini
 .tmp.driveupload/
 .tmp.drivedownload/
 * (1).*
+
+# Exclude heavy ML weights & cache
+hf_ecg_space/weights/
+hf_ecg_space/__pycache__/
+_eval_20.ts

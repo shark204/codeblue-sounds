@@ -151,9 +151,9 @@ export default function SoundsLabPage() {
           >
             <span>{isAr ? "أصوات القلب" : "Heart Sounds"}</span>
             <span className="opacity-40">•</span>
-            <span>{isAr ? "تشخيص ECG الذكي" : "AI ECG Engine"}</span>
-            <span className="opacity-40">•</span>
             <span>{isAr ? "أصوات التنفس" : "Breath Sounds"}</span>
+            <span className="opacity-40">•</span>
+            <span>{isAr ? "محرك تشخيص الـ ECG" : "ECG Diagnostic Engine"}</span>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
@@ -199,21 +199,21 @@ export default function SoundsLabPage() {
             <div className="lg:col-span-6 flex flex-col gap-4">
               <div className="space-y-2.5">
                 <h1 className={`text-2xl sm:text-3xl xl:text-4xl font-black leading-[1.18] ${isLight ? "text-slate-900" : "text-white"}`}>
-                  {isAr ? "منصة أصوات القلب والتنفس والتشخيص الذكي" : "Interactive Heart, Breath Sounds & Live ECG"}
+                  {isAr ? "منصة أصوات القلب والتنفس ومحرك تشخيص الـ ECG" : "Interactive Heart, Breath Sounds & ECG Engine"}
                 </h1>
                 <p className={`text-sm sm:text-base leading-relaxed max-w-xl ${isLight ? "text-slate-600" : "text-slate-300"}`}>
                   {isAr ? (
                     <>
-                      محاكي تفاعلي ثلاثي الأبعاد لأصوات القلب واللغط القلبي ومحرك تشخيص الـ ECG{" "}
+                      محاكي تفاعلي ثلاثي الأبعاد لأصوات القلب واللغط القلبي وأصوات الصدر والتنفس، مع{" "}
                       <span className={isLight ? "text-[#9f1239] font-extrabold" : "text-[#fb7185] font-extrabold"}>
-                        وأصوات الصدر والتنفس السريرية
+                        محرك تشخيص الـ ECG الهجين وكشف الفخاخ السريرية
                       </span>
                     </>
                   ) : (
                     <>
-                      Interactive 3D simulator for heart murmurs, clinical ECG diagnostic rules engine,{" "}
+                      Interactive 3D simulator for heart murmurs &amp; clinical breath auscultation, paired with a{" "}
                       <span className={isLight ? "text-[#9f1239] font-extrabold" : "text-[#fb7185] font-extrabold"}>
-                        live ECG strips &amp; clinical breath auscultation
+                        hybrid ECG diagnostic engine &amp; clinical pitfalls detector
                       </span>
                     </>
                   )}
@@ -222,9 +222,10 @@ export default function SoundsLabPage() {
                   <button
                     type="button"
                     onClick={() => launchMode("heart")}
-                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#881337] via-[#be123c] to-[#e11d48] hover:from-[#9f1239] hover:via-[#e11d48] hover:to-[#f43f5e] text-white font-black text-sm sm:text-base shadow-[0_0_30px_rgba(190,18,60,0.45)] transition transform hover:scale-[1.03] active:scale-[0.99] cursor-pointer"
+                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#881337] via-[#be123c] to-[#e11d48] hover:from-[#9f1239] hover:via-[#e11d48] hover:to-[#f43f5e] text-white font-black text-sm sm:text-base inline-flex items-center gap-2 shadow-[0_0_30px_rgba(190,18,60,0.45)] transition transform hover:scale-[1.03] active:scale-[0.99] cursor-pointer"
                   >
-                    {isAr ? "ابدأ المحاكاة الآن" : "Start Simulation Now"}
+                    <Stethoscope className="w-4 h-4" />
+                    {isAr ? "أصوات القلب والتنفس" : "Heart & Breath Sounds"}
                   </button>
                   <button
                     type="button"
@@ -254,7 +255,7 @@ export default function SoundsLabPage() {
                     <div className="w-9 h-9 mb-1.5 rounded-2xl bg-rose-500/15 border border-rose-400/35 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform duration-300">
                       <HeartPulse className="w-5 h-5" />
                     </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "أصوات ولغط القلب" : "Heart Murmurs"}</div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "أصوات ولغط القلب" : "Heart Sounds"}</div>
                     <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
                       {isAr ? "S1/S2 وS3/S4 واضطرابات الصمامات" : "S1–S4 & valve murmurs"}
                     </div>
@@ -267,9 +268,9 @@ export default function SoundsLabPage() {
                     <div className="w-9 h-9 mb-1.5 rounded-2xl bg-cyan-500/15 border border-cyan-400/35 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform duration-300">
                       <Activity className="w-5 h-5" />
                     </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "محرك تشخيص ECG" : "ECG Rules Engine"}</div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "محرك تشخيص ECG الهجين" : "Hybrid ECG Engine"}</div>
                     <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "STEMI وQTc وAF وVT وAV Blocks" : "STEMI, QTc, AF, VT & AV Blocks"}
+                      {isAr ? "قواعد + حالات مرجعية + فخاخ سريرية" : "Rules + Reference Cases + Pitfalls"}
                     </div>
                   </div>
 
@@ -280,7 +281,7 @@ export default function SoundsLabPage() {
                     <div className="w-9 h-9 mb-1.5 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform duration-300">
                       <Wind className="w-5 h-5" />
                     </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "أصوات الصدر والتنفس" : "Breath Sounds"}</div>
+                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "أصوات الصدر والتنفس" : "Chest & Breath"}</div>
                     <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
                       {isAr ? "Wheezes وCrackles وStridor" : "Wheezes, Crackles & Stridor"}
                     </div>
@@ -318,54 +319,53 @@ export default function SoundsLabPage() {
     );
   }
 
+  const isEcgMode = mode === "ecg-ai";
+
   return (
-    <div className="h-screen w-screen bg-transparent text-slate-100 flex flex-col overflow-hidden">
-      <header className="h-13 shrink-0 px-4 border-b border-slate-800/80 bg-[#070b16]/85 backdrop-blur-md flex items-center justify-between gap-3 z-30">
+    <div className={`h-screen w-screen bg-transparent flex flex-col overflow-hidden ${isLight ? "text-slate-900" : "text-slate-100"}`}>
+      <header className={`h-13 shrink-0 px-4 border-b backdrop-blur-xl flex items-center justify-between gap-3 z-30 ${isLight ? "border-slate-200/80 bg-white/70" : "border-white/10 bg-[#070b16]/65"}`}>
         <div className="flex items-center gap-3 overflow-x-auto">
           <button
             type="button"
             onClick={() => setView("landing")}
-            className="w-8 h-8 shrink-0 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 hover:bg-emerald-500/25 transition"
+            className="w-8 h-8 shrink-0 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 hover:bg-emerald-500/25 transition cursor-pointer"
             title={isAr ? "العودة للرئيسية" : "Back to Home"}
           >
             <Home className="w-4 h-4" />
           </button>
-          <span className="font-bold text-sm tracking-tight text-white shrink-0">
-            Code Blue <span className="text-emerald-400">Sounds &amp; ECG</span>
+          <span className={`font-bold text-sm tracking-tight shrink-0 ${isLight ? "text-slate-900" : "text-white"}`}>
+            Code Blue <span className="text-emerald-400">{isEcgMode ? "ECG Engine" : "Sounds Lab"}</span>
           </span>
 
-          <div className="ml-2 flex items-center p-1 rounded-xl bg-slate-900/90 border border-slate-800 shrink-0">
-            <button
-              type="button"
-              onClick={() => launchMode("heart")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                mode === "heart" ? "bg-rose-500/20 text-rose-300 border border-rose-500/40" : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              <Heart className="w-3.5 h-3.5" />
-              <span>{isAr ? "أصوات القلب والـ ECG" : "Heart & ECG"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => launchMode("breath")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                mode === "breath" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40" : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              <Wind className="w-3.5 h-3.5" />
-              <span>{isAr ? "أصوات الصدر والتنفس" : "Chest & Breath"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => launchMode("ecg-ai")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                mode === "ecg-ai" ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{isAr ? "تشخيص الـ ECG الذكي" : "AI ECG Diagnosis"}</span>
-            </button>
-          </div>
+          {isEcgMode ? (
+            <div className="ml-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-500/15 border border-rose-500/35 text-rose-200 text-xs font-bold shrink-0">
+              <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+              <span>{isAr ? "محرك تشخيص الـ ECG الهجين" : "ECG Diagnostic Engine"}</span>
+            </div>
+          ) : (
+            <div className="ml-2 flex items-center p-1 rounded-xl bg-slate-900/90 border border-slate-800 shrink-0">
+              <button
+                type="button"
+                onClick={() => launchMode("heart")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  mode === "heart" ? "bg-rose-500/20 text-rose-300 border border-rose-500/40" : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                <Heart className="w-3.5 h-3.5" />
+                <span>{isAr ? "أصوات القلب" : "Heart Sounds"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => launchMode("breath")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  mode === "breath" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40" : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                <Wind className="w-3.5 h-3.5" />
+                <span>{isAr ? "أصوات الصدر والتنفس" : "Chest & Breath"}</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <nav className="flex items-center gap-1.5 text-xs shrink-0">
@@ -379,15 +379,23 @@ export default function SoundsLabPage() {
           <button
             type="button"
             onClick={() => setLocale(isAr ? "en" : "ar")}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-700/80 text-slate-200 border border-slate-700/60 font-semibold"
+            className={`px-2.5 py-1.5 rounded-lg border font-semibold cursor-pointer transition ${isLight ? "bg-white/80 hover:bg-white text-slate-800 border-slate-300/80" : "bg-slate-800/70 hover:bg-slate-700/80 text-slate-200 border-slate-700/60"}`}
           >
             {isAr ? "EN" : "AR"}
+          </button>
+          <button
+            type="button"
+            onClick={handleToggleTheme}
+            className={`p-1.5 rounded-lg border transition cursor-pointer ${isLight ? "bg-white/80 hover:bg-white text-slate-800 border-slate-300/80" : "bg-slate-800/70 hover:bg-slate-700/80 text-slate-200 border-slate-700/60"}`}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
         </nav>
       </header>
 
       <main className="relative flex-1 w-full overflow-hidden">
-        {mode === "ecg-ai" ? (
+        {isEcgMode ? (
           <EcgDiagnosticStudio />
         ) : (
           <>

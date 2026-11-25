@@ -106,6 +106,17 @@ export interface ECGInput {
   negative_p_qrs_lead_i?: boolean;
   normal_precordial_r_progression?: boolean;
   quality?: ECGQuality;
+  // ---- categorical (clinician-supplied) features. No number is ever invented from them. ----
+  st_elevation_leads?: string[];
+  st_depression_leads?: string[];
+  q_wave_leads?: string[];
+  early_repolarization_leads?: string[];
+  qrs_width_class?: "narrow" | "wide" | null;
+  pr_class?: "normal" | "prolonged" | "short" | "variable" | null;
+  rhythm_class?: "regular" | "irregularly_irregular" | "pauses" | null;
+  p_wave_status?: "present" | "absent" | "variable" | null;
+  axis_class?: "normal" | "left" | "right" | "extreme" | null;
+  lvh_voltage?: boolean | null;
 }
 
 export interface ECGFinding {
@@ -168,6 +179,24 @@ const EXTRA_KB: Record<
     immediate_action_ar: string;
   }
 > = {
+  EARLY_REPOLARIZATION: {
+    urgency: "ABNORMAL",
+    name_en: "Early repolarization pattern (diffuse ST elevation without reciprocal change)",
+    name_ar: "نمط إعادة استقطاب مبكر (ارتفاع ST منتشر بدون انعكاس)",
+    explanation_en: "Widespread ST elevation without reciprocal ST depression is the classic STEMI/pericarditis mimic. Correlate with symptoms and compare with an old ECG; some patterns carry arrhythmic risk, so do not assume it is always benign.",
+    explanation_ar: "ارتفاع ST منتشر بدون هبوط انعكاسي هو أشهر مقلّد للجلطة وللتهاب التامور. اربطه بالأعراض وقارنه بتخطيط قديم، وبعض الأنماط مرتبطة بخطر اضطراب نظم فلا تفترض أنه حميد دائماً.",
+    immediate_action_en: "Correlate clinically; serial ECGs if symptomatic; keep a baseline copy.",
+    immediate_action_ar: "اربطه بالحالة السريرية، وكرّر التخطيط لو فيه أعراض، واحتفظ بنسخة مرجعية.",
+  },
+  HCM_PATTERN: {
+    urgency: "URGENT",
+    name_en: "LVH voltage with deep inferolateral T-wave inversion (HCM pattern)",
+    name_ar: "جهد LVH مع انقلاب عميق في موجات T السفلية الجانبية (نمط HCM)",
+    explanation_en: "This combination suggests hypertrophic cardiomyopathy; ischemia and other cardiomyopathies are in the differential. A normal initial echo does not exclude it.",
+    explanation_ar: "هذا الاجتماع يوحي باعتلال العضلة الضخامي، ومن التشخيصات التفريقية الإقفار واعتلالات العضلة الأخرى. وطبيعية الإيكو الأول لا تستبعده.",
+    immediate_action_en: "Cardiac MRI, exercise testing and ambulatory monitoring; specialist follow-up.",
+    immediate_action_ar: "رنين قلب واختبار جهد ومراقبة متنقلة ومتابعة متخصصة.",
+  },
   INSUFFICIENT_DATA: {
     urgency: "ABNORMAL",
     name_en: "Insufficient data for a reliable interpretation",
@@ -284,7 +313,7 @@ function computeHeartRate(ecg: ECGInput): { hr: number | null; rrMs: number | nu
   return { hr: null, rrMs: null, method: "unavailable" };
 }
 
-function computeQTc(qtMs: number | null, rrMs: number | null, hrBpm: number | null) {
+function computeQTc(qtMs: number | null, rrMs: number | null, hrBpm: number | null, qrsMs: number | null = null) {
   if (!qtMs || qtMs <= 0) {
     return { bazett: null, fridericia: null, hodges: null, primary: null, formula: "bazett" };
   }
@@ -293,14 +322,18 @@ function computeQTc(qtMs: number | null, rrMs: number | null, hrBpm: number | nu
     return { bazett: null, fridericia: null, hodges: null, primary: null, formula: "bazett" };
   }
   const rrSec = effRr / 1000;
-  const qtSec = qtMs / 1000;
+  // Bogossian wide-QRS QT adjustment when QRS >= 120 ms (LBBB/RBBB/paced) to avoid false Long-QT alarms
+  const adjQtMs = qrsMs != null && qrsMs >= 120 ? Math.max(200, qtMs - 0.485 * (qrsMs - 100)) : qtMs;
+  const qtSec = adjQtMs / 1000;
   const effHr = hrBpm || 60 / rrSec;
   const bazett = round1((qtSec / Math.sqrt(rrSec)) * 1000);
   const fridericia = round1((qtSec / Math.cbrt(rrSec)) * 1000);
-  const hodges = round1(qtMs + 1.75 * (effHr - 60));
-  const formula: string = criteria.intervals_ms.qt_qtc.default_formula || "bazett";
+  const hodges = round1(adjQtMs + 1.75 * (effHr - 60));
+  // Bazett massively over-corrects at HR > 100 bpm (e.g., AFib RVR) and under-corrects at HR < 50 bpm -> use Fridericia!
+  const useFridericia = effHr > 100 || effHr < 50;
+  const formula: string = useFridericia ? "fridericia" : (criteria.intervals_ms.qt_qtc.default_formula || "bazett");
   const map: Record<string, number> = { bazett, fridericia, hodges };
-  return { bazett, fridericia, hodges, primary: map[formula] ?? bazett, formula };
+  return { bazett, fridericia, hodges, primary: map[formula] ?? fridericia, formula };
 }
 
 function classifyAxis(axisDeg: number | null): string | null {
@@ -347,7 +380,7 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
   const qrsMs = ecg.qrs_ms ?? null;
   const qtMs = ecg.qt_ms ?? null;
   const axisDeg = ecg.axis_deg ?? null;
-  const qtc = computeQTc(qtMs, rrMs, hr);
+  const qtc = computeQTc(qtMs, rrMs, hr, qrsMs);
   const axisLabel = classifyAxis(axisDeg);
   const isPaced = Boolean(ecg.pacing_spikes);
   const findings: ECGFinding[] = [];
@@ -358,6 +391,15 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
   const hypCfg = criteria.hypertrophy_and_voltage_criteria;
   const axisCfg = criteria.axis_degrees;
   const hrCfg = criteria.heart_rate;
+
+  // ---- categorical (clinician-supplied) features -> engine-equivalent flags ----
+  const catElev = new Set<string>(ecg.st_elevation_leads ?? []);
+  const catDep = new Set<string>(ecg.st_depression_leads ?? []);
+  const rrPattern: RrPatternInput | undefined = ecg.rr_pattern ?? (ecg.rhythm_class ?? undefined);
+  const prProlongedCat = ecg.pr_class === "prolonged";
+  const prShortCat = ecg.pr_class === "short";
+  const brugNorm = (ecg.brugada_pattern || "").toLowerCase().replace(/^type(\d)$/, "type_$1");
+  const hcmFlag = Boolean(ecg.lvh_voltage) && (ecg.t_wave_inversion_leads ?? []).length >= 3;
 
   // ---- AV conduction ------------------------------------------------------
   let hasFirstDeg = false;
@@ -372,25 +414,31 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
     findings.push(makeFinding("HIGH_GRADE_OR_2_TO_1_AV_BLOCK", [`AV block pattern: ${avb}`]));
   } else if (["mobitz_1", "mobitz_i", "wenckebach", "type_1"].includes(avb) || ecg.progressive_pr_prolongation) {
     findings.push(makeFinding("MOBITZ_I_AV_BLOCK", ["Progressive PR lengthening followed by dropped QRS"]));
-  } else if (prMs != null && prMs >= intCfg.pr.first_degree_avb_min_ms) {
+  } else if (prMs != null ? prMs >= intCfg.pr.first_degree_avb_min_ms : prProlongedCat) {
     hasFirstDeg = true;
-    findings.push(makeFinding("FIRST_DEGREE_AV_BLOCK", [`PR = ${prMs} ms (> ${intCfg.pr.normal_max_ms} ms)`]));
+    findings.push(
+      makeFinding("FIRST_DEGREE_AV_BLOCK", [prMs != null ? `PR = ${prMs} ms (> ${intCfg.pr.normal_max_ms} ms)` : "Prolonged PR interval (as supplied, value not stated)"])
+    );
   }
   const hasSpecificAvBlock = findings.some((f) =>
     ["COMPLETE_HEART_BLOCK", "MOBITZ_II_AV_BLOCK", "HIGH_GRADE_OR_2_TO_1_AV_BLOCK", "MOBITZ_I_AV_BLOCK"].includes(f.code)
   );
 
   // ---- Bundle branch / fascicular ----------------------------------------
-  const wideQrs = qrsMs != null && qrsMs >= intCfg.qrs.wide_qrs_min_ms;
+  const wideQrs = qrsMs != null ? qrsMs >= intCfg.qrs.wide_qrs_min_ms : ecg.qrs_width_class === "wide";
+  const qrsText = qrsMs != null ? `QRS = ${qrsMs} ms` : "Wide QRS (as supplied, duration not stated)";
   const morph = (ecg.qrs_morphology || "").toLowerCase();
+  const incompleteLike = /atypical|borderline|incomplete|partial/.test(morph); // never call these a complete BBB
+  const morphRbbb = morph.includes("rbbb") && !incompleteLike;
+  const morphLbbb = morph.includes("lbbb") && !incompleteLike;
   let hasRbbb = false;
   let hasLbbb = false;
-  if (wideQrs && (morph === "rbbb" || (ecg.rsr_prime_v1 && ecg.wide_s_i_v6))) {
+  if (wideQrs && (morphRbbb || (ecg.rsr_prime_v1 && ecg.wide_s_i_v6))) {
     hasRbbb = true;
-    findings.push(makeFinding("RBBB", [`QRS = ${qrsMs} ms`, "rSR' in V1-V2 & wide S in I/V6"]));
-  } else if (wideQrs && (morph === "lbbb" || (ecg.broad_monophasic_r_lateral && ecg.deep_qs_v1))) {
+    findings.push(makeFinding("RBBB", [qrsText, "rSR' in V1-V2 & wide S in I/V6"]));
+  } else if (wideQrs && (morphLbbb || (ecg.broad_monophasic_r_lateral && ecg.deep_qs_v1))) {
     hasLbbb = true;
-    findings.push(makeFinding("LBBB", [`QRS = ${qrsMs} ms`, "Broad notched R in I/aVL/V5-V6 & deep QS in V1"]));
+    findings.push(makeFinding("LBBB", [qrsText, "Broad notched R in I/aVL/V5-V6 & deep QS in V1"]));
   }
   const hasLafb = Boolean(ecg.lafb) || (axisDeg != null && axisDeg >= axisCfg.lafb_min && axisDeg <= axisCfg.lafb_max);
   const hasLpfb = Boolean(ecg.lpfb);
@@ -403,10 +451,14 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
 
   // ---- Rhythm -------------------------------------------------------------
   const rhythmHint = (ecg.rhythm_type || "").toLowerCase();
-  const regular: boolean | undefined = ecg.rhythm_regular; // undefined = NOT assessed (never "regular by default")
-  const pPresent: boolean | undefined = ecg.p_waves_present; // undefined = NOT assessed
+  // undefined = NOT assessed (never "regular by default")
+  const regular: boolean | undefined =
+    ecg.rhythm_regular ?? (ecg.rhythm_class === "regular" ? true : ecg.rhythm_class === "irregularly_irregular" || ecg.rhythm_class === "pauses" ? false : undefined);
+  const pPresent: boolean | undefined =
+    ecg.p_waves_present ?? (ecg.p_wave_status === "present" ? true : ecg.p_wave_status === "absent" ? false : undefined);
   const isRegular = regular === true;
-  const isIrregular = regular === false;
+  // "pauses" (dropped beats on an otherwise regular rhythm) is NOT an irregularly-irregular rhythm
+  const isIrregular = regular === false && rrPattern !== "pauses";
 
   if (["vf", "ventricular_fibrillation", "asystole"].includes(rhythmHint)) {
     findings.push(makeFinding("VF_OR_ASYSTOLE", [`Arrest rhythm: ${rhythmHint.toUpperCase()}`]));
@@ -424,9 +476,11 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
     const ev = ["Irregular wide-complex tachycardia with pre-excitation"];
     if (ecg.shortest_rr_ms) ev.push(`Shortest RR = ${ecg.shortest_rr_ms} ms`);
     findings.push(makeFinding("PREEXCITED_AF", ev));
+    if (ecg.delta_wave) findings.push(makeFinding("WPW_PATTERN", ["Delta wave present (accessory pathway)"]));
   } else {
-    if ((hr != null && hr >= arrCfg.wct_vt_criteria.min_rate_bpm && wideQrs && isRegular) || ["vt", "ventricular_tachycardia", "monomorphic_vt"].includes(rhythmHint)) {
-      const vtEv = [`Regular WCT: HR = ${hr} bpm, QRS = ${qrsMs} ms`];
+    const regularWct = hr != null && hr >= arrCfg.wct_vt_criteria.min_rate_bpm && wideQrs && isRegular;
+    if (regularWct || ["vt", "ventricular_tachycardia", "monomorphic_vt"].includes(rhythmHint) || ecg.polymorphic_vt) {
+      const vtEv = regularWct ? [`Regular WCT: HR = ${hr} bpm, ${qrsText}`] : [ecg.polymorphic_vt ? "Polymorphic VT (as supplied; QT not prolonged or not stated)" : "Ventricular tachycardia (as supplied)"];
       if (ecg.av_dissociation) vtEv.push("AV dissociation present");
       if (ecg.capture_or_fusion_beats) vtEv.push("Capture/fusion beats present");
       if (ecg.precordial_concordance) vtEv.push(`Precordial concordance (${ecg.precordial_concordance})`);
@@ -466,16 +520,15 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
       isRegular &&
       hr != null &&
       hr >= arrCfg.svt.min_rate_bpm &&
-      qrsMs != null &&
-      qrsMs <= arrCfg.svt.max_qrs_ms &&
+      (qrsMs != null ? qrsMs <= arrCfg.svt.max_qrs_ms : ecg.qrs_width_class === "narrow") &&
       (pPresent === false || ecg.retrograde_p_waves || ["svt", "avnrt", "avrt", "psvt"].includes(rhythmHint))
     ) {
-      const ev = [`Regular narrow-complex tachycardia: HR = ${hr} bpm, QRS = ${qrsMs} ms`];
+      const ev = [`Regular narrow-complex tachycardia: HR = ${hr} bpm, QRS ${qrsMs != null ? `= ${qrsMs} ms` : "narrow (as supplied)"}`];
       if (ecg.rp_interval_ms != null) {
         ev.push(`RP = ${ecg.rp_interval_ms} ms (${ecg.rp_interval_ms < arrCfg.svt.avnrt_short_rp_max_ms ? "AVNRT likely" : "AVRT/AT likely"})`);
       }
       findings.push(makeFinding("SVT_NARROW", ev));
-    } else if (isIrregular && ecg.rr_pattern === "irregularly_irregular" && pPresent !== true) {
+    } else if (isIrregular && rrPattern === "irregularly_irregular" && pPresent !== true) {
       findings.push(
         makeFinding("IRREGULAR_RHYTHM_UNSPECIFIED", [
           "RR intervals irregularly irregular (no repeating pattern)",
@@ -484,14 +537,14 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
       );
     }
 
-    if (ecg.rr_pattern === "pauses" && !hasSpecificAvBlock) {
+    if (rrPattern === "pauses" && !hasSpecificAvBlock) {
       findings.push(makeFinding("PAUSES_POSSIBLE_AV_BLOCK", ["Pauses of ~2x the basic RR interval", "PR trend before the pauses inconclusive"]));
     }
 
-    if (ecg.delta_wave || (prMs != null && prMs <= intCfg.pr.short_pr_max_ms && wideQrs)) {
+    if (ecg.delta_wave || ((prMs != null ? prMs <= intCfg.pr.short_pr_max_ms : prShortCat) && wideQrs)) {
       const ev: string[] = [];
       if (prMs != null) ev.push(`PR = ${prMs} ms`);
-      if (qrsMs != null) ev.push(`QRS = ${qrsMs} ms`);
+      ev.push(qrsText);
       if (ecg.delta_wave) ev.push("Delta wave present");
       findings.push(makeFinding("WPW_PATTERN", ev));
     }
@@ -508,7 +561,7 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
 
   // ---- ST / ischemia (only when per-lead ST values were supplied) ---------
   const stMap = ecg.st_elevation_mm || {};
-  const hasStData = Object.keys(stMap).length > 0;
+  const hasStData = Object.keys(stMap).length > 0 || catElev.size > 0 || catDep.size > 0;
   if (hasLbbb || isPaced) {
     const sg = stCfg.sgarbossa_lbbb_or_paced;
     let score = 0;
@@ -531,15 +584,36 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
     }
   } else if (hasStData) {
     const stdLeadsAll = criteria.lead_groups_and_territories.all_standard_leads as string[];
-    const elevatedStd = stdLeadsAll.filter((ld) => ld !== "aVR" && (stMap[ld] ?? 0) >= stThreshold(ld, ecg.age, ecg.sex));
-    const depressedNonAvrV1 = Object.entries(stMap).filter(([ld, v]) => ld !== "aVR" && ld !== "V1" && v <= stCfg.nstemi_ischemia_st_depression_mm);
+    const elevatedStd = stdLeadsAll.filter((ld) => ld !== "aVR" && ((stMap[ld] ?? 0) >= stThreshold(ld, ecg.age, ecg.sex) || catElev.has(ld)));
+    const depressedNonAvrV1 = Array.from(
+      new Set([
+        ...Object.entries(stMap)
+          .filter(([ld, v]) => ld !== "aVR" && ld !== "V1" && v <= stCfg.nstemi_ischemia_st_depression_mm)
+          .map(([ld]) => ld),
+        ...Array.from(catDep).filter((ld) => ld !== "aVR" && ld !== "V1"),
+      ])
+    );
+    const erLeads = ecg.early_repolarization_leads ?? [];
+    const isEarlyRepol = erLeads.length >= 3 && depressedNonAvrV1.length === 0 && !ecg.pr_depression;
+    // Brugada morphology confined to V1-V3 explains that elevation: do not call it STEMI.
+    const brugadaOnly =
+      (brugNorm === "type_1" || brugNorm === "type_2") && elevatedStd.length > 0 && elevatedStd.every((ld) => ["V1", "V2", "V3"].includes(ld));
     const peric = arrCfg.pericarditis;
     const isPericarditis =
       elevatedStd.length >= peric.min_diffuse_ste_leads &&
       depressedNonAvrV1.length === 0 &&
       (Boolean(ecg.st_morphology_concave) || Boolean(ecg.pr_depression) || (ecg.v6_st_t_ratio ?? 0) > peric.st_t_ratio_v6_min);
 
-    if (isPericarditis) {
+    if (isEarlyRepol) {
+      findings.push(
+        makeFinding("EARLY_REPOLARIZATION", [
+          `Diffuse ST elevation in ${erLeads.length} leads (${erLeads.join(", ")}) without reciprocal ST depression`,
+          "Differential: STEMI and acute pericarditis (correlate with symptoms / old ECG)",
+        ])
+      );
+    } else if (brugadaOnly) {
+      // handled by the Brugada rule below
+    } else if (isPericarditis) {
       findings.push(
         makeFinding("ACUTE_PERICARDITIS", [
           `Diffuse concave STE in ${elevatedStd.length} leads (${elevatedStd.join(", ")}) without reciprocal STD`,
@@ -548,9 +622,14 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
       );
     } else {
       const avrSte = stMap["aVR"] ?? 0;
-      const depLeads = Object.entries(stMap)
-        .filter(([ld, v]) => ld !== "aVR" && v <= stCfg.nstemi_ischemia_st_depression_mm)
-        .map(([ld]) => ld);
+      const depLeads = Array.from(
+        new Set([
+          ...Object.entries(stMap)
+            .filter(([ld, v]) => ld !== "aVR" && v <= stCfg.nstemi_ischemia_st_depression_mm)
+            .map(([ld]) => ld),
+          ...Array.from(catDep).filter((ld) => ld !== "aVR"),
+        ])
+      );
       if (avrSte >= stCfg.lmca_avr_ste_min_mm && depLeads.length >= stCfg.lmca_diffuse_std_min_leads) {
         findings.push(makeFinding("LMCA_OCCLUSION", [`aVR STE +${avrSte} mm`, `Diffuse STD in ${depLeads.length} leads (${depLeads.join(", ")})`]));
       }
@@ -559,21 +638,26 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
       const stEv: string[] = [];
       for (const tName of ["septal", "anterior", "lateral_low_apical", "lateral_high", "inferior"]) {
         const t = territories[tName];
-        const qual = (t.leads as string[]).filter((ld) => (stMap[ld] ?? 0) >= stThreshold(ld, ecg.age, ecg.sex));
+        const qual = (t.leads as string[]).filter((ld) => (stMap[ld] ?? 0) >= stThreshold(ld, ecg.age, ecg.sex) || catElev.has(ld));
         if (qual.length >= t.min_contiguous_leads) {
-          const recip = (t.reciprocal_leads as string[]).filter((rl) => (stMap[rl] ?? 0) <= stCfg.nstemi_ischemia_st_depression_mm);
+          const recip = (t.reciprocal_leads as string[]).filter((rl) => (stMap[rl] ?? 0) <= stCfg.nstemi_ischemia_st_depression_mm || catDep.has(rl));
           let artery = t.artery;
           if (tName === "inferior") {
-            artery = (stMap["III"] ?? 0) > (stMap["II"] ?? 0) ? "RCA (STE III > II)" : "LCx likely (STE II >= III)";
+            artery =
+              stMap["III"] === undefined || stMap["II"] === undefined
+                ? "RCA or LCx (magnitudes not stated)"
+                : stMap["III"] > stMap["II"]
+                  ? "RCA (STE III > II)"
+                  : "LCx likely (STE II >= III)";
           }
           stEv.push(
-            `[${tName.toUpperCase()}] ${qual.map((ld) => `${ld} (+${stMap[ld]}mm)`).join(", ")} | Artery: ${artery}${
+            `[${tName.toUpperCase()}] ${qual.map((ld) => `${ld} (${stMap[ld] !== undefined ? `+${stMap[ld]}mm` : "elevation, magnitude not stated"})`).join(", ")} | Artery: ${artery}${
               recip.length ? ` | Reciprocal STD: ${recip.join(", ")}` : ""
             }`
           );
         }
       }
-      if (stEv.length > 0) findings.push(makeFinding("STEMI", stEv));
+      if (stEv.length > 0 && !brugadaOnly) findings.push(makeFinding("STEMI", stEv));
 
       const postLeads = ["V7", "V8", "V9"].filter((ld) => (stMap[ld] ?? 0) >= stThreshold(ld, ecg.age, ecg.sex));
       const v1v3Std = ["V1", "V2", "V3"].filter((ld) => stMap[ld] != null && stMap[ld]! <= stCfg.posterior_mi_v1_v3_st_depression_mm);
@@ -594,7 +678,7 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
       const wType = (ecg.wellens_pattern || "").toLowerCase();
       if (["type_a", "type_b", "biphasic", "deep_symmetric"].includes(wType)) {
         findings.push(makeFinding("WELLENS_SYNDROME", [`Wellens ${wType.toUpperCase()} T-wave pattern in V2-V3/V4`]));
-      } else if (stEv.length === 0 && !findings.some((f) => ["LMCA_OCCLUSION", "POSTERIOR_STEMI"].includes(f.code))) {
+      } else if (stEv.length === 0 && !hcmFlag && !findings.some((f) => ["LMCA_OCCLUSION", "POSTERIOR_STEMI"].includes(f.code))) {
         const tInv = ecg.t_wave_inversion_leads || [];
         if (depLeads.length >= 2 || tInv.length >= 2) {
           findings.push(
@@ -624,7 +708,7 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
 
   // ---- Morphology / metabolic / structural (fire only on supplied data) ----
   const v1v2Ste = Math.max(stMap["V1"] ?? 0, stMap["V2"] ?? 0);
-  const brug = (ecg.brugada_pattern || "").toLowerCase();
+  const brug = brugNorm;
   if (brug === "type_1" || (ecg.coved_ste_v1_v2 && v1v2Ste >= arrCfg.brugada.type1_coved_ste_min_mm)) {
     findings.push(makeFinding("BRUGADA_TYPE_1", [`Coved STE ${v1v2Ste} mm in V1-V2`]));
   } else if (brug === "type_2" || (ecg.saddleback_ste_v1_v2 && v1v2Ste >= arrCfg.brugada.type2_saddleback_ste_min_mm)) {
@@ -665,8 +749,16 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
   const sokolow = (ecg.s_v1_mm ?? 0) + Math.max(ecg.r_v5_mm ?? 0, ecg.r_v6_mm ?? 0);
   const cornell = (ecg.r_avl_mm ?? 0) + (ecg.s_v3_mm ?? 0);
   const cornellCut = (ecg.sex || "").toLowerCase() === "female" ? hypCfg.lvh.cornell_female_ravl_plus_sv3_mm : hypCfg.lvh.cornell_male_ravl_plus_sv3_mm;
-  if (sokolow >= hypCfg.lvh.sokolow_lyon_sv1_plus_rv5_or_rv6_mm || cornell > cornellCut || (ecg.r_avl_mm ?? 0) >= hypCfg.lvh.r_avl_min_mm) {
-    findings.push(makeFinding("LVH", [`Sokolow-Lyon = ${sokolow} mm, Cornell = ${cornell} mm`]));
+  if (ecg.lvh_voltage || sokolow >= hypCfg.lvh.sokolow_lyon_sv1_plus_rv5_or_rv6_mm || cornell > cornellCut || (ecg.r_avl_mm ?? 0) >= hypCfg.lvh.r_avl_min_mm) {
+    findings.push(
+      makeFinding("LVH", [ecg.lvh_voltage && sokolow === 0 && cornell === 0 ? "LVH voltage criteria met (as supplied)" : `Sokolow-Lyon = ${sokolow} mm, Cornell = ${cornell} mm`])
+    );
+  }
+  if (hcmFlag) {
+    const tInvLeads = ecg.t_wave_inversion_leads ?? [];
+    findings.push(
+      makeFinding("HCM_PATTERN", [`LVH voltage with T-wave inversion in ${tInvLeads.length} leads (${tInvLeads.join(", ")})`, "Differential: ischemia, other cardiomyopathies"])
+    );
   }
   if (((ecg.v1_r_to_s_ratio ?? 0) > hypCfg.rvh.v1_r_to_s_ratio_min || (ecg.r_v1_mm ?? 0) >= hypCfg.rvh.v1_r_amplitude_min_mm) && axisDeg != null && axisDeg >= hypCfg.rvh.rad_min_degrees) {
     findings.push(makeFinding("RVH", [`Dominant R in V1 (${ecg.r_v1_mm ?? "?"} mm), Axis = ${axisDeg}°`]));
@@ -679,19 +771,19 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
   // ---- What was (not) assessed ----------------------------------------------
   const notAssessed: string[] = [];
   if (hr == null) notAssessed.push("Heart rate");
-  if (ecg.rhythm_regular === undefined) notAssessed.push("Rhythm regularity");
-  if (ecg.p_waves_present === undefined) notAssessed.push("P waves");
-  if (prMs == null) notAssessed.push("PR interval");
-  if (qrsMs == null) notAssessed.push("QRS duration");
+  if (regular === undefined) notAssessed.push("Rhythm regularity");
+  if (pPresent === undefined) notAssessed.push("P waves");
+  if (prMs == null && !ecg.pr_class) notAssessed.push("PR interval");
+  if (qrsMs == null && !ecg.qrs_width_class) notAssessed.push("QRS duration");
   if (qtMs == null) notAssessed.push("QT/QTc");
-  if (axisDeg == null) notAssessed.push("Electrical axis");
+  if (axisDeg == null && !ecg.axis_class) notAssessed.push("Electrical axis");
   if (!hasStData) notAssessed.push("ST segment (per lead)");
   if (!ecg.qrs_morphology && ecg.rsr_prime_v1 === undefined && ecg.broad_monophasic_r_lateral === undefined) notAssessed.push("QRS morphology (BBB/fascicular)");
 
   // ---- Empty result: never silently "normal" ----------------------------------
   if (findings.length === 0) {
     const nsrAssessable =
-      hr != null && hr >= (hrCfg?.normal_min_bpm ?? 60) && hr <= (hrCfg?.normal_max_bpm ?? 100) && isRegular && pPresent === true && prMs != null && qrsMs != null;
+      hr != null && hr >= (hrCfg?.normal_min_bpm ?? 60) && hr <= (hrCfg?.normal_max_bpm ?? 100) && isRegular && pPresent === true && (prMs != null || ecg.pr_class === "normal") && (qrsMs != null || ecg.qrs_width_class === "narrow");
     if (nsrAssessable) {
       findings.push(
         makeFinding("NORMAL_SINUS_RHYTHM", [`HR = ${hr} bpm`, `PR = ${prMs} ms`, `QRS = ${qrsMs} ms`, ...(qtc.primary != null ? [`QTc = ${qtc.primary} ms`] : [])])

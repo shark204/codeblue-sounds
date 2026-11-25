@@ -1,0 +1,4643 @@
+{
+  "metadata": {
+    "schema_version": "2.0",
+    "books": [
+      "ECG_Masters collection v2 @cardiobooks (2).pdf",
+      "ECG_Masters collection v1 @cardiobooks (2).pdf"
+    ],
+    "total_cases": 40,
+    "cases_per_book": {
+      "ECG_Masters collection v2 @cardiobooks (2).pdf": 20,
+      "ECG_Masters collection v1 @cardiobooks (2).pdf": 20
+    },
+    "case_type_counts": {
+      "static_12lead": 14,
+      "dynamic_holter_telemetry": 12,
+      "exercise": 1,
+      "context_dependent": 11,
+      "ep_study": 2
+    },
+    "urgency_counts": {
+      "emergent": 17,
+      "routine": 4,
+      "urgent": 19
+    },
+    "diagnoses_with_lt_5_cases": [
+      "ACUTE_PERICARDITIS",
+      "ARTIFACT_LEAD_FAULT",
+      "ARVD_C_PATTERN",
+      "ATHLETE_HEART",
+      "ATRIAL_FIBRILLATION",
+      "ATRIAL_FLUTTER",
+      "BIFASCICULAR_BLOCK",
+      "BRUGADA_PATTERN_DRUG_INDUCED",
+      "BRUGADA_TYPE_1",
+      "EARLY_REPOLARIZATION",
+      "FIRST_DEGREE_AV_BLOCK",
+      "HCM_PATTERN",
+      "HIGH_GRADE_OR_2_TO_1_AV_BLOCK",
+      "HYPERKALEMIA",
+      "HYPERKALEMIA_SEVERE",
+      "INTERATRIAL_BLOCK_ADVANCED",
+      "LBBB",
+      "LMCA_OCCLUSION",
+      "LONG_QT",
+      "LONG_QT_CRITICAL",
+      "LVH",
+      "MOBITZ_I_AV_BLOCK",
+      "PACEMAKER_DEMAND_INHIBITION",
+      "PACEMAKER_RHYTHM",
+      "PAUSE_DEPENDENT_HIS_PURKINJE_BLOCK",
+      "POSTERIOR_STEMI",
+      "PREEXCITED_AF",
+      "RBBB",
+      "SHORT_QT",
+      "STEMI",
+      "SVT_NARROW",
+      "TAKOTSUBO_CARDIOMYOPATHY",
+      "TORSADES_DE_POINTES",
+      "VAGAL_AV_BLOCK_BENIGN",
+      "VENTRICULAR_TACHYCARDIA",
+      "WPW_PATTERN"
+    ],
+    "mean_completeness": 0.235,
+    "max_ngram_overlap_words": 9,
+    "rules_engine_consistency": {
+      "exact_match": 12,
+      "partial_vocab": 6,
+      "mismatch_breakdown": {
+        "vocabulary_mismatch": 13,
+        "dynamic_case": 5,
+        "missing_feature": 10
+      }
+    },
+    "step_d_leave_one_out_retrieval": {
+      "precision_at_3_overall": 0.575,
+      "precision_at_3_when_matched": 0.622,
+      "no_close_match_threshold": 0.25,
+      "no_close_match_triggered": "3/40 (7.5%)",
+      "optimism_caveat": "Leave-one-out numbers are optimistic because all cases come from the same two textbook volumes."
+    }
+  },
+  "cases": [
+    {
+      "case_id": "v2_case_10_1",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 147,
+        "page_end": 150,
+        "figure_ref": "Figure 10.1.1"
+      },
+      "clinical_context": {
+        "age": 49,
+        "sex": "female",
+        "presentation": "Anginal chest pain, dizziness, and cardiogenic shock",
+        "relevant_history": [
+          "Hypertension",
+          "Dyslipidemia"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "I",
+          "aVL",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6"
+        ],
+        "st_depression_leads": [
+          "II",
+          "III",
+          "aVF"
+        ],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": "left",
+        "brugada_pattern": null,
+        "qrs_morphology": "RBBB+LAFB",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": true,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Transmural ST elevation across I, aVL, and V2-V6 sparing V1 and aVR",
+        "Mirror-image ST depression in inferior leads II, III, and aVF",
+        "Right bundle branch block paired with left anterior fascicular block"
+      ],
+      "final_diagnosis": "Acute total left main trunk (LMT) coronary occlusion with STEMI pattern",
+      "diagnosis_label_free_text": "Acute total left main trunk occlusion (anterolateral STEMI with RBBB and LAFB)",
+      "diagnosis_codes": [
+        "STEMI",
+        "LMCA_OCCLUSION",
+        "BIFASCICULAR_BLOCK"
+      ],
+      "differential": [
+        "Proximal LAD occlusion with large conal branch protecting high septum",
+        "Circumferential subendocardial LMT subtotal occlusion"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Excluding total LMT occlusion because V1 and aVR lack ST elevation",
+          "why_it_misleads": "Per source text, concomitant LCX involvement generates ST depression in V1 and aVR that attenuates septal ST elevation",
+          "how_to_avoid": "Suspect total LMT occlusion when anterolateral STEMI with RBBB/LAFB spares V1 and aVR in shock",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Total LMT occlusion frequently presents with cardiogenic shock or arrest (70%) and RBBB with LAFB (60%)",
+        "Lack of ST changes in V1 and aVR separates total LMT occlusion from most proximal LAD occlusions"
+      ],
+      "next_steps": [
+        "Emergency coronary angiography and primary PCI",
+        "Urgent hemodynamic stabilization for cardiogenic shock"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_2_2",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 33,
+        "page_end": 34,
+        "figure_ref": "Figure 2.2.1; Figure 2.2.2"
+      },
+      "clinical_context": {
+        "age": 21,
+        "sex": "female",
+        "presentation": "Intermittent palpitations without dizziness or loss of consciousness",
+        "relevant_history": [
+          "Collegiate rower",
+          "Normal echo, cardiac MRI, and stress test",
+          "No medications"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": "Normal laboratory tests"
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": "pauses",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": "complete",
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": 56,
+          "pr_ms": null,
+          "qrs_ms": 80,
+          "qt_ms": 405,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {
+            "hr_bpm": "patient_measurement",
+            "qrs_ms": "patient_measurement",
+            "qt_ms": "patient_measurement"
+          },
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "narrow",
+          "pr_class": null,
+          "rhythm_class": "pauses",
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": "pauses",
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": "complete",
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Baseline 12-lead ECG shows sinus bradycardia (56 bpm), QRS 80 ms, QT 405 ms, and marked sinus arrhythmia",
+        "Ambulatory strip captures gradual rate slowing before complete AV block with a 7.8 s pause (range 4-13.6 s overnight) while atrial rate stays slow"
+      ],
+      "final_diagnosis": "Asymptomatic nocturnal autonomic-mediated paroxysmal complete AV block in a healthy athlete",
+      "diagnosis_label_free_text": "Benign autonomic nocturnal paroxysmal complete AV block in an athlete",
+      "diagnosis_codes": [
+        "VAGAL_AV_BLOCK_BENIGN",
+        "ATHLETE_HEART"
+      ],
+      "differential": [
+        "Intrinsic His-Purkinje conduction disease",
+        "Sleep-apnea-related nocturnal AV block"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Implanting a pacemaker solely for long nocturnal pauses in an asymptomatic athlete",
+          "why_it_misleads": "Per source text, gradual slowing and slow atrial rate during block strongly favor an autonomic etiology",
+          "how_to_avoid": "Evaluate daytime symptoms, exercise response, and atrial rate slowing before considering pacing",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Gradual rate slowing and slow atrial rate during AV block strongly favor an autonomic cause",
+        "No pacemaker or sports restriction was deemed indicated given absence of daytime symptoms"
+      ],
+      "next_steps": [
+        "Routine follow-up without pacemaker implantation or sports restriction while asymptomatic"
+      ],
+      "urgency": "routine",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_2_1",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 25,
+        "page_end": 30,
+        "figure_ref": "Figure 2.1.1"
+      },
+      "clinical_context": {
+        "age": 84,
+        "sex": "male",
+        "presentation": "10-day recurrent syncope (Panel B); paired with 68yo woman 3 days post-AVR (Panel A)",
+        "relevant_history": [
+          "Admitted for recurrent syncope"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": "pauses",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "LBBB / bilateral BBB",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "SVT/atrial tachycardia terminates into a 1440 ms pause followed by a blocked sinus beat",
+        "Subsequent sinus P wave conducts with LBBB (Panel A) or bilateral BBB (Panel B)"
+      ],
+      "final_diagnosis": "Pause-dependent (deceleration-dependent) His-Purkinje conduction block",
+      "diagnosis_label_free_text": "Pause-dependent / deceleration-dependent bundle branch and AV conduction block",
+      "diagnosis_codes": [
+        "PAUSE_DEPENDENT_HIS_PURKINJE_BLOCK",
+        "LBBB"
+      ],
+      "differential": [
+        "His-Purkinje system fatigue phenomenon",
+        "Vagal stimulation"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Mistaking pause-dependent His-Purkinje block for vagal slowing",
+          "why_it_misleads": "Per source text, block occurs after heart-rate deceleration and pauses in a diseased His-Purkinje system",
+          "how_to_avoid": "Identify conduction block appearing immediately after post-tachycardia pauses",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Pause-dependent block reflects pathological behavior of a diseased His-Purkinje system"
+      ],
+      "next_steps": [
+        "Continuous telemetry monitoring",
+        "Urgent electrophysiology evaluation for pacing"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_2_3",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 36,
+        "page_end": 37,
+        "figure_ref": "Figure 2.3.1"
+      },
+      "clinical_context": {
+        "age": 67,
+        "sex": "female",
+        "presentation": "Abrupt unheralded collapse with minor scalp laceration, recovery <30 s",
+        "relevant_history": [
+          "Similar collapse 1 year prior",
+          "No cardioactive medications",
+          "Normal baseline ECG and echo"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "narrow",
+        "pr_class": null,
+        "rhythm_class": "pauses",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": "high_grade",
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "narrow",
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "narrow",
+          "pr_class": null,
+          "rhythm_class": "pauses",
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": "high_grade",
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Narrow-QRS sinus rhythm (initial PP 860 ms) abruptly transitions to symptomatic high-grade AV block",
+        "PP intervals progressively shorten during block before returning toward baseline as block resolves"
+      ],
+      "final_diagnosis": "Symptomatic paroxysmal high-grade AV block",
+      "diagnosis_label_free_text": "Paroxysmal high-grade AV block with progressive PP shortening",
+      "diagnosis_codes": [
+        "HIGH_GRADE_OR_2_TO_1_AV_BLOCK"
+      ],
+      "differential": [
+        "Vagally mediated AV block"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming normal resting ECG and echo exclude serious arrhythmic syncope",
+          "why_it_misleads": "Resting tracings appear normal between paroxysmal episodes",
+          "how_to_avoid": "Monitor ED telemetry for abrupt high-grade AV block accompanied by PP-interval shortening",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Progressive PP shortening during high-grade AV block distinguishes abrupt intrinsic block from vagal slowing"
+      ],
+      "next_steps": [
+        "Inpatient telemetry with backup pacing readiness",
+        "Urgent permanent pacemaker assessment"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_2_5",
+      "case_type": "exercise",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 40,
+        "page_end": 42,
+        "figure_ref": "Figure 2.5.1; Figure 2.5.2; Figure 2.5.3"
+      },
+      "clinical_context": {
+        "age": 64,
+        "sex": "male",
+        "presentation": "New exertional dyspnea; HR rose to 113 bpm during Bruce stage II then abruptly dropped to 75 bpm",
+        "relevant_history": [
+          "Baseline right bundle branch conduction delay/block"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 75,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement"
+        },
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": "regular",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "RBBB",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": "2:1",
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": "RBBB",
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "event",
+          "hr_bpm": 75,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {
+            "hr_bpm": "patient_measurement"
+          },
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": "regular",
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": "RBBB",
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": "2:1",
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Baseline resting RBBB",
+        "During Bruce stage II, ventricular rate abruptly drops from 113 bpm to 75 bpm due to 2:1 AV block with P waves buried in T waves"
+      ],
+      "final_diagnosis": "Exercise-induced infranodal 2:1 AV block",
+      "diagnosis_label_free_text": "Exercise-induced infranodal 2:1 AV block with baseline RBBB",
+      "diagnosis_codes": [
+        "HIGH_GRADE_OR_2_TO_1_AV_BLOCK",
+        "RBBB"
+      ],
+      "differential": [
+        "AV nodal conduction disease"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Treating exercise-induced 2:1 AV block as benign AV nodal disease",
+          "why_it_misleads": "Per source text, AV nodal conduction improves with catecholamines and vagal withdrawal, whereas worsening block during exercise localizes below the AV node",
+          "how_to_avoid": "Search T waves for buried P waves whenever heart rate abruptly halves during exercise",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Exercise-induced heart block indicates disease below the AV node with higher risk of complete heart block"
+      ],
+      "next_steps": [
+        "Stop exercise test and arrange urgent electrophysiology consult",
+        "Evaluate for permanent pacemaker implantation"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_2_6",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 43,
+        "page_end": 44,
+        "figure_ref": "Figure 2.6.1"
+      },
+      "clinical_context": {
+        "age": 76,
+        "sex": "male",
+        "presentation": "Syncope associated with bradycardia",
+        "relevant_history": [
+          "10-year hypertension",
+          "No ischemic heart disease",
+          "No AV nodal blocking agents"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": 260,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "pr_ms": "patient_measurement"
+        },
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": "variable",
+        "rhythm_class": "pauses",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": "mobitz_1",
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "First P wave conducts at PR 260 ms, second is blocked, third conducts at PR 524 ms",
+        "Fourth and fifth P waves are blocked (lower then upper AV node) before sixth resets to PR 260 ms"
+      ],
+      "final_diagnosis": "Wenckebach periods of alternate beats (two-level AV nodal block)",
+      "diagnosis_label_free_text": "Alternating Wenckebach periods (two-level AV nodal block)",
+      "diagnosis_codes": [
+        "MOBITZ_I_AV_BLOCK",
+        "HIGH_GRADE_OR_2_TO_1_AV_BLOCK"
+      ],
+      "differential": [
+        "Complete heart block",
+        "Mobitz type II AV block"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Misclassifying two consecutive blocked P waves as complete heart block or Mobitz II",
+          "why_it_misleads": "Per source text, block occurs at two levels (lower and upper AV node), producing alternating Wenckebach PR prolongation (260 to 524 ms)",
+          "how_to_avoid": "Measure PR intervals across conducted alternate beats to spot the progressive prolongation and reset",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Two-level AV nodal block can produce Wenckebach periods of alternate beats ending in two consecutive dropped P waves"
+      ],
+      "next_steps": [
+        "Inpatient telemetry for syncope and bradycardia",
+        "Urgent cardiology pacing evaluation"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_3_4",
+      "case_type": "context_dependent",
+      "ecg_state": "baseline",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 59,
+        "page_end": 59,
+        "figure_ref": "Figure 3.4.1"
+      },
+      "clinical_context": {
+        "age": 40,
+        "sex": "female",
+        "presentation": "Cardiac arrest with sustained monomorphic LBBB-morphology VT while running",
+        "relevant_history": [
+          "Normal echo and gadolinium cardiac MRI",
+          "Negative sarcoidosis and HCM/DCM genetics"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": "Negative cardiomyopathy genetics"
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [
+          "II",
+          "III",
+          "aVF",
+          "V1",
+          "V2",
+          "V3",
+          "V4"
+        ],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": "prolonged",
+        "rhythm_class": null,
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Q waves across inferior and anterior leads",
+        "First-degree AV block on resting ECG despite normal echo and cardiac MRI"
+      ],
+      "final_diagnosis": "Inferior and anterior Q waves with 1st-degree AV block in idiopathic exercise-induced VT arrest",
+      "diagnosis_label_free_text": "Inferior/anterior Q waves and 1st-degree AV block post-monomorphic VT cardiac arrest",
+      "diagnosis_codes": [
+        "FIRST_DEGREE_AV_BLOCK",
+        "VENTRICULAR_TACHYCARDIA"
+      ],
+      "differential": [
+        "Prior myocardial infarction",
+        "Cardiac sarcoidosis",
+        "Concealed cardiomyopathy"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming normal echo and cardiac MRI make an abnormal resting ECG benign after arrest",
+          "why_it_misleads": "Absence of visible structural heart disease does not negate documented sustained VT arrest",
+          "how_to_avoid": "Correlate markedly abnormal resting Q waves and AV block with the arrest history",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Markedly abnormal resting ECGs and VT arrest can occur even when echo, gadolinium MRI, and standard genetic panels are negative"
+      ],
+      "next_steps": [
+        "Specialized electrophysiology management for secondary prevention",
+        "Restrict strenuous running pending specialist clearance"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_4_2",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 63,
+        "page_end": 64,
+        "figure_ref": "Figure 4.2.1"
+      },
+      "clinical_context": {
+        "age": 22,
+        "sex": "male",
+        "presentation": "Palpitations evaluated on 24-hour Holter during sleep",
+        "relevant_history": [
+          "Double inlet left ventricle",
+          "Intermittent ventricular preexcitation"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": "prolonged",
+        "rhythm_class": "pauses",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": true,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Nocturnal sinus rhythm with 1st-degree AV delay and no initial preexcitation",
+        "Transient AV slowing and block followed by conduction predominantly via an accessory pathway"
+      ],
+      "final_diagnosis": "Intermittent ventricular preexcitation unmasked after transient vagal AV block",
+      "diagnosis_label_free_text": "Intermittent ventricular preexcitation during sleep in double inlet left ventricle",
+      "diagnosis_codes": [
+        "WPW_PATTERN",
+        "FIRST_DEGREE_AV_BLOCK"
+      ],
+      "differential": [
+        "Ventricular escape beat",
+        "Intermittent bundle branch block"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Ruling out an accessory pathway from non-preexcited baseline sinus beats",
+          "why_it_misleads": "Per source text, transient increase in vagal tone slows/blocks AV nodal conduction and shifts activation to the accessory pathway",
+          "how_to_avoid": "Inspect nocturnal Holter pauses for sudden onset of preexcited QRS complexes",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Double inlet left ventricle carries high predisposition to both heart block and sustained atrial arrhythmias"
+      ],
+      "next_steps": [
+        "Refer to adult congenital heart disease and electrophysiology specialists"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_4_5",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 71,
+        "page_end": 72,
+        "figure_ref": "Figure 4.5.1; Figure 4.5.2"
+      },
+      "clinical_context": {
+        "age": 64,
+        "sex": "female",
+        "presentation": "2 hours of palpitations and dizziness in ED; converted by DC cardioversion",
+        "relevant_history": [
+          "Left lateral accessory pathway confirmed on EP study"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": "irregularly_irregular",
+        "p_wave_status": "absent",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "wide_preexcited",
+        "delta_wave": true,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": "irregularly_irregular",
+          "p_wave_status": "absent",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": true,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": "short",
+          "rhythm_class": null,
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": true,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Irregular wide-complex tachycardia without P waves on ED admission",
+        "Post-DC cardioversion sinus rhythm shows short PR interval and positive inferior delta waves"
+      ],
+      "final_diagnosis": "Preexcited atrial fibrillation (left lateral accessory pathway)",
+      "diagnosis_label_free_text": "Preexcited atrial fibrillation via left lateral accessory pathway",
+      "diagnosis_codes": [
+        "PREEXCITED_AF",
+        "WPW_PATTERN"
+      ],
+      "differential": [
+        "Polymorphic ventricular tachycardia",
+        "Atrial fibrillation with aberrancy"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Mistaking rapid irregular wide-complex tachycardia for routine AF",
+          "why_it_misleads": "Per source text, abnormal ventricular depolarization via an accessory pathway creates wide irregular complexes without P waves",
+          "how_to_avoid": "Use DC cardioversion when refractory/unstable and check post-conversion ECG for short PR and delta waves",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Preexcited AF features irregular rhythm, absent P waves, wide QRS, and rapid rates (>200 bpm typically)"
+      ],
+      "next_steps": [
+        "Immediate DC cardioversion if unstable or refractory",
+        "Electrophysiology referral for accessory pathway ablation"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_4_6",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 73,
+        "page_end": 75,
+        "figure_ref": "Figure 4.6.1; Figure 4.6.2; Figure 4.6.3"
+      },
+      "clinical_context": {
+        "age": 35,
+        "sex": "male",
+        "presentation": "Recurrent palpitations in ED 2 years after WPW ablation for AVRT",
+        "relevant_history": [
+          "Prior WPW catheter ablation"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": "regular",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "rate_related_IVCD",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": 52,
+          "pr_ms": 160,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {
+            "hr_bpm": "patient_measurement",
+            "pr_ms": "patient_measurement"
+          },
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": "normal",
+          "rhythm_class": "regular",
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": true,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": true,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": "regular",
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": "rate_related_IVCD",
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Preablation ECG shows sinus bradycardia (52 bpm, PR 160 ms), left atrial abnormality, and left posteroseptal WPW",
+        "Follow-up ECG shows PAC with recurrent preexcitation",
+        "ED ECG shows long-RP orthodromic AVRT with rate-related intraventricular conduction delay"
+      ],
+      "final_diagnosis": "Recurrent WPW pattern and long-RP orthodromic AVRT with rate-related IVCD",
+      "diagnosis_label_free_text": "Recurrent WPW preexcitation and orthodromic AVRT 2 years post-ablation",
+      "diagnosis_codes": [
+        "WPW_PATTERN",
+        "SVT_NARROW"
+      ],
+      "differential": [
+        "Atrial tachycardia",
+        "Atypical AVNRT"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming prior ablation permanently eliminates WPW-mediated tachycardia",
+          "why_it_misleads": "Baseline beats may appear non-preexcited until a PAC unmasks pathway recovery",
+          "how_to_avoid": "Check PACs for preexcitation and evaluate recurrent long-RP tachycardia with EP",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Accessory pathways can recover conduction years after ablation and present with recurrent AVRT"
+      ],
+      "next_steps": [
+        "Acute ED arrhythmia management",
+        "Repeat electrophysiology study and ablation evaluation"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_5_1",
+      "case_type": "context_dependent",
+      "ecg_state": "baseline",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 77,
+        "page_end": 78,
+        "figure_ref": "Figure 5.1.1"
+      },
+      "clinical_context": {
+        "age": 51,
+        "sex": "male",
+        "presentation": "Asymptomatic routine evaluation",
+        "relevant_history": [
+          "No history of heart disease"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "II",
+          "III",
+          "aVF",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6"
+        ],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": [
+          "II",
+          "III",
+          "aVF",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6"
+        ]
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "ST elevation across a majority of leads in an asymptomatic adult consistent with benign early repolarization"
+      ],
+      "final_diagnosis": "Benign early repolarization (BER) ECG pattern",
+      "diagnosis_label_free_text": "Early repolarization (BER) ECG pattern in an asymptomatic adult",
+      "diagnosis_codes": [
+        "EARLY_REPOLARIZATION"
+      ],
+      "differential": [
+        "Acute STEMI",
+        "Acute pericarditis"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Treating asymptomatic early repolarization as STEMI or assuming all early repolarization is always benign",
+          "why_it_misleads": "Widespread ST elevation overlaps with STEMI and pericarditis, while epidemiologic studies have also linked ER to serious arrhythmias",
+          "how_to_avoid": "Correlate with asymptomatic clinical status and keep as baseline reference",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "BER overlaps on ECG with STEMI and pericarditis",
+        "Observational reports link certain early repolarization patterns with malignant ventricular arrhythmias and arrest"
+      ],
+      "next_steps": [
+        "Document as baseline ECG",
+        "Advise prompt cardiology evaluation if syncope or palpitations arise"
+      ],
+      "urgency": "routine",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_5_2",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 79,
+        "page_end": 80,
+        "figure_ref": "Figure 5.2.1; Figure 5.2.2; Figure 5.2.3"
+      },
+      "clinical_context": {
+        "age": 17,
+        "sex": "female",
+        "presentation": "Repeated syncope post-cardiac arrest persisting despite anti-epileptic drugs",
+        "relevant_history": [
+          "Active epileptic focus on EEG"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "I",
+          "aVL",
+          "II",
+          "III",
+          "aVF",
+          "V4",
+          "V5",
+          "V6"
+        ],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": true,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": [
+          "I",
+          "aVL",
+          "II",
+          "III",
+          "aVF",
+          "V4",
+          "V5",
+          "V6"
+        ]
+      },
+      "ecg_inputs": [
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [
+            "I",
+            "aVL",
+            "II",
+            "III",
+            "aVF",
+            "V4",
+            "V5",
+            "V6"
+          ],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": true,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": [
+            "I",
+            "aVL",
+            "II",
+            "III",
+            "aVF",
+            "V4",
+            "V5",
+            "V6"
+          ]
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": [
+            "I",
+            "aVL",
+            "II",
+            "III",
+            "aVF",
+            "V4",
+            "V5",
+            "V6"
+          ]
+        }
+      ],
+      "ecg_findings": [
+        "Early repolarization across I, aVL, inferior, and lateral leads",
+        "Early short-coupled PVCs (210-230 bpm) in trigeminy followed by runs of polymorphic VT on loop recorder"
+      ],
+      "final_diagnosis": "Malignant early repolarization syndrome with short-coupled PVCs triggering polymorphic VT",
+      "diagnosis_label_free_text": "Early repolarization syndrome with short-coupled PVCs and polymorphic VT",
+      "diagnosis_codes": [
+        "EARLY_REPOLARIZATION",
+        "VENTRICULAR_TACHYCARDIA"
+      ],
+      "differential": [
+        "Epileptic seizures",
+        "Idiopathic polymorphic VT"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Attributing persistent post-arrest syncope solely to an epileptic EEG focus",
+          "why_it_misleads": "Arrhythmic syncope can mimic seizures when monitor misses intermittent episodes",
+          "how_to_avoid": "Use loop recording and inspect resting ECGs for inferolateral early repolarization and short-coupled PVCs",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Short-coupled PVCs on an inferolateral early repolarization pattern can trigger polymorphic VT and cardiac arrest"
+      ],
+      "next_steps": [
+        "Immediate ICU monitoring and emergent electrophysiology management",
+        "Targeted antiarrhythmic therapy and sudden-death protection"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_7_1",
+      "case_type": "ep_study",
+      "ecg_state": "post_intervention",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 87,
+        "page_end": 88,
+        "figure_ref": "Figure 7.1.1; Figure 7.1.2"
+      },
+      "clinical_context": {
+        "age": 47,
+        "sex": "male",
+        "presentation": "Recent isolated syncopal episode while jogging",
+        "relevant_history": [
+          "Previously healthy"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "V1",
+          "V2"
+        ],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [
+          "V1",
+          "V2"
+        ],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": "type_1",
+        "qrs_morphology": "RBBB",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [
+            "V1",
+            "V2"
+          ],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": "atypical_RBBB",
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [
+            "V1",
+            "V2"
+          ],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [
+            "V1",
+            "V2"
+          ],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": "type_1",
+          "qrs_morphology": "RBBB",
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Baseline ECG shows atypical RBBB with minimal ST elevation in V1 and V2",
+        "Procainamide infusion (500 mg at 10 min, 1 g at 20 min) unmasks classic coved Type 1 Brugada pattern with negative T waves in V1-V2"
+      ],
+      "final_diagnosis": "Procainamide-unmasked Type 1 Brugada ECG pattern (suspected Brugada syndrome)",
+      "diagnosis_label_free_text": "Procainamide-unmasked Type 1 Brugada syndrome in symptomatic syncope",
+      "diagnosis_codes": [
+        "BRUGADA_TYPE_1"
+      ],
+      "differential": [
+        "Atypical right bundle branch block"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Performing provocative sodium-channel blocker challenge in asymptomatic individuals or those already showing baseline Type 1 Brugada",
+          "why_it_misleads": "Per source text, additional diagnostic and prognostic value is unclear in those populations",
+          "how_to_avoid": "Limit drug challenge to symptomatic patients with non-Type 1 baseline patterns",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Procainamide infusion and recording early precordial leads 1-2 interspaces higher help unmask Type 1 Brugada"
+      ],
+      "next_steps": [
+        "Urgent electrophysiology referral for prognosis, screening, and therapy"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_7_2",
+      "case_type": "context_dependent",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 89,
+        "page_end": 90,
+        "figure_ref": "Figure 7.2.1; Figure 7.2.2; Figure 7.2.3"
+      },
+      "clinical_context": {
+        "age": 50,
+        "sex": "male",
+        "presentation": "Evaluated during cocaine intoxication and at baseline after resolution",
+        "relevant_history": [
+          "Alcohol and cocaine abuse"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": "Cocaine intoxication"
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "V1",
+          "V2"
+        ],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": "type_1",
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [
+            "V1",
+            "V2"
+          ],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": "type_1",
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "baseline",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "12-lead ECG during cocaine intoxication displays coved Type 1 Brugada ST elevation in V1 and V2",
+        "Post-resolution baseline ECG shows only mild nonspecific repolarization changes in V1-V3"
+      ],
+      "final_diagnosis": "Cocaine-induced Type 1 Brugada ECG pattern",
+      "diagnosis_label_free_text": "Drug-induced (cocaine) Type 1 Brugada ECG pattern",
+      "diagnosis_codes": [
+        "BRUGADA_PATTERN_DRUG_INDUCED"
+      ],
+      "differential": [
+        "Congenital Brugada syndrome",
+        "Cocaine-related anteroseptal ischemia"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Overlooking cocaine intoxication as a reversible trigger of Type 1 Brugada elevation",
+          "why_it_misleads": "Per source text, cocaine can induce a Type 1 Brugada pattern whose long-term clinical significance remains unknown",
+          "how_to_avoid": "Obtain toxicology history and repeat baseline ECG after intoxication resolves",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Cocaine intoxication can transiently induce a coved Type 1 Brugada pattern in V1-V2"
+      ],
+      "next_steps": [
+        "Telemetry monitoring and serial ECGs until baseline resolution",
+        "Cardiology follow-up and substance-use cessation"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_7_4",
+      "case_type": "ep_study",
+      "ecg_state": "post_intervention",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 93,
+        "page_end": 94,
+        "figure_ref": "Figure 7.4.1; Figure 7.4.2"
+      },
+      "clinical_context": {
+        "age": 45,
+        "sex": "male",
+        "presentation": "Syncopal attacks in ED",
+        "relevant_history": [
+          "No known structural cardiac disease",
+          "Family history of Brugada syndrome and sudden cardiac death"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "V1",
+          "V2"
+        ],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": "type_1",
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": 50,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": 430,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {
+            "hr_bpm": "patient_measurement",
+            "qt_ms": "patient_measurement"
+          },
+          "st_elevation_leads": [
+            "V1"
+          ],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": "borderline_RBBB",
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [
+            "V1",
+            "V2"
+          ],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": "type_1",
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Baseline ED ECG shows sinus bradycardia (50 bpm, QT 430 ms, QTc 393 ms) with borderline RBBB and slight V1 ST elevation",
+        "Ajmaline challenge unmasks typical coved ST-T changes in V1 and V2"
+      ],
+      "final_diagnosis": "Brugada syndrome unmasked by ajmaline challenge",
+      "diagnosis_label_free_text": "Ajmaline-unmasked Type 1 Brugada syndrome",
+      "diagnosis_codes": [
+        "BRUGADA_TYPE_1"
+      ],
+      "differential": [
+        "Isolated borderline RBBB"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Ruling out Brugada syndrome from one non-diagnostic ED ECG",
+          "why_it_misleads": "Per source text, diagnostic Brugada patterns can transiently normalize and require sodium-channel blocker unmasking",
+          "how_to_avoid": "Perform ajmaline challenge when syncope and family history of sudden death are present",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Ajmaline is the most commonly used sodium-channel blocker for provocative Brugada diagnosis"
+      ],
+      "next_steps": [
+        "Urgent electrophysiology evaluation for ICD and family screening"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_12_1",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 151,
+        "page_end": 152,
+        "figure_ref": "Figure 12.1.1"
+      },
+      "clinical_context": {
+        "age": 48,
+        "sex": null,
+        "presentation": "Palpitations in ED",
+        "relevant_history": [
+          "Heart failure (LVEF 25%)",
+          "Atrial fibrillation",
+          "CRT-P implanted 3 months prior",
+          "Enalapril, furosemide, metoprolol succinate"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 93,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement"
+        },
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": "regular",
+        "p_wave_status": "absent",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": true,
+        "fibrillatory_waves": true,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Coarse atrial fibrillation f waves visible in V1",
+        "Regular ventricular rhythm at 93 bpm with small pacing spikes preceding three distinct QRS morphologies"
+      ],
+      "final_diagnosis": "Coarse atrial fibrillation with regular CRT-P ventricular pacing and QRS polymorphism",
+      "diagnosis_label_free_text": "Coarse AF with regular CRT-P pacing (93 bpm) and polymorphic paced QRS",
+      "diagnosis_codes": [
+        "ATRIAL_FIBRILLATION",
+        "PACEMAKER_RHYTHM"
+      ],
+      "differential": [
+        "Polymorphic ventricular tachycardia"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Mistaking polymorphic CRT-P paced complexes for polymorphic VT",
+          "why_it_misleads": "Three varying wide QRS complexes look concerning if small pacing spikes are overlooked",
+          "how_to_avoid": "Check V1 for coarse f waves, note regular 93 bpm rate, and look for small pacing spikes before each QRS",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Atrial fibrillation can underlie a regular ventricular-paced rhythm"
+      ],
+      "next_steps": [
+        "Urgent CRT-P device interrogation",
+        "Optimize AF rate control for biventricular capture"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_12_7",
+      "case_type": "context_dependent",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 166,
+        "page_end": 168,
+        "figure_ref": "Figure 12.7.1; Figure 12.7.2"
+      },
+      "clinical_context": {
+        "age": 86,
+        "sex": "male",
+        "presentation": "Dyspnea and leg swelling (acute heart failure); suspected pacemaker malfunction",
+        "relevant_history": [
+          "Ischemic cardiomyopathy",
+          "Diabetes",
+          "COPD",
+          "ESRD",
+          "Implanted pacemaker"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 95,
+        "pr_ms": null,
+        "qrs_ms": 150,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement",
+          "qrs_ms": "patient_measurement"
+        },
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [
+          "II",
+          "III",
+          "aVF"
+        ],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": "prolonged",
+        "rhythm_class": "regular",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "RBBB",
+        "delta_wave": null,
+        "pacing_spikes": false,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "event",
+          "hr_bpm": 95,
+          "pr_ms": null,
+          "qrs_ms": 150,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {
+            "hr_bpm": "patient_measurement",
+            "qrs_ms": "patient_measurement"
+          },
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [
+            "II",
+            "III",
+            "aVF"
+          ],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": "prolonged",
+          "rhythm_class": "regular",
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": "RBBB",
+          "delta_wave": null,
+          "pacing_spikes": false,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": "prolonged",
+          "rhythm_class": null,
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": false,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Sinus rhythm at 95 bpm with right atrial enlargement and 1st-degree AV block",
+        "Complete RBBB (QRS 150 ms) and inferior Q waves without pacing spikes"
+      ],
+      "final_diagnosis": "Spontaneous sinus rhythm (95 bpm) with RAE, 1st-degree AV block, complete RBBB, and inferior Q waves (pacemaker demand inhibition)",
+      "diagnosis_label_free_text": "Pacemaker demand inhibition during spontaneous sinus rhythm (95 bpm) with 1st-degree AVB and RBBB",
+      "diagnosis_codes": [
+        "PACEMAKER_DEMAND_INHIBITION",
+        "FIRST_DEGREE_AV_BLOCK",
+        "RBBB"
+      ],
+      "differential": [
+        "True pacemaker malfunction / lead failure"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming absence of pacing spikes at 95 bpm proves pacemaker malfunction",
+          "why_it_misleads": "Spontaneous sinus rhythm above the programmed lower rate inhibits demand pacing",
+          "how_to_avoid": "Verify with electrophysiology interrogation and chest radiograph while treating acute heart failure",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Spontaneous sinus rhythm at 95 bpm normally inhibits demand ventricular pacing"
+      ],
+      "next_steps": [
+        "Treat acute heart failure",
+        "Complete formal device interrogation and chest radiograph review"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_15_10",
+      "case_type": "context_dependent",
+      "ecg_state": "baseline",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 205,
+        "page_end": 205,
+        "figure_ref": "Figure 15.10.1"
+      },
+      "clinical_context": {
+        "age": 21,
+        "sex": "male",
+        "presentation": "Asymptomatic pre-participation sports screening",
+        "relevant_history": [
+          "Professional football player"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "LBBB",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Complete left bundle branch block (LBBB) in an asymptomatic young athlete"
+      ],
+      "final_diagnosis": "Complete LBBB in an athlete (pathological finding requiring structural cardiac evaluation)",
+      "diagnosis_label_free_text": "Complete LBBB in an asymptomatic athlete requiring cardiomyopathy workup",
+      "diagnosis_codes": [
+        "LBBB"
+      ],
+      "differential": [
+        "Dilated or hypertrophic cardiomyopathy",
+        "LVNC, myocarditis, or cardiac sarcoidosis"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Dismissing complete LBBB as normal athletic training adaptation",
+          "why_it_misleads": "Complete LBBB is rare in athletes (<0.1%) and frequently marks structural cardiac disease",
+          "how_to_avoid": "Always investigate athletic LBBB with echo, cardiac MRI, and ischemia testing",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Complete LBBB occurs in <0.1% of athletes and always requires comprehensive cardiac investigation"
+      ],
+      "next_steps": [
+        "Order echocardiography, cardiac MRI, and ischemia testing",
+        "Defer competitive clearance pending cardiology workup"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_15_11",
+      "case_type": "context_dependent",
+      "ecg_state": "baseline",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 206,
+        "page_end": 206,
+        "figure_ref": "Figure 15.11.1"
+      },
+      "clinical_context": {
+        "age": 24,
+        "sex": "male",
+        "presentation": "Asymptomatic athlete screening ECG with normal initial echocardiogram",
+        "relevant_history": [
+          "Basketball player"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [
+          "II",
+          "III",
+          "aVF",
+          "V4",
+          "V5",
+          "V6"
+        ],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [
+          "II",
+          "III",
+          "aVF",
+          "V4",
+          "V5",
+          "V6"
+        ],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": true,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "ST-segment depression and deep inferolateral T-wave inversion",
+        "LVH by voltage criteria"
+      ],
+      "final_diagnosis": "Grossly abnormal athlete ECG strongly suspicious for hypertrophic cardiomyopathy (HCM)",
+      "diagnosis_label_free_text": "Pathological inferolateral T-wave inversion and ST depression suspicious for HCM",
+      "diagnosis_codes": [
+        "HCM_PATTERN",
+        "LVH"
+      ],
+      "differential": [
+        "Hypertrophic cardiomyopathy (HCM)",
+        "Other structural cardiomyopathies"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Stopping evaluation because the initial echocardiogram is normal",
+          "why_it_misleads": "ST depression and deep lateral TWI are strong predictors of HCM even before overt echo changes",
+          "how_to_avoid": "Proceed to cardiac MRI, exercise testing, ambulatory monitoring, and close longitudinal follow-up",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "ST depression and deep inferolateral T-wave inversion are never normal athletic adaptations"
+      ],
+      "next_steps": [
+        "Order cardiac MRI, exercise testing, and ambulatory monitoring",
+        "Maintain close follow-up even if initial tests are negative"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v2_case_16_1",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v2 @cardiobooks (2).pdf",
+        "page_start": 209,
+        "page_end": 210,
+        "figure_ref": "Figure 16.1.1; Figure 16.1.2"
+      },
+      "clinical_context": {
+        "age": null,
+        "sex": null,
+        "presentation": "ECG recording with widespread baseline artifacts",
+        "relevant_history": [
+          "Disconnected single limb electrode"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Artifacts present across limb and precordial leads sparing only lead II",
+        "Artifacts vanish immediately after replacing the left arm electrode"
+      ],
+      "final_diagnosis": "Disconnected left arm (LA) electrode artifact",
+      "diagnosis_label_free_text": "Left arm electrode disconnection artifact sparing lead II",
+      "diagnosis_codes": [
+        "ARTIFACT_LEAD_FAULT"
+      ],
+      "differential": [
+        "True cardiac arrhythmia",
+        "Disconnected chest electrodes"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming precordial artifacts come from loose chest electrodes or true arrhythmia",
+          "why_it_misleads": "Per source text, precordial and augmented unipolar leads connect to the Wilson central terminal, which includes the left arm electrode",
+          "how_to_avoid": "Check which bipolar lead is clean: if lead II alone is clean, replace the left arm electrode",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Lead II is independent of the left arm electrode; sparing of lead II alone localizes disconnection to LA"
+      ],
+      "next_steps": [
+        "Replace the left arm electrode and repeat a clean 12-lead ECG"
+      ],
+      "urgency": "routine",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_6a_2",
+      "case_type": "static_12lead",
+      "ecg_state": "baseline",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 177,
+        "page_end": 178,
+        "figure_ref": "Figure 6A.2.1"
+      },
+      "clinical_context": {
+        "age": 29,
+        "sex": "female",
+        "presentation": "Routine follow-up after ICD implantation for presyncope",
+        "relevant_history": [
+          "Congenital deafness",
+          "Family history of sudden death / LQTS",
+          "Jervell and Lange-Nielsen syndrome"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 60,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": 520,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement",
+          "qt_ms": "patient_measurement"
+        },
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "narrow",
+        "pr_class": "normal",
+        "rhythm_class": "regular",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Sinus rhythm at 60 bpm with normal PR and narrow QRS",
+        "Markedly prolonged QT (520 ms) and Bazett QTc (520 ms) with flattened T waves in II, aVF, V5-V6"
+      ],
+      "final_diagnosis": "Jervell and Lange-Nielsen congenital Long QT Syndrome",
+      "diagnosis_label_free_text": "Congenital Long QT Syndrome (Jervell and Lange-Nielsen, QTc 520 ms)",
+      "diagnosis_codes": [
+        "LONG_QT_CRITICAL"
+      ],
+      "differential": [
+        "Acquired drug-induced or electrolyte-induced QT prolongation"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Using uncorrected QT without heart-rate correction",
+          "why_it_misleads": "Per source text, QT naturally shortens at faster rates and lengthens at slower rates",
+          "how_to_avoid": "Compute QTc (Bazett: QT / sqrt(RR)) and compare against adult cutoffs (>=440 ms men, >=460 ms women)",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "QTc >=440 ms in adult men and >=460 ms in adult women is abnormal; 520 ms is severely prolonged"
+      ],
+      "next_steps": [
+        "Continue specialist electrophysiology follow-up and avoid QT-prolonging drugs"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_6b_1",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 193,
+        "page_end": 194,
+        "figure_ref": "Figure 6B.1.1; Figure 6B.1.2"
+      },
+      "clinical_context": {
+        "age": 36,
+        "sex": "male",
+        "presentation": "Recurrent syncope",
+        "relevant_history": [
+          "Diagnosed Short QT Syndrome (SQTS)"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": true,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Frequent PVCs with extremely short RR coupling intervals",
+        "Polymorphic Torsades de Pointes triggered by short-coupled PVCs"
+      ],
+      "final_diagnosis": "Short QT Syndrome with short-coupled PVC-triggered Torsades de Pointes",
+      "diagnosis_label_free_text": "Short QT Syndrome presenting with polymorphic TdP",
+      "diagnosis_codes": [
+        "SHORT_QT",
+        "TORSADES_DE_POINTES"
+      ],
+      "differential": [
+        "Acquired Long QT Torsades de Pointes"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming Torsades de Pointes only happens when QT is prolonged",
+          "why_it_misleads": "Short-coupled PVCs in SQTS can also initiate polymorphic TdP",
+          "how_to_avoid": "Evaluate both short QT and short-coupled PVC triggers in unexplained syncope",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Extremely short-coupled PVCs before and after TdP are a hallmark trigger in Short QT Syndrome"
+      ],
+      "next_steps": [
+        "Immediate cardiac telemetry and urgent electrophysiology management"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_6c_1",
+      "case_type": "context_dependent",
+      "ecg_state": "baseline",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 195,
+        "page_end": 196,
+        "figure_ref": "Figure 6C.1.1"
+      },
+      "clinical_context": {
+        "age": 15,
+        "sex": "female",
+        "presentation": "Recurrent syncope while rowing competitively",
+        "relevant_history": [
+          "Diagnosed with seizures since infancy",
+          "Competitive rower"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "narrow",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Marked QT-interval prolongation on resting ECG associated with exertional syncope"
+      ],
+      "final_diagnosis": "Marked QT prolongation causing exertional Torsades de Pointes (misdiagnosed as seizures)",
+      "diagnosis_label_free_text": "Congenital Long QT Syndrome causing exercise-related syncope",
+      "diagnosis_codes": [
+        "LONG_QT"
+      ],
+      "differential": [
+        "Primary epilepsy / seizure disorder"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Accepting a childhood epilepsy label without measuring QT in exertional syncope",
+          "why_it_misleads": "Arrhythmic syncope during competitive exercise closely mimics seizures",
+          "how_to_avoid": "Always obtain and measure QTc on a 12-lead ECG in any patient with unexplained syncope or seizures",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Marked QT prolongation is a critical reversible-miss cause of exertional syncope in young athletes"
+      ],
+      "next_steps": [
+        "Restrict competitive rowing immediately and refer urgently to electrophysiology"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_6c_3",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 200,
+        "page_end": 201,
+        "figure_ref": "Figure 6C.3.2"
+      },
+      "clinical_context": {
+        "age": null,
+        "sex": "female",
+        "presentation": "Torsades de Pointes episode without structural heart disease",
+        "relevant_history": [
+          "Borderline pre-TdP QTc 468 ms; post-TdP QTc 338 ms; baseline 456 ms"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": true,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": true,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Short-coupled R-on-T PVCs (<300 ms) initiating Torsades de Pointes without severe baseline QT prolongation",
+        "Dynamic QTc shift: 468 ms pre-TdP, 338 ms immediately post-TdP, 456 ms baseline days later"
+      ],
+      "final_diagnosis": "Short-coupled PVC-triggered variant of Torsades de Pointes",
+      "diagnosis_label_free_text": "Short-coupled R-on-T PVC-induced Torsades de Pointes",
+      "diagnosis_codes": [
+        "TORSADES_DE_POINTES"
+      ],
+      "differential": [
+        "Classic Long QT Torsades de Pointes"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Excluding TdP/VF risk because baseline QTc is not markedly prolonged",
+          "why_it_misleads": "Per source text, R-on-T short-coupled PVCs (<300 ms) can trigger TdP and VF even in structurally normal hearts without QT prolongation",
+          "how_to_avoid": "Recognize short-coupled R-on-T PVCs as a distinct malignant trigger",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Short-coupled TdP is a distinct variant where PVC coupling intervals rarely exceed 300 ms"
+      ],
+      "next_steps": [
+        "Immediate telemetry with defibrillation readiness and urgent electrophysiology consult"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_8c_1",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 251,
+        "page_end": 252,
+        "figure_ref": "Figure 8C.1.1"
+      },
+      "clinical_context": {
+        "age": 79,
+        "sex": "male",
+        "presentation": "16-hour history of irregular palpitations in ED",
+        "relevant_history": [],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": "regular",
+        "p_wave_status": "absent",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Regular atrial tachyarrhythmia with low-amplitude flutter (F) waves visible in inferior leads"
+      ],
+      "final_diagnosis": "Atrial flutter with low-amplitude inferior F waves",
+      "diagnosis_label_free_text": "Atrial flutter (low-amplitude inferior flutter waves)",
+      "diagnosis_codes": [
+        "ATRIAL_FLUTTER"
+      ],
+      "differential": [
+        "Atrial fibrillation"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Mistaking low-amplitude atrial flutter for atrial fibrillation",
+          "why_it_misleads": "Patient symptoms feel irregular and flutter waves have low amplitude",
+          "how_to_avoid": "Inspect inferior leads closely for regular organized F waves",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Atrial flutter waves can be low-amplitude and easily missed unless inferior leads are magnified"
+      ],
+      "next_steps": [
+        "Evaluate hemodynamic stability, rate/rhythm control, and anticoagulation risk"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_8c_5",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 256,
+        "page_end": 256,
+        "figure_ref": "Figure 8C.5.1"
+      },
+      "clinical_context": {
+        "age": 18,
+        "sex": "male",
+        "presentation": "Severe congestive heart failure, incessant tachycardia (120 bpm), LVEF 15%",
+        "relevant_history": [
+          "LVEF normalized within 4 months after RAA ablation"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 120,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement"
+        },
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "narrow",
+        "pr_class": null,
+        "rhythm_class": "regular",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Incessant regular tachycardia at 120 bpm",
+        "Inverted P wave in V1 with late precordial transition localizing to right atrial appendage"
+      ],
+      "final_diagnosis": "Incessant right atrial appendage (RAA) atrial tachycardia with tachycardia-mediated cardiomyopathy",
+      "diagnosis_label_free_text": "Incessant focal RAA atrial tachycardia causing reversible cardiomyopathy",
+      "diagnosis_codes": [
+        "SVT_NARROW"
+      ],
+      "differential": [
+        "Sinus tachycardia secondary to dilated cardiomyopathy"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Labeling incessant 120 bpm tachycardia in heart failure as compensatory sinus tachycardia",
+          "why_it_misleads": "Moderate rate (120 bpm) looks like reactive sinus tachycardia unless P-wave polarity in V1 is checked",
+          "how_to_avoid": "Check V1 P-wave polarity: inverted V1 P with late transition points to a curable RAA focus",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "The right atrial appendage is a classic origin for incessant tachycardia-mediated cardiomyopathy reversible by ablation"
+      ],
+      "next_steps": [
+        "Urgent electrophysiology referral for catheter ablation alongside heart failure therapy"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_8d_1",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 275,
+        "page_end": 275,
+        "figure_ref": "Figure 8D.1.1"
+      },
+      "clinical_context": {
+        "age": 67,
+        "sex": "male",
+        "presentation": "Recurrent PSVT episode",
+        "relevant_history": [
+          "No obvious structural heart disease"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 258,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement"
+        },
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": "regular",
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "LBBB",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Irregular narrow-QRS SVT transitioning into regular wide-QRS LBBB-morphology tachycardia at 258 bpm"
+      ],
+      "final_diagnosis": "Typical slow/fast AVNRT with rate-related LBBB aberrancy",
+      "diagnosis_label_free_text": "Typical slow/fast AVNRT transitioning to LBBB-aberrant wide-complex tachycardia (258 bpm)",
+      "diagnosis_codes": [
+        "SVT_NARROW",
+        "LBBB"
+      ],
+      "differential": [
+        "Ventricular tachycardia (VT)"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming regular wide-complex tachycardia at 258 bpm cannot be AVNRT",
+          "why_it_misleads": "Rate-related LBBB aberrancy widens the QRS during rapid AVNRT",
+          "how_to_avoid": "Manage any 258 bpm wide-complex tachycardia emergently, and evaluate narrow-to-wide transitions",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Typical slow/fast AVNRT can transition from narrow complexes to rapid LBBB-morphology wide-complex tachycardia"
+      ],
+      "next_steps": [
+        "Immediate hemodynamic stabilization / synchronized cardioversion readiness",
+        "EP evaluation for ablation"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_8d_4",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 281,
+        "page_end": 281,
+        "figure_ref": "Figure 8D.4.1; Figure 8D.4.2"
+      },
+      "clinical_context": {
+        "age": 39,
+        "sex": "female",
+        "presentation": "Postoperative relapsing narrow-QRS tachycardia after hip fracture surgery",
+        "relevant_history": [
+          "History of paroxysmal palpitations"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "narrow",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Relapsing narrow-QRS tachycardia with an uninterrupted underlying sinus rhythm (dual AV nodal non-reentrant tachycardia)"
+      ],
+      "final_diagnosis": "Dual AV nodal non-reentrant tachycardia (DAVNNT)",
+      "diagnosis_label_free_text": "Dual AV nodal non-reentrant tachycardia (double-fire)",
+      "diagnosis_codes": [
+        "SVT_NARROW"
+      ],
+      "differential": [
+        "Atrial fibrillation",
+        "Typical AVNRT"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming every dual-pathway narrow tachycardia is reentrant AVNRT",
+          "why_it_misleads": "Double ventricular firing per sinus beat mimics AF or AVNRT",
+          "how_to_avoid": "Trace the uninterrupted underlying sinus rhythm on the rhythm strip",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Dual AV nodal non-reentrant tachycardia preserves an uninterrupted underlying sinus rhythm"
+      ],
+      "next_steps": [
+        "Postoperative cardiology/electrophysiology consultation"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_8f_1",
+      "case_type": "static_12lead",
+      "ecg_state": "post_intervention",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 307,
+        "page_end": 308,
+        "figure_ref": "Figure 8F.1.1; Figure 8F.1.2"
+      },
+      "clinical_context": {
+        "age": 68,
+        "sex": "male",
+        "presentation": "Post-cardioversion follow-up after prior atrial fibrillation",
+        "relevant_history": [
+          "Prior myocardial infarction 15 years earlier",
+          "LVEF 40%"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "P-wave duration >=160 ms with biphasic (+/-) morphology in leads II, III, and aVF (advanced interatrial block)"
+      ],
+      "final_diagnosis": "Advanced interatrial block (IAB) predicting AF recurrence within 1-2 years",
+      "diagnosis_label_free_text": "Advanced interatrial block (P >=160 ms, biphasic +/- in II, III, aVF)",
+      "diagnosis_codes": [
+        "INTERATRIAL_BLOCK_ADVANCED"
+      ],
+      "differential": [
+        "Partial interatrial block (bimodal P >=120 ms without +/- morphology)"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Ignoring inferior P-wave duration and biphasic (+/-) morphology after AF cardioversion",
+          "why_it_misleads": "Advanced IAB is subtle without magnification yet strongly predicts recurrent AF within 1-2 years",
+          "how_to_avoid": "Inspect leads II, III, and aVF closely for wide (>=120 ms) biphasic (+/-) P waves",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Advanced IAB (P >=120 ms and +/- in II, III, aVF) predicts new AF episodes within 1-2 years"
+      ],
+      "next_steps": [
+        "Close rhythm surveillance for AF recurrence and cardiology follow-up"
+      ],
+      "urgency": "routine",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_9a_1",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 317,
+        "page_end": 318,
+        "figure_ref": "Figure 9A.1.1; Figure 9A.1.2"
+      },
+      "clinical_context": {
+        "age": null,
+        "sex": "male",
+        "presentation": "Mild palpitations, dyspnea, and fatigue",
+        "relevant_history": [
+          "Remote myocardial infarction",
+          "Taking amiodarone"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 102,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement"
+        },
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": "regular",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "AV dissociation with sinus P waves marching independently of a faster 102 bpm ventricular rate",
+        "Interspersed fusion beats and narrow capture beats; negative VT QRS in inferior leads"
+      ],
+      "final_diagnosis": "Slow ventricular tachycardia (102 bpm, on amiodarone) from remote inferior MI",
+      "diagnosis_label_free_text": "Slow monomorphic ventricular tachycardia (102 bpm) with AV dissociation, fusion, and capture beats",
+      "diagnosis_codes": [
+        "VENTRICULAR_TACHYCARDIA"
+      ],
+      "differential": [
+        "SVT with aberrancy"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Excluding VT because the ventricular rate is only 102 bpm and symptoms are mild",
+          "why_it_misleads": "Amiodarone can markedly slow VT rates into the 100-110 bpm range",
+          "how_to_avoid": "Look for independent marching P waves (AV dissociation), fusion beats, and narrow capture beats",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "AV dissociation plus fusion and narrow capture beats confirm VT even at slow rates"
+      ],
+      "next_steps": [
+        "Inpatient telemetry and urgent electrophysiology management"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_10_1",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 395,
+        "page_end": 396,
+        "figure_ref": "Figure 10.1.1; Figure 10.1.2"
+      },
+      "clinical_context": {
+        "age": 60,
+        "sex": "male",
+        "presentation": "Severe chest pressure for several hours",
+        "relevant_history": [],
+        "labs": {
+          "potassium": null,
+          "troponin": "Peak 6.94 ng/mL (ref 0.04)",
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [
+          "V2",
+          "V3",
+          "V4"
+        ],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Anterior ST-segment depression (1-2 mm) in leads V2-V4 representing reciprocal posterior ST elevation"
+      ],
+      "final_diagnosis": "Acute true posterior STEMI (emergent PCI)",
+      "diagnosis_label_free_text": "True posterior STEMI presenting with reciprocal V2-V4 ST depression",
+      "diagnosis_codes": [
+        "POSTERIOR_STEMI"
+      ],
+      "differential": [
+        "Anterior subendocardial ischemia / NSTEMI"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Missing true posterior STEMI because standard 12-lead ECG shows only anterior ST depression",
+          "why_it_misleads": "Per source text, anterior ST depression in V2-V4 can be reciprocal to acute posterior ST elevation",
+          "how_to_avoid": "Treat ischemic V2-V4 ST depression as a potential posterior STEMI equivalent needing emergent reperfusion",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Overlooking true posterior STEMI causes a missed opportunity for emergent PCI or thrombolysis"
+      ],
+      "next_steps": [
+        "Immediate emergency coronary angiography and primary PCI"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_10_4",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 407,
+        "page_end": 408,
+        "figure_ref": "Figure 10.4.1; Figure 10.4.2"
+      },
+      "clinical_context": {
+        "age": 66,
+        "sex": "male",
+        "presentation": "Acute chest pain and dyspnea",
+        "relevant_history": [
+          "Diabetes",
+          "Hypertension",
+          "Recent proximal LAD PCI"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "aVR",
+          "V1",
+          "V2",
+          "V3",
+          "V4"
+        ],
+        "st_depression_leads": [
+          "II",
+          "III",
+          "aVF",
+          "V5",
+          "V6"
+        ],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "RBBB",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [
+            "aVR",
+            "V1",
+            "V2",
+            "V3",
+            "V4"
+          ],
+          "st_depression_leads": [
+            "II",
+            "III",
+            "aVF",
+            "V5",
+            "V6"
+          ],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": "wide",
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": "RBBB",
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "New-onset RBBB compared with prior ECG 1 month earlier",
+        "ST elevation in anterior precordial leads and aVR with reciprocal ST depression in inferior and lateral leads"
+      ],
+      "final_diagnosis": "Acute anterior myocardial infarction with new RBBB",
+      "diagnosis_label_free_text": "Acute anterior STEMI with new-onset RBBB",
+      "diagnosis_codes": [
+        "STEMI",
+        "RBBB"
+      ],
+      "differential": [
+        "Acute LMCA occlusion"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Assuming bundle branch block obscures acute anterior STEMI",
+          "why_it_misleads": "RBBB alters terminal QRS depolarization but leaves anterior ST elevation clearly visible",
+          "how_to_avoid": "Always compare with prior ECGs and act immediately on anterior + aVR ST elevation with new RBBB",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Anterior STEMI remains clearly recognizable despite new-onset RBBB"
+      ],
+      "next_steps": [
+        "Immediate emergency cath lab activation for angiography and PCI"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_10_9",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 418,
+        "page_end": 419,
+        "figure_ref": "Figure 10.9.1; Figure 10.9.2"
+      },
+      "clinical_context": {
+        "age": 47,
+        "sex": "male",
+        "presentation": "40 min severe retrosternal pain, profuse sweating, emesis, unobtainable BP (cardiogenic shock)",
+        "relevant_history": [],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 83,
+        "pr_ms": null,
+        "qrs_ms": 160,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement",
+          "qrs_ms": "patient_measurement"
+        },
+        "st_elevation_leads": [
+          "V1",
+          "V2",
+          "V3"
+        ],
+        "st_depression_leads": [],
+        "q_wave_leads": [
+          "V1",
+          "V2",
+          "V3"
+        ],
+        "t_wave_inversion_leads": [
+          "V1",
+          "V2",
+          "V3"
+        ],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": "RBBB",
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Sinus rhythm with PACs (83 bpm) and prolonged QRS (160 ms)",
+        "Complete RBBB with qR pattern in V1-V3, upward convex ST elevation, and negative T waves"
+      ],
+      "final_diagnosis": "Acute anterior STEMI from total LMCA occlusion with cardiogenic shock and complete RBBB",
+      "diagnosis_label_free_text": "Total LMCA occlusion causing anterior STEMI, RBBB (160 ms), and cardiogenic shock",
+      "diagnosis_codes": [
+        "STEMI",
+        "LMCA_OCCLUSION",
+        "RBBB"
+      ],
+      "differential": [
+        "Proximal LAD occlusion"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Underestimating severity because heart rate is only 83 bpm",
+          "why_it_misleads": "Unobtainable BP with QRS 160 ms RBBB and qR V1-V3 signals catastrophic LMCA occlusion",
+          "how_to_avoid": "Transfer immediately for emergent thrombus aspiration and stenting",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Total LMCA occlusion without collaterals rapidly causes cardiogenic shock and broad RBBB (qR V1-V3)"
+      ],
+      "next_steps": [
+        "Immediate primary PCI with thrombus aspiration and hemodynamic support"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_11_1",
+      "case_type": "context_dependent",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 433,
+        "page_end": 434,
+        "figure_ref": "Figure 11.1.1; Figure 11.1.2; Figure 11.1.3"
+      },
+      "clinical_context": {
+        "age": 73,
+        "sex": "female",
+        "presentation": "ED admission for DKA and acute renal insufficiency",
+        "relevant_history": [
+          "Taking lisinopril",
+          "Prior normal ECG 2 weeks earlier"
+        ],
+        "labs": {
+          "potassium": 7.6,
+          "troponin": "Peak 1.36 ng/mL (ref 0.04)",
+          "other": "Glucose 580 mg/dL, CO2 8 mEq/L, AG 29, Cr 3.24 mg/dL"
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "V1",
+          "V2"
+        ],
+        "st_depression_leads": [],
+        "q_wave_leads": [
+          "V1",
+          "V2"
+        ],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "event",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [
+            "V1",
+            "V2"
+          ],
+          "st_depression_leads": [],
+          "q_wave_leads": [
+            "V1",
+            "V2"
+          ],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "post_intervention",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Peaked T waves in leads II, V5, and V6",
+        "Marked ST elevation and Q waves in V1-V2 that resolved after treating hyperkalemia and DKA"
+      ],
+      "final_diagnosis": "Severe hyperkalemia (7.6 mEq/L) mimicking acute anteroseptal STEMI",
+      "diagnosis_label_free_text": "Severe hyperkalemia (K+ 7.6 mEq/L) causing pseudo-STEMI in V1-V2",
+      "diagnosis_codes": [
+        "HYPERKALEMIA"
+      ],
+      "differential": [
+        "Acute anteroseptal STEMI"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Treating hyperkalemia-induced V1-V2 ST elevation solely as STEMI without checking potassium",
+          "why_it_misleads": "Severe hyperkalemia in DKA/AKI produces marked V1-V2 STE and Q waves that resolve with metabolic therapy",
+          "how_to_avoid": "Check stat potassium in DKA/renal failure/ACE-inhibitor patients and repeat ECG after lowering K+",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Severe hyperkalemia (7.6 mEq/L) can mimic acute anterior MI with V1-V2 ST elevation and Q waves"
+      ],
+      "next_steps": [
+        "Immediate emergency hyperkalemia and DKA therapy",
+        "Serial ECGs to confirm resolution"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_11_2",
+      "case_type": "context_dependent",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 436,
+        "page_end": 437,
+        "figure_ref": "Figure 11.2.1"
+      },
+      "clinical_context": {
+        "age": 80,
+        "sex": "female",
+        "presentation": "Admitted for malaise with renal failure",
+        "relevant_history": [
+          "Single-chamber pacemaker for AF and bradycardia"
+        ],
+        "labs": {
+          "potassium": 8.2,
+          "troponin": null,
+          "other": "Renal failure"
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": true,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Very broad-QRS ventricular tachycardia caused by severe hyperkalemia-slowed conduction",
+        "Pacemaker ventricular undersensing"
+      ],
+      "final_diagnosis": "Severe hyperkalemia (8.2 mmol/L) causing very broad-QRS VT and pacemaker undersensing",
+      "diagnosis_label_free_text": "Severe hyperkalemia (8.2 mmol/L) with broad-QRS VT and pacemaker undersensing",
+      "diagnosis_codes": [
+        "HYPERKALEMIA_SEVERE",
+        "VENTRICULAR_TACHYCARDIA"
+      ],
+      "differential": [
+        "Primary pacemaker malfunction"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Attributing broad-QRS rhythm and undersensing solely to pacemaker failure",
+          "why_it_misleads": "Per source text, severe hyperkalemia (8.2 mmol/L) slows intraventricular conduction into very wide VT complexes that the pacemaker undersenses",
+          "how_to_avoid": "Check emergent serum potassium in any renal-failure patient with very wide QRS and undersensing",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "Extreme hyperkalemia (8.2 mmol/L) causes profound QRS widening, VT, and pacemaker undersensing"
+      ],
+      "next_steps": [
+        "Immediate emergency hyperkalemia stabilization and urgent dialysis",
+        "Re-check pacemaker after K+ normalizes"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_13a_1",
+      "case_type": "context_dependent",
+      "ecg_state": "baseline",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 479,
+        "page_end": 480,
+        "figure_ref": "Figure 13A.1.1"
+      },
+      "clinical_context": {
+        "age": 16,
+        "sex": "female",
+        "presentation": "Recurrent syncope while running",
+        "relevant_history": [
+          "Echo confirmed marked RV enlargement/dyskinesis; MRI showed RV fibrofatty infiltration"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [
+          "V1",
+          "V2",
+          "V3",
+          "V4"
+        ],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "T-wave inversions across leads V1-V4 in a 16-year-old with exertional syncope"
+      ],
+      "final_diagnosis": "Arrhythmogenic right ventricular dysplasia/cardiomyopathy (ARVD/C)",
+      "diagnosis_label_free_text": "ARVD/C presenting with V1-V4 T-wave inversions and exertional syncope",
+      "diagnosis_codes": [
+        "ARVD_C_PATTERN"
+      ],
+      "differential": [
+        "Benign juvenile T-wave inversion pattern"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Dismissing V1-V4 T-wave inversions in a 16-year-old with exertional syncope as juvenile variant",
+          "why_it_misleads": "Adolescent age overlaps with juvenile TWI, but exertional syncope and V1-V4 extent indicate ARVD/C",
+          "how_to_avoid": "Order echocardiography and cardiac MRI whenever anterior TWI accompanies exercise-induced syncope",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "V1-V4 T-wave inversions plus exercise-induced syncope strongly indicate ARVD/C"
+      ],
+      "next_steps": [
+        "Urgent electrophysiology care, competitive exercise restriction, and family screening"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_13b_1",
+      "case_type": "context_dependent",
+      "ecg_state": "baseline",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 499,
+        "page_end": 499,
+        "figure_ref": "Figure 13B.1"
+      },
+      "clinical_context": {
+        "age": 61,
+        "sex": "male",
+        "presentation": "Intermittent atrial fibrillation",
+        "relevant_history": [
+          "Multiple normal initial echoes and gadolinium cardiac MRI; septal hypertrophy appeared 5 years later"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [
+          "I",
+          "II",
+          "aVL",
+          "aVF",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6"
+        ],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": true,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Left ventricular hypertrophy with diffuse T-wave inversions preceding overt septal hypertrophy by 5 years"
+      ],
+      "final_diagnosis": "Hypertrophic cardiomyopathy (early electrical phenotype)",
+      "diagnosis_label_free_text": "Hypertrophic cardiomyopathy (LVH + diffuse TWI preceding overt hypertrophy)",
+      "diagnosis_codes": [
+        "HCM_PATTERN",
+        "LVH"
+      ],
+      "differential": [
+        "Hypertensive LVH with strain",
+        "Diffuse myocardial ischemia"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Discharging a patient with LVH and diffuse TWI permanently after one normal echo/MRI",
+          "why_it_misleads": "Electrical HCM markers can appear years before septal thickening becomes detectable on imaging",
+          "how_to_avoid": "Schedule longitudinal repeat imaging when marked LVH and diffuse TWI remain unexplained",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "ECG signs of HCM can precede echocardiographic and MRI hypertrophy by 5 or more years"
+      ],
+      "next_steps": [
+        "Longitudinal cardiology follow-up with serial imaging and AF management"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_13e_1",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 531,
+        "page_end": 531,
+        "figure_ref": "Figure 13E.1.1A; Figure 13E.1.1C"
+      },
+      "clinical_context": {
+        "age": 77,
+        "sex": "female",
+        "presentation": "3 days malaise/GI symptoms, self-terminating chest pain, personal living stress; hemodynamically stable",
+        "relevant_history": [
+          "Hypertension",
+          "Dyslipidemia",
+          "Urgent angiogram normal; ventriculogram showed Takotsubo"
+        ],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": 101,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {
+          "hr_bpm": "patient_measurement"
+        },
+        "st_elevation_leads": [
+          "I",
+          "II",
+          "III",
+          "aVF",
+          "V1",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6"
+        ],
+        "st_depression_leads": [
+          "aVR"
+        ],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": "regular",
+        "p_wave_status": "present",
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [
+        {
+          "state": "baseline",
+          "hr_bpm": null,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {},
+          "st_elevation_leads": [],
+          "st_depression_leads": [],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": null,
+          "p_wave_status": null,
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        },
+        {
+          "state": "event",
+          "hr_bpm": 101,
+          "pr_ms": null,
+          "qrs_ms": null,
+          "qt_ms": null,
+          "axis_deg": null,
+          "st_elevation_mm": {},
+          "value_origin": {
+            "hr_bpm": "patient_measurement"
+          },
+          "st_elevation_leads": [
+            "I",
+            "II",
+            "III",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6"
+          ],
+          "st_depression_leads": [
+            "aVR"
+          ],
+          "q_wave_leads": [],
+          "t_wave_inversion_leads": [],
+          "qrs_width_class": null,
+          "pr_class": null,
+          "rhythm_class": "regular",
+          "p_wave_status": "present",
+          "axis_class": null,
+          "brugada_pattern": null,
+          "qrs_morphology": null,
+          "delta_wave": null,
+          "pacing_spikes": null,
+          "fibrillatory_waves": null,
+          "polymorphic_vt": null,
+          "lafb": null,
+          "av_block_type": null,
+          "lvh_voltage": null,
+          "early_repolarization_leads": []
+        }
+      ],
+      "ecg_findings": [
+        "Sinus tachycardia at 101 bpm",
+        "Diffuse ST elevation across all precordial and limb leads except aVL, horizontal ST depression in aVR, ST elevation in II, and no mirror-image ST depression"
+      ],
+      "final_diagnosis": "Takotsubo (stress) cardiomyopathy",
+      "diagnosis_label_free_text": "Takotsubo stress cardiomyopathy (diffuse STE sparing aVL, horizontal aVR STD)",
+      "diagnosis_codes": [
+        "TAKOTSUBO_CARDIOMYOPATHY"
+      ],
+      "differential": [
+        "Acute multi-territory STEMI",
+        "Acute pericarditis"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Skipping urgent coronary angiography when Takotsubo is suspected on ECG",
+          "why_it_misleads": "Diffuse ST elevation cannot exclude obstructive CAD without angiography",
+          "how_to_avoid": "Hospitalize immediately for urgent angiography before confirming Takotsubo on ventriculogram/echo",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Diffuse STE sparing aVL, horizontal ST depression in aVR, STE in II, and lack of reciprocal depression point toward Takotsubo"
+      ],
+      "next_steps": [
+        "Immediate hospitalization and urgent coronary angiography to exclude CAD"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_13g_1",
+      "case_type": "static_12lead",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 545,
+        "page_end": 546,
+        "figure_ref": "Figure 13G.1.1"
+      },
+      "clinical_context": {
+        "age": null,
+        "sex": "male",
+        "presentation": "Chest pain in ED",
+        "relevant_history": [],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [
+          "II",
+          "III",
+          "aVF",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6"
+        ],
+        "st_depression_leads": [
+          "aVR"
+        ],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": null,
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": null,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Extensive ST elevation across all leads except aVL, V1, and low-voltage lead I",
+        "ST depression in aVR reflecting reciprocal orientation of diffuse pericardial ST elevation"
+      ],
+      "final_diagnosis": "Acute pericarditis",
+      "diagnosis_label_free_text": "Acute pericarditis (extensive ST elevation sparing V1 and aVL, STD in aVR)",
+      "diagnosis_codes": [
+        "ACUTE_PERICARDITIS"
+      ],
+      "differential": [
+        "Acute STEMI"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Expecting literally every lead (including V1 and aVL) to show ST elevation in pericarditis",
+          "why_it_misleads": "Per source text, 'universal' ST elevation is an exaggeration; V1 and aVL frequently lack ST elevation and aVR shows ST depression",
+          "how_to_avoid": "Look for extensive non-territorial STE sparing V1/aVL with aVR depression and correlate clinically",
+          "mechanism_flag": true
+        }
+      ],
+      "teaching_points": [
+        "V1 and aVL are the two leads most frequently lacking ST elevation in acute pericarditis"
+      ],
+      "next_steps": [
+        "Urgent clinician evaluation to exclude MI and bedside echo for pericardial effusion"
+      ],
+      "urgency": "urgent",
+      "qc_flags": []
+    },
+    {
+      "case_id": "v1_case_6a_1",
+      "case_type": "dynamic_holter_telemetry",
+      "ecg_state": "event",
+      "source": {
+        "book": "ECG_Masters collection v1 @cardiobooks (2).pdf",
+        "page_start": 173,
+        "page_end": 173,
+        "figure_ref": "Figure 6A.1.1; Figure 6A.1.2"
+      },
+      "clinical_context": {
+        "age": null,
+        "sex": null,
+        "presentation": "12-lead ECG recording of polymorphic ventricular tachycardia",
+        "relevant_history": [],
+        "labs": {
+          "potassium": null,
+          "troponin": null,
+          "other": null
+        }
+      },
+      "ecg_input": {
+        "hr_bpm": null,
+        "pr_ms": null,
+        "qrs_ms": null,
+        "qt_ms": null,
+        "axis_deg": null,
+        "st_elevation_mm": {},
+        "value_origin": {},
+        "st_elevation_leads": [],
+        "st_depression_leads": [],
+        "q_wave_leads": [],
+        "t_wave_inversion_leads": [],
+        "qrs_width_class": "wide",
+        "pr_class": null,
+        "rhythm_class": null,
+        "p_wave_status": null,
+        "axis_class": null,
+        "brugada_pattern": null,
+        "qrs_morphology": null,
+        "delta_wave": null,
+        "pacing_spikes": null,
+        "fibrillatory_waves": null,
+        "polymorphic_vt": true,
+        "lafb": null,
+        "av_block_type": null,
+        "lvh_voltage": null,
+        "early_repolarization_leads": []
+      },
+      "ecg_inputs": [],
+      "ecg_findings": [
+        "Gradual change in QRS amplitude and characteristic twisting around the isoelectric line on 12-lead ECG"
+      ],
+      "final_diagnosis": "Torsades de Pointes (polymorphic ventricular tachycardia)",
+      "diagnosis_label_free_text": "Torsades de Pointes (twisting-of-the-spikes polymorphic VT)",
+      "diagnosis_codes": [
+        "TORSADES_DE_POINTES"
+      ],
+      "differential": [
+        "Ischemic polymorphic VT"
+      ],
+      "pitfalls": [
+        {
+          "trap": "Relying only on a single-lead strip to exclude Torsades de Pointes",
+          "why_it_misleads": "Per source text, the twisting morphology around the isoelectric line is better detected on 12-lead ECG recordings",
+          "how_to_avoid": "Inspect multi-lead/12-lead recordings whenever polymorphic VT is suspected",
+          "mechanism_flag": false
+        }
+      ],
+      "teaching_points": [
+        "Torsades de pointes means 'twisting of the spikes' and is best identified on 12-lead recordings"
+      ],
+      "next_steps": [
+        "Immediate defibrillation readiness if unstable and urgent IV magnesium / electrolyte correction"
+      ],
+      "urgency": "emergent",
+      "qc_flags": []
+    }
+  ]
+}
