@@ -6,6 +6,8 @@ import {
   AlertOctagon,
   AlertTriangle,
   CheckCircle2,
+  Download,
+  Loader2,
   Flame,
   FlaskConical,
   Minus,
@@ -16,6 +18,7 @@ import {
 } from "lucide-react";
 import { HybridDiagnosisResult, WizardFeatures } from "@/lib/ecgHybridEngine";
 import { getClinicalInvTtt } from "@/lib/ecgClinicalLibrary";
+import { downloadEcgReportSlide } from "@/lib/ecgReportSlide";
 
 interface Props {
   result: HybridDiagnosisResult;
@@ -26,6 +29,7 @@ interface Props {
   onApplyCheck: (checkId: string, flagKey: keyof WizardFeatures) => void;
   measurementSource?: "device_ocr" | "auto_waveform" | "manual" | null;
   showCalibratedPercent?: boolean;
+  ecgImageDataUrl?: string | null;
 }
 
 export function EcgResultsPanel({
@@ -37,7 +41,9 @@ export function EcgResultsPanel({
   onApplyCheck,
   measurementSource,
   showCalibratedPercent = false,
+  ecgImageDataUrl = null,
 }: Props) {
+  const [exportingSlide, setExportingSlide] = useState(false);
   // Expandable inline Inv/TTT drawer for each Co-Existing Confirmed Diagnosis inside the main panel
   const [expandedCoDx, setExpandedCoDx] = useState<string | null>(null);
 
@@ -201,13 +207,40 @@ export function EcgResultsPanel({
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={onEditInputs}
-              className={`min-h-[44px] px-3.5 py-2 rounded-full border text-xs font-bold cursor-pointer shrink-0 cb-hover-lift ${isLight ? "bg-white/75 border-slate-300 text-slate-900 hover:bg-white" : "bg-black/30 hover:bg-black/45 border-white/20 text-white"}`}
-            >
-              {isAr ? "تعديل الاختيارات" : "Edit Inputs"}
-            </button>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                disabled={exportingSlide}
+                onClick={async () => {
+                  setExportingSlide(true);
+                  try {
+                    await downloadEcgReportSlide({
+                      result,
+                      isAr,
+                      ecgImageDataUrl,
+                      measurementSource,
+                    });
+                  } finally {
+                    setExportingSlide(false);
+                  }
+                }}
+                className="cb-btn-primary inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-extrabold cursor-pointer shrink-0 disabled:opacity-60"
+              >
+                {exportingSlide ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Download className="w-3.5 h-3.5" />
+                )}
+                <span>{isAr ? "تحميل تقرير سلايد" : "Download Slide Report"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={onEditInputs}
+                className={`min-h-[44px] px-3.5 py-2 rounded-full border text-xs font-bold cursor-pointer shrink-0 cb-hover-lift ${isLight ? "bg-white/75 border-slate-300 text-slate-900 hover:bg-white" : "bg-black/30 hover:bg-black/45 border-white/20 text-white"}`}
+              >
+                {isAr ? "تعديل الاختيارات" : "Edit Inputs"}
+              </button>
+            </div>
           </div>
 
           {/* Mandatory Safety Warning on Insufficient Certainty (never looks normal/green) */}

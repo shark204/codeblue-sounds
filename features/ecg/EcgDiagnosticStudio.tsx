@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Activity,
   CheckCircle2,
@@ -9,6 +9,8 @@ import {
   Eye,
   HeartPulse,
   ImagePlus,
+  Camera,
+  ClipboardPaste,
   Layers,
   Loader2,
   RotateCcw,
@@ -30,6 +32,7 @@ import {
   analyzeEcgImageLocally,
 } from "@/lib/ecgImageEngine";
 import { EcgResultsPanel, EcgGradCamPanel } from "@/features/ecg/EcgDiagnosisView";
+import { EcgSmartCameraModal } from "@/features/ecg/EcgSmartCameraModal";
 import { makeProvenanced } from "@/lib/ecgMeasurementUncertainty";
 import { useAtlasLocale } from "@/lib/atlasI18n";
 import { useUIStore } from "@/stores/uiStore";
@@ -89,6 +92,57 @@ export function EcgDiagnosticStudio() {
   const [measurementSource, setMeasurementSource] = useState<"device_ocr" | "auto_waveform" | "manual" | null>(null);
 
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [pasteMenu, setPasteMenu] = useState<{ x: number; y: number } | null>(null);
+  const [pasteHint, setPasteHint] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState<boolean>(false);
+
+  const handlePasteFromClipboard = async () => {
+    setPasteMenu(null);
+    setPasteHint(null);
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.read === "function") {
+        const items = await navigator.clipboard.read();
+        const found: File[] = [];
+        for (const item of items) {
+          const imgType = item.types.find((t) => t.startsWith("image/"));
+          if (imgType) {
+            const blob = await item.getType(imgType);
+            const ext = imgType.split("/")[1] || "png";
+            found.push(new File([blob], `pasted-ecg-${Date.now()}.${ext}`, { type: imgType }));
+          }
+        }
+        if (found.length > 0) {
+          const dt = new DataTransfer();
+          found.forEach((f) => dt.items.add(f));
+          addFiles(dt.files);
+          return;
+        }
+        setPasteHint(isAr ? "لا توجد صورة منسوخة في الحافظة — انسخ صورة ECG أولاً." : "No image found in clipboard — copy an ECG image first.");
+      } else {
+        setPasteHint(isAr ? "استخدم Ctrl+V للصق الصورة مباشرة." : "Press Ctrl+V to paste an image directly.");
+      }
+    } catch {
+      setPasteHint(isAr ? "اسمح بالوصول للحافظة أو اضغط Ctrl+V للصق الصورة." : "Allow clipboard access or press Ctrl+V to paste.");
+    }
+  };
+
+  useEffect(() => {
+    if (!pasteMenu) return;
+    const close = () => setPasteMenu(null);
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setPasteMenu(null); };
+    window.addEventListener("click", close);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("click", close);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [pasteMenu]);
+
+  useEffect(() => {
+    if (!pasteHint) return;
+    const t = setTimeout(() => setPasteHint(null), 4000);
+    return () => clearTimeout(t);
+  }, [pasteHint]);
   const [analyzingImg, setAnalyzingImg] = useState<boolean>(false);
   const [imgAnalysis, setImgAnalysis] = useState<LocalECGAnalysisResult | null>(null);
   const [backendSource, setBackendSource] = useState<"modal-ai" | "local" | null>(null);
@@ -428,7 +482,7 @@ export function EcgDiagnosticStudio() {
                         </button>
                       </div>
                     ))}
-                    <label className="shrink-0 w-12 h-9 rounded-lg border border-dashed border-slate-600 hover:border-cyan-400 flex items-center justify-center text-slate-400 hover:text-cyan-300 cursor-pointer">
+                    <label onContextMenu={(e) => { e.preventDefault(); setPasteMenu({ x: e.clientX, y: e.clientY }); }} className="shrink-0 w-12 h-9 rounded-lg border border-dashed border-slate-600 hover:border-cyan-400 flex items-center justify-center text-slate-400 hover:text-cyan-300 cursor-pointer">
                       <ImagePlus className="w-4 h-4" />
                       <input type="file" accept="image/*,application/pdf" multiple className="hidden" onChange={(e) => addFiles(e.target.files)} />
                     </label>
@@ -436,17 +490,27 @@ export function EcgDiagnosticStudio() {
                 </div>
               ) : (
                 <label
+                  onContextMenu={(e) => { e.preventDefault(); setPasteMenu({ x: e.clientX, y: e.clientY }); }}
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={(e) => { e.preventDefault(); setIsDragging(false); addFiles(e.dataTransfer.files); }}
                   className={`flex flex-col items-center justify-center gap-2 min-h-[112px] py-5 px-4 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 ${isDragging ? "cb-dropzone-active" : isLight ? "border-slate-300 hover:border-teal-500/70 bg-white/45" : "border-white/20 hover:border-teal-400/60 bg-white/[0.03]"}`}
                 >
                   <ImagePlus className="cb-drop-icon w-7 h-7 text-rose-400" />
-                  <div className="text-xs font-bold text-center">{isAr ? "اسحب صورة الـ ECG هنا أو اضغط للرفع" : "Drop ECG image(s) here or click to upload"}</div>
+                  <div className="text-xs font-bold text-center">{isAr ? "اسحب صورة الـ ECG هنا أو اضغط للرفع — أو كليك يمين للصق" : "Drop ECG image(s) here, click to upload, or right-click to Paste"}</div>
                   
                   <input type="file" accept="image/*,application/pdf" multiple className="hidden" onChange={(e) => addFiles(e.target.files)} />
                 </label>
               )}
+
+              <button
+                type="button"
+                onClick={() => setCameraOpen(true)}
+                className="cb-btn-primary w-full min-h-[44px] py-2.5 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Camera className="w-4 h-4" />
+                <span>{isAr ? "مسح الـ ECG بالكاميرا الذكية (التقاط تلقائي)" : "Smart Camera ECG Scan (Auto-Capture)"}</span>
+              </button>
 
               {/* Live Auto-Extraction Status Banner (100% Automatic from Image) */}
               {activeImage && analyzingImg && (
@@ -863,6 +927,7 @@ export function EcgDiagnosticStudio() {
                   onEditInputs={() => setShowResults(false)}
                   onApplyCheck={handleApplyCheck}
                   measurementSource={measurementSource}
+                  ecgImageDataUrl={activeImage?.dataUrl ?? null}
                 />
               )
             )}
@@ -870,6 +935,37 @@ export function EcgDiagnosticStudio() {
         </div>
 
       </div>
+      <EcgSmartCameraModal
+        isOpen={cameraOpen}
+        isAr={isAr}
+        onClose={() => setCameraOpen(false)}
+        onCapture={(file) => {
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          addFiles(dt.files);
+        }}
+      />
+      {pasteHint && (
+        <div className="fixed bottom-5 end-5 z-50 rounded-xl border border-amber-400/50 bg-slate-950/95 px-4 py-2.5 text-xs font-bold text-amber-200 shadow-2xl backdrop-blur-md">
+          {pasteHint}
+        </div>
+      )}
+      {pasteMenu && (
+        <div
+          style={{ top: pasteMenu.y, left: pasteMenu.x }}
+          onClick={(e) => e.stopPropagation()}
+          className="fixed z-50 min-w-[180px] rounded-xl border border-white/20 bg-slate-950/95 p-1.5 shadow-2xl backdrop-blur-xl"
+        >
+          <button
+            type="button"
+            onClick={() => void handlePasteFromClipboard()}
+            className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-slate-100 hover:bg-rose-700/70 transition-colors cursor-pointer"
+          >
+            <ClipboardPaste className="w-4 h-4 text-rose-300" />
+            <span>{isAr ? "لصق صورة (Paste)" : "Paste Image"}</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
