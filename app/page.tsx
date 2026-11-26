@@ -114,8 +114,8 @@ export default function SoundsLabPage() {
 
   if (view === "landing") {
     const petalBase = isLight
-      ? "bg-white/90 border-slate-200/90 text-slate-800 shadow-[0_14px_30px_rgba(15,23,42,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] hover:bg-white"
-      : "bg-[#0e172c]/82 border-white/14 text-slate-100 shadow-[0_16px_34px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.12)] hover:bg-[#13203d]/92";
+      ? "cb-glass-card cb-hover-lift text-slate-900 hover:border-rose-500/55"
+      : "cb-glass-card cb-hover-lift text-slate-100 hover:border-rose-400/55";
 
     return (
       <div
@@ -124,22 +124,18 @@ export default function SoundsLabPage() {
           isLight ? "text-slate-900" : "text-slate-100"
         }`}
       >
-        <header
-          className={`shrink-0 h-14 px-5 md:px-10 border-b backdrop-blur-xl flex items-center justify-between gap-4 z-40 ${
-            isLight ? "border-slate-200/80 bg-white/75" : "border-white/10 bg-[#070b16]/70"
-          }`}
-        >
+        <header className="shrink-0 mx-3 sm:mx-6 mt-2.5 cb-glass-pill min-h-[56px] px-4 sm:px-6 py-1.5 flex items-center justify-between gap-4 z-40">
           <div className="flex items-center gap-3">
             <img
               src="/icon.png"
               alt="Code Blue"
-              className="w-8 h-8 rounded-xl border border-rose-500/40 shadow-lg shadow-rose-900/30"
+              className="w-8 h-8 rounded-xl border border-rose-500/45 shadow-lg shadow-rose-950/40"
             />
             <div className="leading-tight">
               <div className={`font-extrabold text-sm md:text-base tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>
                 Code Blue
               </div>
-              <div className={`text-[10.5px] font-mono ${isLight ? "text-[#9f1239]" : "text-[#f47292]"}`}>
+              <div className={`text-[10.5px] font-mono ${isLight ? "text-[#9f1239]" : "text-[#fb7185]"}`}>
                 codeblue-ecg&amp;sounds
               </div>
             </div>
@@ -175,8 +171,8 @@ export default function SoundsLabPage() {
               onClick={() => setLocale(isAr ? "en" : "ar")}
               className={`px-3 py-1.5 rounded-xl border font-bold transition ${
                 isLight
-                  ? "bg-rose-50 hover:bg-rose-100 text-[#9f1239] border-rose-200"
-                  : "bg-rose-950/40 hover:bg-rose-900/50 text-rose-200 border-rose-400/25"
+                  ? "bg-rose-50/90 hover:bg-rose-100 text-[#9f1239] border-rose-300/80"
+                  : "bg-rose-950/45 hover:bg-rose-900/55 text-rose-100 border-rose-400/35"
               }`}
             >
               {isAr ? "EN" : "AR"}
@@ -224,7 +220,7 @@ export default function SoundsLabPage() {
                   <button
                     type="button"
                     onClick={() => launchMode("heart")}
-                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#881337] via-[#be123c] to-[#e11d48] hover:from-[#9f1239] hover:via-[#e11d48] hover:to-[#f43f5e] text-white font-black text-sm sm:text-base inline-flex items-center gap-2 shadow-[0_0_30px_rgba(190,18,60,0.45)] transition transform hover:scale-[1.03] active:scale-[0.99] cursor-pointer"
+                    className="cb-btn-primary min-h-[48px] px-6 py-3 rounded-2xl font-black text-sm sm:text-base inline-flex items-center gap-2 cursor-pointer"
                   >
                     <Stethoscope className="w-4 h-4" />
                     {isAr ? "أصوات القلب والتنفس" : "Heart & Breath Sounds"}
@@ -234,8 +230,8 @@ export default function SoundsLabPage() {
                     onClick={() => launchMode("ecg-ai")}
                     className={`px-5 py-3 rounded-2xl border font-extrabold text-sm sm:text-base inline-flex items-center gap-2 transition transform hover:scale-[1.03] cursor-pointer ${
                       isLight
-                        ? "bg-white border-rose-300 text-[#9f1239] hover:bg-rose-50"
-                        : "bg-rose-950/50 border-rose-400/40 text-rose-200 hover:bg-rose-900/60"
+                        ? "cb-glass-nested border-rose-400/60 text-[#9f1239] hover:bg-rose-50/90"
+                        : "cb-glass-nested border-rose-400/45 text-rose-100 hover:bg-rose-950/45"
                     }`}
                   >
                     <Sparkles className="w-4 h-4" />
@@ -325,7 +321,7 @@ export default function SoundsLabPage() {
 
   return (
     <div className={`h-screen w-screen bg-transparent flex flex-col overflow-hidden ${isLight ? "text-slate-900" : "text-slate-100"}`}>
-      <header className={`h-13 shrink-0 px-4 border-b backdrop-blur-xl flex items-center justify-between gap-3 z-30 ${isLight ? "border-slate-200/80 bg-white/70" : "border-white/10 bg-[#070b16]/65"}`}>
+      <header className="shrink-0 mx-3 sm:mx-5 mt-2 cb-glass-pill min-h-[52px] px-3.5 sm:px-5 py-1.5 flex items-center justify-between gap-3 z-30">
         <div className="flex items-center gap-3 overflow-x-auto">
           <button
             type="button"
@@ -340,17 +336,17 @@ export default function SoundsLabPage() {
           </span>
 
           {isEcgMode ? (
-            <div className="ml-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-500/15 border border-rose-500/35 text-rose-200 text-xs font-bold shrink-0">
+            <div className="ms-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-950/50 border border-rose-400/40 text-rose-200 text-xs font-bold shrink-0">
               <Sparkles className="w-3.5 h-3.5 text-rose-400" />
               <span>{isAr ? "محرك تشخيص الـ ECG الهجين" : "ECG Diagnostic Engine"}</span>
             </div>
           ) : (
-            <div className="ml-2 flex items-center p-1 rounded-xl bg-slate-900/90 border border-slate-800 shrink-0">
+            <div className="ms-2 flex items-center p-1 rounded-full cb-glass-nested shrink-0">
               <button
                 type="button"
                 onClick={() => launchMode("heart")}
                 className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  mode === "heart" ? "bg-rose-500/20 text-rose-300 border border-rose-500/40" : "text-slate-400 hover:text-slate-200"
+                  mode === "heart" ? "bg-[#9f1239]/40 text-rose-100 border border-rose-400/50" : "text-slate-400 hover:text-slate-200"
                 }`}
               >
                 <Heart className="w-3.5 h-3.5" />

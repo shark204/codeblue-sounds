@@ -365,6 +365,150 @@ export const ECG_CLINICAL_LIBRARY: Record<string, EcgClinicalEntry> = {
       "بدون أعراض: تجنّب مثبطات العقدة الأذينية البطينية قدر الإمكان ومتابعة قلب. مع إغماء أو دوخة شديدة: حجز بالمراقبة وتقييم عاجل لتركيب منظم ضربات.",
   }),
 
+  WELLENS_SYNDROME: mk({
+    title_en: "Wellens Syndrome (Critical Proximal LAD Stenosis)",
+    title_ar: "متلازمة ويلينز (تضيق حرج في الشريان التاجي الأمامي النازل LAD)",
+    explanation_en:
+      "Deeply inverted (Type B) or biphasic (Type A) T-waves in V2–V3 during a pain-free interval with minimal ST elevation and preserved R-waves — high-specificity marker of critical proximal LAD stenosis (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "انقلاب عميق (النوع B) أو موجات T ثنائية الطور (النوع A) في V2–V3 بعد زوال ألم الصدر — علامة نوعية عالية لتضيق حرج في الشريان التاجي الأمامي النازل (LAD).",
+    inv_en: "Serial hs-Troponin, serial 12-lead ECGs, urgent Cardiology consult for early coronary angiography. NEVER perform an exercise stress test.",
+    inv_ar: "تروبونين متسلسل، تخطيطات متكررة، واستشارة قلب عاجلة للقسطرة التشخيصية المبكرة. يُمنع منعاً باتاً إجراء اختبار المجهود.",
+    ttt_en: "Treat as high-risk ACS (Aspirin 300 mg, anticoagulation, telemetry) and arrange urgent coronary angiography/PCI; avoid stress testing (risk of massive anterior MI/VF).",
+    ttt_ar: "علاج كمتلازمة شريان تاجي حادة عالية الخطورة (أسبرين، مضاد تخثر، مراقبة) مع قسطرة عاجلة؛ تجنب اختبار المجهود لخطر الجلطة الأمامية والرجفان البطيني.",
+  }),
+  DE_WINTER_T_WAVES: mk({
+    title_en: "De Winter T-Waves (LAD Occlusion STEMI Equivalent)",
+    title_ar: "موجات دي وينتر (مكافئ STEMI لانسداد الشريان LAD)",
+    explanation_en:
+      "Upsloping ST depression >1 mm at the J-point in V1–V6 continuing into tall, prominent symmetrical T-waves, often with 0.5–1 mm ST elevation in aVR — acute proximal LAD occlusion equivalent (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "انخفاض ST صاعد >1 مم عند نقطة J في V1–V6 يتبعها موجات T طويلة متناظرة مع ارتفاع طفيف في aVR — مكافئ STEMI لانسداد حاد في الشريان LAD.",
+    inv_en: "Immediate Cath Lab activation (do NOT delay for Troponin), serial ECGs every 10 min, BMP, and coagulation profile.",
+    inv_ar: "تفعيل فوري لقسطرة القلب (لا تنتظر التروبونين)، تخطيط متكرر كل 10 دقائق، شوارد، وسيولة.",
+    ttt_en: "Emergency reperfusion (Primary PCI) identical to anterior STEMI + Aspirin 300 mg + P2Y12 inhibitor + Heparin + defibrillator pads.",
+    ttt_ar: "إعادة تروية فورية (قسطرة أولية) تماماً مثل الجلطة الأمامية الحادة + أسبرين 300 ملغ + مضاد صفائح + هيبارين.",
+  }),
+  BRUGADA_TYPE_1: mk({
+    title_en: "Brugada Pattern (Type 1 Coved ST Elevation V1–V2)",
+    title_ar: "نمط بروغادا من النوع الأول (ارتفاع ST مقبب في V1–V2)",
+    explanation_en:
+      "Coved ST-segment elevation >=2 mm in V1–V2 followed by a negative symmetrical T-wave — sodium channelopathy carrying high risk of polymorphic VT/VF and sudden cardiac death, often unmasked by fever or Na-channel blockers (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "ارتفاع ST مقبب >=2 مم في V1–V2 متبوعاً بموجة T سلبية — اعتلال قنوات صوديوم يرفع خطر الرجفان البطيني والموت المفاجئ، وغالباً تكشفه الحمى أو حاصرات الصوديوم.",
+    inv_en: "High-precordial ECG (V1–V2 in 2nd–3rd ICS), core temperature, BMP (K+/Ca2+), full drug review (BrugadaDrugs.org), and urgent EP consult.",
+    inv_ar: "تخطيط بأقطاب صدرية عالية (V1–V2 في الفراغ الثاني/الثالث)، قياس الحرارة، شوارد، مراجعة الأدوية، واستشارة كهرباء قلب.",
+    ttt_en: "Aggressively treat fever with paracetamol, stop all Na-channel blockers/TCAs, place on telemetry; if syncope/VT/VF or electrical storm, give Isoproterenol infusion and refer for ICD.",
+    ttt_ar: "خافض حرارة فوري ومكثف للحمى، إيقاف حاصرات الصوديوم فوراً، مراقبة قلبية؛ ومع الإغماء أو العاصفة الكهربائية: إيزوبروتيرينول وزراعة صاعق داخلي (ICD).",
+  }),
+  WPW_PATTERN: mk({
+    title_en: "Wolff-Parkinson-White (WPW) Pre-Excitation",
+    title_ar: "متلازمة وولف-باركنسون-وايت (التنبيه المبكر WPW)",
+    explanation_en:
+      "Short PR interval (<120 ms), slurred QRS upstroke (Delta wave), and widened QRS (>110 ms) due to an accessory AV pathway (Bundle of Kent) (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "قصر فترة PR (<120 مللي ثانية) مع موجة دلتا (Delta wave) واتساع QRS بسبب مسار توصيل إضافي (حزمة كنت).",
+    inv_en: "12-lead ECG during sinus rhythm and palpitations, Electrolytes, TSH, Echocardiography (exclude Ebstein anomaly), and EP referral.",
+    inv_ar: "تخطيط في النظم الجيبي وأثناء الخفقان، شوارد، غدة درقية، إيكو، وتحويل لكهرباء القلب.",
+    ttt_en: "Asymptomatic isolated WPW: EP risk stratification. If orthodromic AVRT: vagal maneuvers/Adenosine. If pre-excited AFib: NEVER give AV-nodal blockers (Adenosine/Verapamil/Digoxin/Beta-blockers) — use Procainamide or synchronized cardioversion.",
+    ttt_ar: "مع التسارع الأذيني البطيني الضيق: مناورات العصب الحائر/أدينوزين. مع الرجفان الأذيني المصاحب: يُمنع تماماً حاصرات العقدة الأذينية البطينية (أدينوزين/فيراباميل/ديجوكسين) — استخدم بروكايناميد أو صدمة متزامنة.",
+  }),
+  PRE_EXCITED_AFIB: mk({
+    title_en: "Pre-Excited Atrial Fibrillation (WPW + AFib — CRITICAL)",
+    title_ar: "رجفان أذيني مع تنبيه مبكر (WPW + AFib — حالة حرجة)",
+    explanation_en:
+      "Irregularly irregular, very rapid (>200 bpm) wide-complex tachycardia with beat-to-beat QRS morphology variation ('FBI' — Fast, Broad, Irregular) from rapid anterograde accessory pathway conduction (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "تسارع بطيني عريض غير منتظم تماماً وسريع جداً (>200 نبضة/د) بتغير شكل QRS من نبضة لأخرى — خطر تحول فوري لرجفان بطيني.",
+    inv_en: "Do NOT delay cardioversion if unstable. Stat BMP (K+/Mg2+), post-conversion 12-lead ECG (confirm delta waves), and urgent EP consult.",
+    inv_ar: "لا تؤخر الصدمة إذا كان المريض غير مستقر. شوارد عاجلة، تخطيط بعد الاستقرار لإثبات موجة دلتا، واستشارة كهرباء قلب عاجلة.",
+    ttt_en: "Unstable: immediate synchronized DC cardioversion. Stable: IV Procainamide or Ibutilide. STRICTLY AVOID Adenosine, Verapamil, Diltiazem, Digoxin, and Amiodarone (risk of VF).",
+    ttt_ar: "غير مستقر: صدمة كهربائية متزامنة فوراً. مستقر: بروكايناميد وريدي. ممنوع منعاً باتاً: أدينوزين، فيراباميل، ديلتيازيم، ديجوكسين، وأميودارون لخطر الرجفان البطيني.",
+  }),
+  HYPERKALEMIA: mk({
+    title_en: "Hyperkalemia (Peaked T-Waves / QRS Widening / Sine Wave)",
+    title_ar: "فرط بوتاسيوم الدم (موجات T مدببة / اتساع QRS)",
+    explanation_en:
+      "Progressive ECG toxicity: tall narrow tented T-waves -> PR prolongation / flat P-waves -> bizarre QRS widening -> sine-wave pattern and VF/asystole (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "تسمم قلبي متدرج: موجات T مدببة طويلة ← استطالة PR واختفاء P ← اتساع QRS ← موجة جيبية وتوقف قلب.",
+    inv_en: "Stat VBG/ABG potassium, formal BMP/creatinine, glucose, CK, and serial ECGs every 10–15 min.",
+    inv_ar: "بوتاسيوم فوري بغازات الدم (VBG)، وظائف كلى، سكر، إنزيم عضلات، وتخطيط كل 10–15 دقيقة.",
+    ttt_en: "1) IV Calcium Gluconate 10% 10 mL (membrane stabilization), 2) IV Regular Insulin 10 U + Dextrose + nebulized Salbutamol (shift K+ intracellularly), 3) Sodium Bicarbonate if acidotic, 4) Loop diuretic / K-binder / urgent hemodialysis.",
+    ttt_ar: "1) كالسيوم جلوكونات 10% وريدي فوراً لحماية القلب، 2) أنسولين نظامي + جلوكوز + جلسة سالبوتامول لإدخال البوتاسيوم للخلايا، 3) إزالة البوتاسيوم (مدرات/غسيل كلوي عاجل).",
+  }),
+  TCA_SODIUM_BLOCKADE: mk({
+    title_en: "Sodium-Channel Blockade / TCA Toxicity Pattern",
+    title_ar: "تسمم حاصرات قنوات الصوديوم / مضادات الاكتئاب ثلاثية الحلقات (TCA)",
+    explanation_en:
+      "Sinus tachycardia + QRS widening >100 ms (seizure risk) / >160 ms (VT risk) + terminal R-wave >3 mm or R/S >0.7 in aVR + right axis deviation (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "تسارع جيبي + اتساع QRS (>100–160 مللي ثانية) + موجة R نهائية >3 مم في aVR وانحراف محور أيمن — علامة مميزة لتسمم TCA أو حاصرات الصوديوم.",
+    inv_en: "Stat VBG/ABG (pH target 7.50–7.55), BMP, lactate, toxicology screen, and serial ECGs every 10–15 min.",
+    inv_ar: "غازات دم فورية (الهدف pH بين 7.50–7.55)، شوارد، لاكتات، فحص سموم، وتخطيط متكرر.",
+    ttt_en: "Immediate IV Sodium Bicarbonate boluses (1–2 mEq/kg) titrated to narrow QRS and maintain pH 7.50–7.55; benzodiazepines for seizures; avoid Class IA/IC antiarrhythmics and Physostigmine.",
+    ttt_ar: "جرعات فورية من بيكربونات الصوديوم الوريدية (1–2 ملي مكافئ/كجم) لتضييق QRS والحفاظ على pH 7.50–7.55؛ بنزوديازيبين للتشنجات.",
+  }),
+  ACUTE_PERICARDITIS: mk({
+    title_en: "Acute Pericarditis (Diffuse Concave STE + PR Depression)",
+    title_ar: "التهاب التامور الحاد (ارتفاع ST مقعر منتشر + انخفاض PR)",
+    explanation_en:
+      "Widespread concave ('saddle-shaped') ST elevation across multiple territories with PR depression (and reciprocal ST depression + PR elevation in aVR) and Spodick sign (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "ارتفاع ST مقعر منتشر في معظم المساري مع انخفاض PR (وارتفاع PR مع انخفاض ST في aVR).",
+    inv_en: "CRP/ESR, hs-Troponin (exclude myopericarditis), CBC, Chest X-ray, and bedside Echocardiography (check for effusion/tamponade).",
+    inv_ar: "CRP/ESR، تروبونين عالي الحساسية (لاستبعاد التهاب عضلة القلب)، صورة دم، أشعة صدر، وإيكو لاستبعاد الانصباب التأموري.",
+    ttt_en: "High-dose NSAID (Ibuprofen/Aspirin) + Colchicine (3 months) + PPI; restrict strenuous exercise; urgent pericardiocentesis if tamponade develops.",
+    ttt_ar: "مضادات التهاب بجرعة عالية (أيبوبروفين/أسبرين) + كولشيسين 3 شهور + مثبط مضخة بروتون؛ بزل تأموري عاجل لو وجد اندحاس قلبي.",
+  }),
+  PULMONARY_EMBOLISM_S1Q3T3: mk({
+    title_en: "Acute Right Ventricular Strain / Pulmonary Embolism Pattern",
+    title_ar: "إجهاد البطين الأيمن الحاد / نمط الجلطة الرئوية (PE)",
+    explanation_en:
+      "Sinus tachycardia with T-wave inversions simultaneously in right precordial (V1–V4) and inferior (II, III, aVF) leads, new RBBB, RAD, or S1Q3T3 pattern (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "تسارع جيبي مع انقلاب موجات T في المساري الأمامية اليمنى (V1–V4) والسفلية (II, III, aVF) معاً أو نمط S1Q3T3 — علامة قوية لإجهاد البطين الأيمن والجلطة الرئوية.",
+    inv_en: "Wells/PERC score, D-dimer or urgent CT Pulmonary Angiography (CTPA), bedside Echo (McConnell sign / RV dilation), ABG, Troponin, and BNP.",
+    inv_ar: "تقييم Wells، تحليل D-dimer أو أشعة مقطعية بالصبغة لشرايين الرئة (CTPA)، إيكو بجانب السرير، غازات دم، وتروبونين.",
+    ttt_en: "O2 for SpO2 <92%, immediate anticoagulation (LMWH/UFH) if no contraindication; systemic thrombolysis or catheter thrombectomy if massive PE with hemodynamic shock.",
+    ttt_ar: "أكسجين عند نقص التشبع، مضاد تخثر فوري (هيبارين/إينوكسابارين)؛ ومذيب جلطة وريدي إذا كانت الجلطة الرئوية مصحوبة بصدمة.",
+  }),
+  VENTRICULAR_TACHYCARDIA: mk({
+    title_en: "Monomorphic Ventricular Tachycardia (VT — CRITICAL)",
+    title_ar: "تسارع بطيني أحادي الشكل (VT — حالة حرجة)",
+    explanation_en:
+      "Regular wide-complex tachycardia (QRS >120 ms) with AV dissociation, capture/fusion beats, extreme northwest axis, or Brugada/Vereckei criteria — treat any WCT in structural heart disease as VT until proven otherwise (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "تسارع منتظم عريض المركب (QRS >120 مللي ثانية) مع تفكك أذيني بطيني أو نبضات Capture/Fusion — يُعامل أي تسارع عريض كـ VT حتى يثبت العكس.",
+    inv_en: "Check pulse/BP immediately. Stat BMP (K+/Mg2+), hs-Troponin, post-conversion 12-lead ECG, and urgent Cardiology/EP consult.",
+    inv_ar: "افحص النبض والضغط فوراً. شوارد (K+/Mg2+)، تروبونين، تخطيط بعد الاستقرار، واستشارة قلب عاجلة.",
+    ttt_en: "Pulseless: immediate unsynchronized defibrillation + CPR (ACLS). Unstable with pulse: immediate synchronized DC cardioversion. Stable: IV Amiodarone 150 mg over 10 min or Procainamide; correct K+/Mg2+.",
+    ttt_ar: "بدون نبض: صدمة غير متزامنة + إنعاش قلبي رئوي فوراً. غير مستقر مع نبض: صدمة متزامنة. مستقر: أميودارون 150 ملغ وريدي ببطء أو بروكايناميد مع تصحيح الشوارد.",
+  }),
+  TORSADES_DE_POINTES: mk({
+    title_en: "Torsades de Pointes (Polymorphic VT + Prolonged QT)",
+    title_ar: "تورساد دي بوانت (تسارع بطيني متعدد الأشكال مع استطالة QT)",
+    explanation_en:
+      "Polymorphic VT with QRS complexes 'twisting around the isoelectric baseline' in the setting of baseline QTc prolongation (>500 ms) or hypomagnesemia/hypokalemia (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "تسارع بطيني متعدد الأشكال تلتف فيه مركبات QRS حول الخط القاعدي على خلفية استطالة QTc (>500 مللي ثانية).",
+    inv_en: "Stat BMP (K+, Mg2+, ionized Ca2+), medication review (QT-prolonging drugs), and baseline ECG post-termination.",
+    inv_ar: "شوارد عاجلة (بوتاسيوم، ماغنيسيوم، كالسيوم)، مراجعة الأدوية المطيلة للـ QT، وتخطيط بعد توقف النوبة.",
+    ttt_en: "Unstable/pulseless: immediate defibrillation. First-line drug (even if Mg2+ normal): IV Magnesium Sulfate 2 g over 2–5 min; stop offending drugs; repleting K+ >4.0; overdrive pacing/Isoproterenol if pause-dependent.",
+    ttt_ar: "غير مستقر: صدمة كهربائية فورية. العلاج الأول: سلفات ماغنيسيوم 2 جم وريدي خلال 2–5 دقائق حتى لو الماغنيسيوم طبيعي + إيقاف الأدوية المسببة ورفع البوتاسيوم >4.0.",
+  }),
+  DEXTROCARDIA_LEAD_REVERSAL: mk({
+    title_en: "Limb Lead Reversal vs. Dextrocardia",
+    title_ar: "عكس أقطاب الأطراف مقابل انقلاب القلب لليمين (Dextrocardia)",
+    explanation_en:
+      "Global negativity in lead I (inverted P, QRS, T) and positive R-wave in aVR. Normal precordial R-wave progression favors LA/RA limb lead reversal; absent precordial R-wave progression (decreasing V1->V6) indicates true Dextrocardia (LITFL Top 150, CC BY-NC-SA 4.0).",
+    explanation_ar:
+      "سلبية كاملة في المسرى I مع إيجابية aVR: إذا كان تدرج موجة R الصدرية طبيعياً فهو عكس أقطاب الأطراف؛ وإذا تناقصت موجة R من V1 إلى V6 فهو انقلاب قلب حقيقي (Dextrocardia).",
+    inv_en: "Check electrode placement and repeat 12-lead ECG. If true dextrocardia suspected, perform right-sided precordial ECG (V3R–V6R) and Chest X-ray.",
+    inv_ar: "تأكد من وضع الأقطاب وأعد التخطيط. إذا اشتبهت في انقلاب القلب الحقيقي، اطلب مساري صدرية يمنى (V3R–V6R) وأشعة صدر.",
+    ttt_en: "Correct misplaced electrodes immediately so ischemic/axis misdiagnosis is avoided. Isolated dextrocardia requires no emergency treatment unless congenital heart disease is present.",
+    ttt_ar: "تصحيح وضع الأقطاب فوراً لتفادي تشخيص خاطئ. انقلاب القلب المعزول لا يحتاج علاجاً طارئاً.",
+  }),
   BIFASCICULAR_BLOCK: mk({
     title_en: "Bifascicular Block (RBBB + Fascicular Block)",
     title_ar: "إحصار ثنائي الحزم (RBBB + LAFB/LPFB)",
@@ -405,6 +549,18 @@ export function lookupClinicalEntry(code: string, labelHint?: string): EcgClinic
   if (hint.includes("PVC") || hint.includes("BIGEMINY")) return ECG_CLINICAL_LIBRARY.PVC_BIGEMINY;
   if (hint.includes("SHORT_QT") || hint.includes("SHORT QT")) return ECG_CLINICAL_LIBRARY.SHORT_QT;
   if (hint.includes("LONG_QT") || hint.includes("PROLONGED_QT") || hint.includes("QT")) return ECG_CLINICAL_LIBRARY.LONG_QT;
+  if (hint.includes("WELLENS")) return ECG_CLINICAL_LIBRARY.WELLENS_SYNDROME;
+  if (hint.includes("DE_WINTER") || hint.includes("DE WINTER")) return ECG_CLINICAL_LIBRARY.DE_WINTER_T_WAVES;
+  if (hint.includes("BRUGADA")) return ECG_CLINICAL_LIBRARY.BRUGADA_TYPE_1;
+  if (hint.includes("PRE_EXCITED") || hint.includes("PREEXCITED")) return ECG_CLINICAL_LIBRARY.PRE_EXCITED_AFIB;
+  if (hint.includes("WPW") || hint.includes("WOLFF")) return ECG_CLINICAL_LIBRARY.WPW_PATTERN;
+  if (hint.includes("HYPERKALEMIA")) return ECG_CLINICAL_LIBRARY.HYPERKALEMIA;
+  if (hint.includes("TCA") || hint.includes("SODIUM_BLOCK")) return ECG_CLINICAL_LIBRARY.TCA_SODIUM_BLOCKADE;
+  if (hint.includes("PERICARDITIS")) return ECG_CLINICAL_LIBRARY.ACUTE_PERICARDITIS;
+  if (hint.includes("PULMONARY_EMBOLISM") || hint.includes("S1Q3T3")) return ECG_CLINICAL_LIBRARY.PULMONARY_EMBOLISM_S1Q3T3;
+  if (hint.includes("TORSADES")) return ECG_CLINICAL_LIBRARY.TORSADES_DE_POINTES;
+  if (hint.includes("VENTRICULAR_TACHYCARDIA") || hint.includes("MONOMORPHIC_VT")) return ECG_CLINICAL_LIBRARY.VENTRICULAR_TACHYCARDIA;
+  if (hint.includes("DEXTROCARDIA") || hint.includes("LEAD_REVERSAL")) return ECG_CLINICAL_LIBRARY.DEXTROCARDIA_LEAD_REVERSAL;
   if (hint.includes("NORMAL_SINUS")) return ECG_CLINICAL_LIBRARY.NORMAL_SINUS_RHYTHM;
   return null;
 }

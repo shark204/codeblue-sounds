@@ -143,12 +143,19 @@ function boxBlur1D(src: Float32Array, len: number, stride: number, offset: numbe
  */
 function isolateCleanInk(rgba: Uint8ClampedArray, W: number, H: number): Float32Array {
   const luma = new Float32Array(W * H);
+  let satSum = 0;
+  let satCount = 0;
   for (let i = 0; i < W * H; i++) {
     const r = rgba[i * 4]!;
     const g = rgba[i * 4 + 1]!;
     const b = rgba[i * 4 + 2]!;
     luma[i] = 0.55 * r + 0.30 * g + 0.15 * b;
+    if ((i & 31) === 0) {
+      satSum += Math.abs(r - g) + Math.abs(g - b);
+      satCount++;
+    }
   }
+  const isGrayscaleGrid = satCount > 0 && satSum / satCount < 10;
 
   const rx = Math.max(15, Math.floor(W / 32));
   const ry = Math.max(10, Math.floor(H / 32));
@@ -158,20 +165,49 @@ function isolateCleanInk(rgba: Uint8ClampedArray, W: number, H: number): Float32
   for (let x = 0; x < W; x++) boxBlur1D(tmp, H, W, x, ry, bg);
 
   const diff = new Float32Array(W * H);
-  const sample: number[] = [];
   for (let i = 0; i < W * H; i++) {
     let d = Math.max(0, bg[i]! - luma[i]!);
     const r = rgba[i * 4]!;
     const g = rgba[i * 4 + 1]!;
-    if (r - g > 18 && r > 140) d *= 0.25; // suppress pink/red grid lines
+    if (!isGrayscaleGrid && r - g > 18 && r > 140) d *= 0.25; // suppress pink/red grid lines
     diff[i] = d;
-    if ((i & 15) === 0) sample.push(d);
   }
 
-  const p90 = S.percentile(sample, 90);
+  // Grayscale ECG grid suppression (e.g., LITFL thin-line gray scans):
+  // Horizontal/vertical grid lines elevate entire row/col medians; ECG ink occupies <5% of any line.
+  if (isGrayscaleGrid) {
+    const rowGrid = new Float32Array(H);
+    const colGrid = new Float32Array(W);
+    const buf: number[] = [];
+    for (let y = 0; y < H; y++) {
+      buf.length = 0;
+      const base = y * W;
+      for (let x = 0; x < W; x += 3) buf.push(diff[base + x]!);
+      rowGrid[y] = S.percentile(buf, 60);
+    }
+    for (let x = 0; x < W; x++) {
+      buf.length = 0;
+      for (let y = 0; y < H; y += 3) buf.push(diff[y * W + x]!);
+      colGrid[x] = S.percentile(buf, 60);
+    }
+    for (let y = 0; y < H; y++) {
+      const base = y * W;
+      const rg = rowGrid[y]!;
+      for (let x = 0; x < W; x++) {
+        const gFloor = Math.max(rg, colGrid[x]!) * 1.15;
+        const v = diff[base + x]! - gFloor;
+        diff[base + x] = v > 0 ? v : 0;
+      }
+    }
+  }
+
+  const sample: number[] = [];
+  for (let i = 0; i < W * H; i += 16) sample.push(diff[i]!);
+
+  const pFloor = S.percentile(sample, isGrayscaleGrid ? 92 : 90);
   const p996 = S.percentile(sample, 99.6);
-  const lo = Math.max(8, p90);
-  const hi = Math.max(lo + 14, p996);
+  const lo = Math.max(isGrayscaleGrid ? 4 : 8, pFloor);
+  const hi = Math.max(lo + (isGrayscaleGrid ? 10 : 14), p996);
   const span = hi - lo;
   const ink = new Float32Array(W * H);
   for (let i = 0; i < W * H; i++) {
@@ -607,7 +643,9 @@ export async function analyzeEcgImageLocally(dataUrl: string, opts: AnalyzeOptio
   const cond = S.analyzeConduction(beatsP, rr, hrRaw);
   const plaus = S.applyPlausibility(hrRaw, qrsRaw, cond.prMedianMs);
   flags.push(...plaus.flags);
-  const timingTrusted = timingOk && !plaus.flags.some((f) => f.startsWith("hr_implausible"));
+  // Allow standard 10s 12-lead fallback when grid lines are faint/compressed on web JPEGs (still gated as pixel_estimate in fusion)
+  const hasStandard12LeadFallback = !isSingleLead && peaks.length >= 4 && plaus.hr != null;
+  const timingTrusted = (timingOk || hasStandard12LeadFallback) && !plaus.flags.some((f) => f.startsWith("hr_implausible"));
 
   // True TP-segment flutter check (avoids P-wave & QRS harmonic false positives)
   let flutterRate: number | null = null;

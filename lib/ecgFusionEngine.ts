@@ -31,6 +31,10 @@ export const FUSION_CONSTANTS = {
   AI_CRITICAL_TIER1_THRESHOLD: 0.65,
   /** Upper bound for Confidence and RankScore */
   MAX_SCORE: 1.0,
+  /** Strict Certainty Gate: minimum calibrated AI prob & availability to count as CONFIRMED without corroboration */
+  CERTAINTY_MIN_AI_PROB: 0.55,
+  CERTAINTY_MIN_AI_AVAIL: 0.65,
+  CERTAINTY_MIN_RULE_EFF: 0.50,
 } as const;
 
 export type FusionSourceKind = "rules" | "ai_model" | "context_override" | "case_kb";
@@ -67,6 +71,8 @@ export interface FusionCandidate {
   strength: number;
   /** Source availability A_s in [0, 1] */
   availability: number;
+  /** True when derived from unverified pixel_estimate or 'possible' uncertainty band — cannot pass certainty gate alone */
+  isUncertainEstimate?: boolean;
   /** Optional evidence label for the unified Evidence List */
   evidence_summary_en?: string;
   evidence_summary_ar?: string;
@@ -90,6 +96,9 @@ export interface FusedECGFinding extends ECGFinding {
   concordanceLevel: "strong" | "moderate" | "preliminary";
   concordanceLabelEn: string;
   concordanceLabelAr: string;
+  /** Strict clinical certainty gate: only 'confirmed' findings may be displayed as active diagnoses */
+  isConfirmed: boolean;
+  certaintyTier: "confirmed" | "unverified";
   /** Full per-source breakdown for transparent medical education */
   sourceBreakdown: SourceContribution[];
 }
@@ -469,8 +478,33 @@ export function fuseHybridFindings(
     const cleanNameEn = displayLeader.name_en.replace(/\s*\(AI\s+\d+%\)\s*$/i, "");
     const cleanNameAr = displayLeader.name_ar.replace(/\s*\(توقع الذكاء الاصطناعي\s+\d+%\)\s*$/i, "");
 
-    const concordanceLevel: "strong" | "moderate" | "preliminary" =
-      confidence >= 0.75 || nStrong >= 2 ? "strong" : confidence >= 0.45 ? "moderate" : "preliminary";
+    // Strict Certainty Gate (Zero Unverified Pollution):
+    // Confirmed ONLY via: (a) >=2 non-uncertain corroborating sources, (b) confirmed context_override,
+    // (c) deterministic manual/OCR rule (!isUncertainEstimate), or (d) high-certainty calibrated Visual AI.
+    const verifiedGroup = group.filter((c) => !c.isUncertainEstimate);
+    const verifiedStrongCount = verifiedGroup.filter(
+      (c) => c.strength * c.availability >= FUSION_CONSTANTS.STRONG_EFF_THRESHOLD
+    ).length;
+    const hasConfirmedContext = verifiedGroup.some(
+      (c) => c.source === "context_override" && c.strength * c.availability >= FUSION_CONSTANTS.CERTAINTY_MIN_RULE_EFF
+    );
+    const hasConfirmedRule = verifiedGroup.some(
+      (c) => c.source === "rules" && c.strength * c.availability >= FUSION_CONSTANTS.CERTAINTY_MIN_RULE_EFF
+    );
+    const hasConfirmedAi = verifiedGroup.some(
+      (c) =>
+        c.source === "ai_model" &&
+        c.strength >= FUSION_CONSTANTS.CERTAINTY_MIN_AI_PROB &&
+        c.availability >= FUSION_CONSTANTS.CERTAINTY_MIN_AI_AVAIL
+    );
+    const isConfirmed =
+      verifiedStrongCount >= 2 || hasConfirmedContext || hasConfirmedRule || hasConfirmedAi;
+    const certaintyTier: "confirmed" | "unverified" = isConfirmed ? "confirmed" : "unverified";
+
+    // Unverified/possible estimates are strictly capped at 'preliminary' (never 'moderate' or 'strong')
+    const rawConcordance: "strong" | "moderate" | "preliminary" =
+      confidence >= 0.75 || verifiedStrongCount >= 2 ? "strong" : confidence >= 0.45 ? "moderate" : "preliminary";
+    const concordanceLevel: "strong" | "moderate" | "preliminary" = isConfirmed ? rawConcordance : "preliminary";
     const concordanceLabelEn =
       concordanceLevel === "strong"
         ? "Strong Concordance"
@@ -505,6 +539,8 @@ export function fuseHybridFindings(
       tier,
       nStrongSources: nStrong,
       isDemoted,
+      isConfirmed,
+      certaintyTier,
       concordanceLevel,
       concordanceLabelEn,
       concordanceLabelAr,
@@ -512,12 +548,71 @@ export function fuseHybridFindings(
     });
   }
 
-  // Strictly sort by (tier ASC, rankScore DESC, urgency severity DESC)
+  // Strictly sort by (confirmed first, tier ASC, rankScore DESC, urgency severity DESC)
   fused.sort((a, b) => {
+    if (a.isConfirmed !== b.isConfirmed) return a.isConfirmed ? -1 : 1;
     if (a.tier !== b.tier) return a.tier - b.tier;
     if (Math.abs(b.rankScore - a.rankScore) > 1e-6) return b.rankScore - a.rankScore;
     return URGENCY_SEVERITY[b.urgency] - URGENCY_SEVERITY[a.urgency];
   });
 
   return fused;
+}
+
+/**
+ * Strict Certainty Filter (Zero Unverified Pollution):
+ * - Returns ALL co-existing CONFIRMED diagnoses (up to 4) when >=1 diagnosis meets certainty criteria.
+ * - Excludes uncertain pixel estimates ('possible' / unverified) from the confirmed diagnosis list.
+ * - If 0 diagnoses meet certainty criteria, emits an honest INSUFFICIENT_DATA banner rather than
+ *   promoting uncertain guesses, while preserving suppressed signals separately.
+ */
+export function filterConfirmedDiagnoses(fused: FusedECGFinding[]): {
+  primaryFindings: FusedECGFinding[];
+  unverifiedSignals: FusedECGFinding[];
+} {
+  const demoted = fused.filter((f) => f.isDemoted);
+  const confirmed = fused.filter((f) => !f.isDemoted && f.isConfirmed && f.code !== "INSUFFICIENT_DATA");
+  const unverified = fused.filter((f) => !f.isDemoted && !f.isConfirmed && f.code !== "INSUFFICIENT_DATA");
+
+  if (confirmed.length > 0) {
+    return {
+      primaryFindings: [...confirmed.slice(0, 4), ...demoted],
+      unverifiedSignals: unverified,
+    };
+  }
+
+  const insufficient: FusedECGFinding = {
+    code: "INSUFFICIENT_DATA",
+    urgency: "ABNORMAL",
+    priority: 2,
+    urgency_label_en: "VERIFY MANUALLY",
+    urgency_label_ar: "يتطلب مراجعة يدوية",
+    name_en: "Insufficient Certainty — Manual ECG Verification Required",
+    name_ar: "عدم كفاية التيقن التشخيصي — يتطلب مراجعة التخطيط يدوياً",
+    evidence: [],
+    explanation_en:
+      "No diagnosis met strict clinical certainty criteria (visual AI was below the certainty threshold and automatic pixel estimates carry wide measurement uncertainty). Review the 12-lead tracing directly or enter confirmed header intervals/vitals to unlock verified diagnoses.",
+    explanation_ar:
+      "لم يحقق أي تشخيص معايير التيقن السريري الصارمة (الذكاء البصري أقل من عتبة التيقن، والتقديرات البكسلية الآلية وحدها غير كافية للتأكيد). راجع التخطيط الكامل 12-lead يدوياً أو أدخل قياسات الجهاز/العلامات الحيوية المؤكدة.",
+    immediate_action_en: "Inspect rhythm, rate, axis, intervals, and ST-T segments across all 12 leads directly.",
+    immediate_action_ar: "افحص النظم والسرعة والمحور والفترات وقطعة ST-T في جميع الـ 12 مسرى مباشرة.",
+    confidence: "low",
+    source: "rules",
+    canonicalParent: "INSUFFICIENT_DATA",
+    fusionConfidence: 0,
+    rankScore: 0,
+    tier: 2,
+    nStrongSources: 0,
+    isDemoted: false,
+    isConfirmed: false,
+    certaintyTier: "unverified",
+    concordanceLevel: "preliminary",
+    concordanceLabelEn: "Preliminary Finding",
+    concordanceLabelAr: "مؤشر تشخيصي مبدئي",
+    sourceBreakdown: [],
+  };
+  return {
+    primaryFindings: [insufficient, ...demoted],
+    unverifiedSignals: unverified,
+  };
 }

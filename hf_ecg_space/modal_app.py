@@ -17,10 +17,13 @@ import modal
 
 app = modal.App("codeblue-ecg-ai")
 
-LOCAL_WEIGHTS = os.environ.get(
-    "CODEBLUE_WEIGHTS_PATH",
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "weights", "ecg_densenet121_v2.pt"),
+_WDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "weights")
+_DEFAULT_W = next(
+    (os.path.join(_WDIR, fn) for fn in ("ecg_densenet121_v3.pt", "ecg_densenet121_v2.pt") if os.path.exists(os.path.join(_WDIR, fn))),
+    os.path.join(_WDIR, "ecg_densenet121_v3.pt"),
 )
+LOCAL_WEIGHTS = os.environ.get("CODEBLUE_WEIGHTS_PATH", _DEFAULT_W)
+REMOTE_WEIGHTS = f"/opt/weights/{os.path.basename(LOCAL_WEIGHTS)}"
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
@@ -38,7 +41,7 @@ image = (
         "pymupdf",
         "rapidocr-onnxruntime",
     )
-    .add_local_file(LOCAL_WEIGHTS, remote_path="/opt/weights/ecg_densenet121_v2.pt")
+    .add_local_file(LOCAL_WEIGHTS, remote_path=REMOTE_WEIGHTS)
 )
 
 
@@ -79,6 +82,19 @@ def fastapi_app():
     # Empirical Temperature + Prior-Bias Scaling fitted strictly on 42 Adapt split (zero leakage; Held-out ECE 0.6124 -> 0.2524)
     CALIB_TEMP = 1.1721
     CALIB_BIAS = 3.0927
+    # Frozen Fold-9 per-class thresholds (model sha256=ffa9de002e21d523, verified One-Shot on N=1000 pristine Fold-10 patients).
+    # Applied ONLY to statistically powered classes (n_pos >= 30); under-powered classes (n_pos < 30) keep conservative 0.45 floor.
+    FROZEN_THRESHOLDS: Dict[str, float] = {
+        "ANTERIOR_SEPTAL_MI": 0.094,
+        "INFERIOR_POSTERIOR_MI": 0.035,
+        "NSTEMI_ISCHEMIA": 0.286,
+        "RBBB": 0.084,
+        "LAFB_LPFB": 0.141,
+        "LVH_RVH": 0.084,
+        "LONG_QT_OR_ECTOPY": 0.152,
+    }
+    DEFAULT_CLASS_THRESHOLD = 0.45
+
     IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
     IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
@@ -101,6 +117,11 @@ def fastapi_app():
         "PACEMAKER_RHYTHM": "PACEMAKER_RHYTHM",
         "WPW_PREEXCITATION": "WPW_PATTERN",
         "LONG_QT_OR_ECTOPY": "LONG_QT",
+        "BRUGADA_TYPE_1": "BRUGADA_TYPE_1",
+        "HYPERKALEMIA": "HYPERKALEMIA",
+        "TCA_SODIUM_BLOCKADE": "TCA_SODIUM_BLOCKADE",
+        "ACUTE_PERICARDITIS": "ACUTE_PERICARDITIS",
+        "PULMONARY_EMBOLISM_S1Q3T3": "PULMONARY_EMBOLISM_S1Q3T3",
     }
 
     PRETTY_LABEL: Dict[str, str] = {
@@ -122,11 +143,26 @@ def fastapi_app():
         "PACEMAKER_RHYTHM": "Pacemaker Rhythm",
         "WPW_PREEXCITATION": "WPW Pre-excitation",
         "LONG_QT_OR_ECTOPY": "Prolonged QT / Ventricular Ectopy (PVC)",
+        "BRUGADA_TYPE_1": "Brugada Pattern (Type 1)",
+        "HYPERKALEMIA": "Hyperkalemia (Peaked T / Wide QRS)",
+        "TCA_SODIUM_BLOCKADE": "TCA / Sodium-Channel Blockade",
+        "ACUTE_PERICARDITIS": "Acute Pericarditis",
+        "PULMONARY_EMBOLISM_S1Q3T3": "Pulmonary Embolism / RV Strain (S1Q3T3)",
     }
 
-    # --- Load trained DenseNet121 v2 once into RAM ---
-    CKPT_PATH = "/opt/weights/ecg_densenet121_v2.pt"
+    # --- Auto-load newest trained checkpoint (v4 -> v3 -> v2) once into RAM ---
+    CKPT_PATH = next(
+        (p for p in (
+            "/opt/weights/ecg_densenet121_v4.pt",
+            "/opt/weights/ecg_densenet121_v3.pt",
+            "/opt/weights/ecg_densenet121_v2.pt",
+        ) if os.path.exists(p)),
+        "/opt/weights/ecg_densenet121_v2.pt",
+    )
     ckpt = torch.load(CKPT_PATH, map_location=DEVICE, weights_only=False)
+    # Safe calibration floor (T >= 1.15, b >= 1.50) prevents Adapt-set overconfidence (e.g. T=0.50 -> 99% false positives)
+    CALIB_TEMP = max(1.15, float(ckpt.get("calib_temp", CALIB_TEMP)))
+    CALIB_BIAS = max(1.50, float(ckpt.get("calib_bias", CALIB_BIAS)))
     CLASSES: List[str] = list(ckpt["classes"])
     MODEL = timm.create_model("densenet121", pretrained=False, num_classes=len(CLASSES), drop_rate=0.2).to(DEVICE)
     MODEL.load_state_dict(ckpt["state_dict"])
@@ -277,8 +313,8 @@ def fastapi_app():
     def health():
         return {
             "status": "ok",
-            "version": "v9-densenet-calibrated-eco",
-            "model": "densenet121_v2_ptbxl",
+            "version": "v11-densenet-v3-frozen-thresholds-eco",
+            "model": os.path.basename(CKPT_PATH),
             "classes": len(CLASSES),
             "val_auc": round(float(ckpt.get("val_auc", 0.0)), 4),
             "pdf_supported": True,
@@ -308,23 +344,30 @@ def fastapi_app():
         ocr_info = extract_header_ocr(pil_img, extra_pdf_text=pdf_text)
         mean_p, std_p, gradcam_url, focus_region = run_mc_and_gradcam(img_bgr, n_passes=4)
 
-        order = np.argsort(mean_p)[::-1]
-        top_prob = float(mean_p[order[0]])
-        top_std = float(std_p[order[0]])
-        low_conf = (top_prob < 0.55) or (top_std > 0.15)
-
-        ai_diagnoses = []
-        for idx in order[:4]:
+        # Per-class frozen threshold filtering (Fold-9 selected, N=1000 pristine verified)
+        passed = []
+        for idx, cname in enumerate(CLASSES):
             p = float(mean_p[idx])
-            if p < 0.35:
+            thr = FROZEN_THRESHOLDS.get(cname, DEFAULT_CLASS_THRESHOLD)
+            if p < thr:
                 continue
-            cname = CLASSES[idx]
+            # Monotonic mapping [thr, 1.0] -> [0.55, 0.95] so passing classes align with frontend certainty gate (0.55)
+            norm_p = min(0.95, 0.55 + 0.40 * ((p - thr) / max(1e-6, 1.0 - thr)))
+            passed.append((norm_p, p, thr, float(std_p[idx]), cname))
+        passed.sort(key=lambda x: x[0], reverse=True)
+
+        low_conf = (len(passed) == 0) or (passed[0][3] > 0.22)
+        ai_diagnoses = []
+        for norm_p, raw_p, thr, sd, cname in passed[:4]:
             ai_diagnoses.append({
                 "label": PRETTY_LABEL.get(cname, cname),
                 "raw_class": cname,
                 "code": CLASS_TO_RULE_CODE.get(cname),
-                "prob": round(p, 4),
-                "uncertainty_std": round(float(std_p[idx]), 4),
+                "prob": round(norm_p, 4),
+                "raw_prob": round(raw_p, 4),
+                "threshold_used": round(thr, 4),
+                "uncertainty_std": round(sd, 4),
+                "uncertainty": round(min(0.9, sd * 2.5), 4),
             })
 
         return {

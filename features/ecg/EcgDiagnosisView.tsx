@@ -8,7 +8,9 @@ import {
   CheckCircle2,
   Flame,
   FlaskConical,
+  Minus,
   Pill,
+  Plus,
   ShieldAlert,
   X,
 } from "lucide-react";
@@ -23,6 +25,7 @@ interface Props {
   onEditInputs: () => void;
   onApplyCheck: (checkId: string, flagKey: keyof WizardFeatures) => void;
   measurementSource?: "device_ocr" | "auto_waveform" | "manual" | null;
+  showCalibratedPercent?: boolean;
 }
 
 export function EcgResultsPanel({
@@ -33,15 +36,70 @@ export function EcgResultsPanel({
   onEditInputs,
   onApplyCheck,
   measurementSource,
+  showCalibratedPercent = false,
 }: Props) {
-  // Compact anchored floating popover for Secondary Diagnosis Inv / TTT (NOT full-screen zoom)
-  const [secondaryPopover, setSecondaryPopover] = useState<"inv" | "ttt" | null>(null);
+  // Expandable inline Inv/TTT drawer for each Co-Existing Confirmed Diagnosis inside the main panel
+  const [expandedCoDx, setExpandedCoDx] = useState<string | null>(null);
 
-  const urgencyBannerStyle = (u: string) => {
-    if (u === "CRITICAL") return "bg-red-500/20 border-red-500/60 text-red-100";
-    if (u === "URGENT") return "bg-amber-500/20 border-amber-400/60 text-amber-100";
-    if (u === "NORMAL") return "bg-emerald-500/20 border-emerald-400/60 text-emerald-100";
-    return "bg-sky-500/20 border-sky-400/60 text-sky-100";
+  const urgencyBannerStyle = (u: string, insufficient: boolean) => {
+    if (insufficient) {
+      return isLight
+        ? "bg-amber-100/90 border-amber-500/80 text-amber-950"
+        : "bg-amber-500/18 border-amber-400/70 text-amber-50";
+    }
+    if (u === "CRITICAL") {
+      return isLight
+        ? "bg-red-100/90 border-red-500/80 text-red-950"
+        : "bg-red-500/20 border-red-500/70 text-red-50";
+    }
+    if (u === "URGENT") {
+      return isLight
+        ? "bg-amber-100/85 border-amber-500/75 text-amber-950"
+        : "bg-amber-500/18 border-amber-400/65 text-amber-50";
+    }
+    if (u === "NORMAL") {
+      return isLight
+        ? "bg-teal-100/85 border-teal-500/70 text-teal-950"
+        : "bg-teal-500/16 border-teal-400/55 text-teal-50";
+    }
+    return isLight
+      ? "bg-sky-100/85 border-sky-500/70 text-slate-900"
+      : "bg-sky-500/16 border-sky-400/55 text-sky-50";
+  };
+
+  // 3-Level Evidence Meter (Low / Moderate / High — never color-only, respects showCalibratedPercent)
+  const renderEvidenceMeter = (f: typeof primary) => {
+    if (!f || !("concordanceLevel" in f)) return null;
+    const level = f.concordanceLevel === "strong" ? 3 : f.concordanceLevel === "moderate" ? 2 : 1;
+    const label =
+      level === 3
+        ? isAr ? "دليل قوي" : "High Evidence"
+        : level === 2
+          ? isAr ? "دليل متوسط" : "Moderate Evidence"
+          : isAr ? "دليل مبدئي" : "Low Evidence";
+    const pct = "fusionConfidence" in f && f.fusionConfidence > 0 ? Math.round(f.fusionConfidence * 100) : null;
+    const barColor =
+      level === 3 ? "bg-teal-400" : level === 2 ? "bg-amber-400" : "bg-slate-400";
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold border ${
+          isLight ? "bg-white/75 border-slate-300 text-slate-800" : "bg-black/30 border-white/15 text-slate-100"
+        }`}
+      >
+        <span className="inline-flex items-end gap-0.5 h-3" aria-hidden="true">
+          {[1, 2, 3].map((idx) => (
+            <span
+              key={idx}
+              className={`w-1 rounded-full ${idx === 1 ? "h-1.5" : idx === 2 ? "h-2.5" : "h-3"} ${
+                idx <= level ? barColor : isLight ? "bg-slate-300" : "bg-white/20"
+              }`}
+            />
+          ))}
+        </span>
+        <span>{label}</span>
+        {showCalibratedPercent && pct !== null && <span className="font-mono opacity-85">({pct}%)</span>}
+      </span>
+    );
   };
 
   const m = result.rulesResult.measurements;
@@ -49,13 +107,15 @@ export function EcgResultsPanel({
     ? "border-slate-200/90 bg-white/75 text-slate-900"
     : "border-white/10 bg-[#0a1224]/65 text-slate-100";
 
-  // Strictly Top-2 diagnoses ONLY (Primary + Secondary Differential — never 3rd/4th)
+  // Certainty-Gated Multi-Diagnosis: Primary + all additional CONFIRMED co-existing diagnoses (up to 4 total; zero unverified)
   const activeOnly = result.primaryFindings.filter((f) => !("isDemoted" in f && f.isDemoted));
   const primary = activeOnly[0] ?? result.primaryFindings[0];
   const isInsufficient = primary?.code === "INSUFFICIENT_DATA";
-  const secondary = activeOnly[1] ?? null;
+  const coExisting = isInsufficient
+    ? []
+    : activeOnly.slice(1, 4).filter((f) => !("isConfirmed" in f) || f.isConfirmed);
 
-  const isAfibCase = [primary, secondary].some(
+  const isAfibCase = [primary, ...coExisting].some(
     (f) =>
       f &&
       ["ATRIAL_FIBRILLATION", "ATRIAL_FIBRILLATION_RVR", "ATRIAL_FLUTTER", "SECONDARY_AFIB_RVR", "SECONDARY_AFIB_SEPSIS_FEVER"].includes(
@@ -65,9 +125,6 @@ export function EcgResultsPanel({
 
   const primaryInvTtt = primary
     ? getClinicalInvTtt(primary.code, primary.immediate_action_en, primary.immediate_action_ar, primary.name_en)
-    : null;
-  const secondaryInvTtt = secondary
-    ? getClinicalInvTtt(secondary.code, secondary.immediate_action_en, secondary.immediate_action_ar, secondary.name_en)
     : null;
 
   const sourceLabel = (src: string) => {
@@ -112,18 +169,21 @@ export function EcgResultsPanel({
       {/* TOP PRIMARY DIAGNOSIS BANNER — Clean inline Inv & TTT panels (no redundant top buttons) */}
       {primary && primaryInvTtt && (
         <div
-          className={`rounded-2xl border px-4 py-3.5 space-y-2.5 backdrop-blur-xl ${urgencyBannerStyle(
-            result.finalUrgency
+          className={`cb-glass-card px-5 py-4 space-y-3 ${urgencyBannerStyle(
+            result.finalUrgency,
+            isInsufficient
           )}`}
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0 flex-1">
-              {result.finalUrgency === "CRITICAL" ? (
-                <AlertOctagon className="w-6 h-6 shrink-0 mt-0.5 text-red-300" />
+              {isInsufficient ? (
+                <AlertTriangle className={`w-6 h-6 shrink-0 mt-0.5 ${isLight ? "text-amber-700" : "text-amber-300"}`} />
+              ) : result.finalUrgency === "CRITICAL" ? (
+                <AlertOctagon className={`w-6 h-6 shrink-0 mt-0.5 ${isLight ? "text-red-700" : "text-red-300"}`} />
               ) : result.finalUrgency === "URGENT" ? (
-                <AlertTriangle className="w-6 h-6 shrink-0 mt-0.5 text-amber-300" />
+                <AlertTriangle className={`w-6 h-6 shrink-0 mt-0.5 ${isLight ? "text-amber-700" : "text-amber-300"}`} />
               ) : (
-                <CheckCircle2 className="w-6 h-6 shrink-0 mt-0.5 text-emerald-300" />
+                <CheckCircle2 className={`w-6 h-6 shrink-0 mt-0.5 ${isLight ? "text-teal-700" : "text-teal-300"}`} />
               )}
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
@@ -133,7 +193,7 @@ export function EcgResultsPanel({
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/15">
                     {sourceLabel(primary.source)}
                   </span>
-                  {!isInsufficient && concordancePill(primary)}
+                  {!isInsufficient && renderEvidenceMeter(primary)}
                 </div>
                 <div className="font-black text-base sm:text-lg leading-snug mt-1">
                   {isAr ? primary.name_ar : primary.name_en}
@@ -144,11 +204,23 @@ export function EcgResultsPanel({
             <button
               type="button"
               onClick={onEditInputs}
-              className="px-3 py-1.5 rounded-xl bg-black/30 hover:bg-black/45 border border-white/20 text-xs font-bold cursor-pointer shrink-0"
+              className={`min-h-[44px] px-3.5 py-2 rounded-full border text-xs font-bold cursor-pointer shrink-0 cb-hover-lift ${isLight ? "bg-white/75 border-slate-300 text-slate-900 hover:bg-white" : "bg-black/30 hover:bg-black/45 border-white/20 text-white"}`}
             >
               {isAr ? "تعديل الاختيارات" : "Edit Inputs"}
             </button>
           </div>
+
+          {/* Mandatory Safety Warning on Insufficient Certainty (never looks normal/green) */}
+          {isInsufficient && (
+            <div className={`rounded-xl border px-3.5 py-2.5 text-xs font-extrabold flex items-center gap-2 ${isLight ? "bg-amber-200/70 border-amber-500/70 text-amber-950" : "bg-amber-950/55 border-amber-400/60 text-amber-100"}`}>
+              <ShieldAlert className="w-4 h-4 shrink-0" />
+              <span>
+                {isAr
+                  ? "هذا لا يستبعد وجود حالة طارئة — راجع التخطيط يدوياً أو صعّد الحالة فوراً."
+                  : "This does NOT rule out an emergency — verify manually / escalate."}
+              </span>
+            </div>
+          )}
 
           {/* Primary Textbook Clinical Explanation */}
           <p className="text-xs sm:text-[13px] leading-relaxed opacity-95">
@@ -178,6 +250,74 @@ export function EcgResultsPanel({
               </p>
             </div>
           </div>
+          )}
+
+          {/* Co-Existing Confirmed Diagnoses INSIDE the same Primary Panel (Name Only + '+' + Certainty %) */}
+          {!isInsufficient && coExisting.length > 0 && (
+            <div className="pt-2 mt-1 border-t border-white/15 space-y-1.5">
+              <div className="text-[11px] font-black uppercase tracking-wide opacity-90 flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 shrink-0" />
+                <span>
+                  {isAr ? "تشخيصات أخرى مؤكدة في نفس التخطيط" : "Other Confirmed Diagnoses"}
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {coExisting.map((dx) => {
+                  const isOpen = expandedCoDx === dx.code;
+                  const dxInvTtt = getClinicalInvTtt(dx.code, dx.immediate_action_en, dx.immediate_action_ar, dx.name_en);
+                  const certPct = "fusionConfidence" in dx ? Math.round(dx.fusionConfidence * 100) : null;
+                  return (
+                    <div key={dx.code} className="rounded-xl bg-black/25 border border-white/15 overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedCoDx((cur) => (cur === dx.code ? null : dx.code))}
+                        className="w-full min-h-[44px] px-3.5 py-2 flex items-center justify-between gap-2 text-start hover:bg-white/5 transition cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-5 h-5 rounded-md bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
+                            {isOpen ? <Minus className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                          </span>
+                          <span className="font-extrabold text-xs sm:text-[13px] truncate">
+                            {isAr ? dx.name_ar : dx.name_en}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {renderEvidenceMeter(dx)}
+                        </div>
+                      </button>
+
+                      {isOpen && (
+                        <div className="px-3 pb-3 pt-1 border-t border-white/10 space-y-2">
+                          <p className="text-[11.5px] leading-relaxed opacity-90">
+                            {isAr ? dx.explanation_ar : dx.explanation_en}
+                          </p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="rounded-lg bg-black/30 border border-cyan-300/30 px-2.5 py-2 space-y-0.5">
+                              <div className="text-[10.5px] font-black text-cyan-200 flex items-center gap-1">
+                                <FlaskConical className="w-3 h-3 shrink-0" />
+                                <span>{isAr ? "الفحوصات (Inv)" : "Investigations (Inv)"}</span>
+                              </div>
+                              <p className="text-[11.5px] leading-relaxed opacity-95">
+                                {isAr ? dxInvTtt.inv_ar : dxInvTtt.inv_en}
+                              </p>
+                            </div>
+                            <div className="rounded-lg bg-black/30 border border-emerald-300/30 px-2.5 py-2 space-y-0.5">
+                              <div className="text-[10.5px] font-black text-emerald-200 flex items-center gap-1">
+                                <Pill className="w-3 h-3 shrink-0" />
+                                <span>{isAr ? "العلاج (TTT)" : "Treatment (TTT)"}</span>
+                              </div>
+                              <p className="text-[11.5px] leading-relaxed opacity-95">
+                                {isAr ? dxInvTtt.ttt_ar : dxInvTtt.ttt_en}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -238,7 +378,14 @@ export function EcgResultsPanel({
         )}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
           {[
-            { label: "HR", val: m.hr_bpm ? `${m.hr_bpm} bpm` : "—" },
+            {
+              label: "HR",
+              val: m.hr_bpm
+                ? measurementSource === "auto_waveform"
+                  ? `~${Math.max(25, Math.round(m.hr_bpm) - 28)}–${Math.round(m.hr_bpm) + 28} bpm`
+                  : `${m.hr_bpm} bpm`
+                : "—",
+            },
             { label: "PR", val: m.pr_ms ? `${m.pr_ms} ms` : "—" },
             { label: "QRS", val: m.qrs_ms ? `${m.qrs_ms} ms` : "—" },
             { label: "QT", val: m.qt_ms ? `${m.qt_ms} ms` : "—" },
@@ -253,127 +400,27 @@ export function EcgResultsPanel({
           ].map((item) => (
             <div key={item.label} className={`rounded-xl border px-2 py-1.5 ${subCardCls}`}>
               <div className="text-[10px] font-mono text-slate-400">{item.label}</div>
-              <div className="text-xs font-extrabold font-mono text-cyan-400 mt-0.5">{item.val}</div>
+              <div className="text-xs font-extrabold font-mono text-teal-400 mt-0.5">{item.val}</div>
             </div>
           ))}
         </div>
+        {measurementSource !== "device_ocr" && measurementSource !== "manual" && m.pr_ms == null && m.qrs_ms == null && m.qt_ms == null && (
+          <p className={`text-[11px] px-1 ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+            {isAr
+              ? "فترات PR و QRS و QT غير قابلة للقياس الموثوق من الصورة — أدخل أرقام الهيدر المطبوعة أو قِسها يدوياً."
+              : "PR, QRS, and QT are not reliably measurable from raw image pixels — enter printed header values or measure manually."}
+          </p>
+        )}
       </div>
 
-      {/* 2/3 Secondary Differential ONLY (with compact anchored floating Inv/TTT popover) + 1/3 Clinical Pitfalls */}
+      {/* Context Checklists (AFIB / Look-Alikes) + Clinical Pitfalls */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
-        {(secondary || isAfibCase || result.lookAlikeWarnings.length > 0) && (
+        {(isAfibCase || result.lookAlikeWarnings.length > 0) && (
           <div
             className={`rounded-2xl border p-4 space-y-3 flex flex-col relative ${
               result.aggregatedPitfalls.length > 0 ? "lg:col-span-8" : "lg:col-span-12"
             } ${cardCls}`}
           >
-            {secondary && secondaryInvTtt && (
-              <>
-                <div className="flex flex-wrap items-center justify-between gap-2 relative">
-                  <h3 className="text-sm font-black flex items-center gap-2 text-cyan-300">
-                    <Activity className="w-4 h-4 shrink-0" />
-                    <span>{isAr ? "التشخيص الثاني المحتمل (التشخيص التفريقي)" : "Secondary / Differential Diagnosis"}</span>
-                  </h3>
-
-                  {/* Compact Floating Popover Trigger Buttons ONLY on Secondary */}
-                  <div className="relative flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setSecondaryPopover((cur) => (cur === "inv" ? null : "inv"))}
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-black cursor-pointer transition ${
-                        secondaryPopover === "inv"
-                          ? "bg-cyan-500/35 border-cyan-300 text-cyan-100"
-                          : "bg-cyan-500/20 hover:bg-cyan-500/30 border-cyan-400/40 text-cyan-200"
-                      }`}
-                    >
-                      <FlaskConical className="w-3 h-3" />
-                      <span>{isAr ? "Inv" : "Inv"}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSecondaryPopover((cur) => (cur === "ttt" ? null : "ttt"))}
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-black cursor-pointer transition ${
-                        secondaryPopover === "ttt"
-                          ? "bg-emerald-500/35 border-emerald-300 text-emerald-100"
-                          : "bg-emerald-500/20 hover:bg-emerald-500/30 border-emerald-400/40 text-emerald-200"
-                      }`}
-                    >
-                      <Pill className="w-3 h-3" />
-                      <span>{isAr ? "TTT" : "TTT"}</span>
-                    </button>
-
-                    {/* Compact Anchored Floating Panel (NOT full-screen modal!) */}
-                    {secondaryPopover && (
-                      <div
-                        className={`absolute top-full mt-2 z-40 w-72 sm:w-96 rounded-xl border p-3.5 shadow-2xl backdrop-blur-xl ${
-                          isAr ? "left-0" : "right-0"
-                        } ${
-                          secondaryPopover === "inv"
-                            ? "bg-[#08172e]/95 border-cyan-400/60 text-slate-100"
-                            : "bg-[#071f1a]/95 border-emerald-400/60 text-slate-100"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-white/10">
-                          <div className="flex items-center gap-1.5 text-xs font-black">
-                            {secondaryPopover === "inv" ? (
-                              <>
-                                <FlaskConical className="w-3.5 h-3.5 text-cyan-300" />
-                                <span className="text-cyan-200">
-                                  {isAr ? "الفحوصات (Inv)" : "Investigations (Inv)"}
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <Pill className="w-3.5 h-3.5 text-emerald-300" />
-                                <span className="text-emerald-200">
-                                  {isAr ? "العلاج (TTT)" : "Treatment (TTT)"}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setSecondaryPopover(null)}
-                            className="p-1 rounded-md bg-white/10 hover:bg-white/20 text-slate-200 cursor-pointer"
-                            aria-label="Close"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                        <p className="text-xs leading-relaxed text-slate-100">
-                          {secondaryPopover === "inv"
-                            ? isAr
-                              ? secondaryInvTtt.inv_ar
-                              : secondaryInvTtt.inv_en
-                            : isAr
-                              ? secondaryInvTtt.ttt_ar
-                              : secondaryInvTtt.ttt_en}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className={`rounded-xl border border-cyan-400/30 p-3.5 space-y-2 ${subCardCls}`}>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-extrabold text-sm">{isAr ? secondary.name_ar : secondary.name_en}</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
-                        {sourceLabel(secondary.source)}
-                      </span>
-                      {concordancePill(secondary)}
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-800/80 text-slate-200">
-                        {secondary.urgency}
-                      </span>
-                    </div>
-                  </div>
-                  <p className={`text-xs leading-relaxed ${isLight ? "text-slate-600" : "text-slate-300"}`}>
-                    {isAr ? secondary.explanation_ar : secondary.explanation_en}
-                  </p>
-                </div>
-              </>
-            )}
-
             {isAfibCase && (
               <div className="rounded-xl border border-sky-400/35 bg-sky-950/25 p-3 space-y-1.5 text-[11.5px]">
                 <div className="font-black text-sky-300">
@@ -407,7 +454,7 @@ export function EcgResultsPanel({
         {result.aggregatedPitfalls.length > 0 && (
           <div
             className={`${
-              secondary || isAfibCase || result.lookAlikeWarnings.length > 0 ? "lg:col-span-4" : "lg:col-span-12"
+              isAfibCase || result.lookAlikeWarnings.length > 0 ? "lg:col-span-4" : "lg:col-span-12"
             } rounded-2xl border border-amber-500/35 p-3.5 space-y-2.5 flex flex-col ${cardCls}`}
           >
             <h3 className="text-xs sm:text-sm font-black text-amber-400 flex items-center gap-1.5">
@@ -428,6 +475,13 @@ export function EcgResultsPanel({
           </div>
         )}
       </div>
+
+      {/* Explicit Educational & Clinical Decision-Support Notice */}
+      <p className={`text-[11px] px-2 text-center ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+        {isAr
+          ? "للتعليم الطبي ودعم القرار فقط — لا يُعدّ بديلاً عن قراءة الطبيب اليدوية أو التقييم السريري المباشر."
+          : "For medical education and decision support only — not a substitute for clinician ECG interpretation or direct clinical assessment."}
+      </p>
     </div>
   );
 }

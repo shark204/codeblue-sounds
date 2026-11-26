@@ -21,6 +21,7 @@ import {
   computeAiAvailability,
   computeContextAvailability,
   computeRuleAvailability,
+  filterConfirmedDiagnoses,
   fuseHybridFindings,
 } from "@/lib/ecgFusionEngine";
 
@@ -880,6 +881,7 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
       source: "rules",
       strength: adjStrength,
       availability: ruleAvailability,
+      isUncertainEstimate: Boolean((uRes && uRes.status === "possible") || usedPixelEstimate),
     });
   }
 
@@ -933,9 +935,7 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
     });
   }
 
-  // NOTE (Anti-Double-Counting): The 40-Case Reference KB is intentionally EXCLUDED from Noisy-OR fusion
-  // because it matches on overlapping ECG features. It is surfaced strictly in `matchedCases` & `aggregatedPitfalls`
-  // as separate educational reference cases and clinical pitfalls.
+  // KB excluded from Noisy-OR (anti-double-counting); surfaced strictly in matchedCases & pitfalls.
 
   // Fallback if all streams empty
   if (candidates.length === 0) {
@@ -950,6 +950,7 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
   }
 
   const combined = fuseHybridFindings(candidates, demotedCodes);
+  const { primaryFindings: gatedFindings, unverifiedSignals } = filterConfirmedDiagnoses(combined);
 
   // Aggregate unique clinical pitfalls from top matched cases
   const aggregatedPitfalls: (CasePitfall & { from_diagnosis: string })[] = [];
@@ -976,17 +977,16 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
   }
 
   const conditionalChecks = buildConditionalChecks(f, ruleCodes);
-  const topActive = combined.find((x) => !x.isDemoted) ?? combined[0];
-
+  const topActive = gatedFindings.find((x) => !x.isDemoted) ?? gatedFindings[0];
   const sourceConflict = detectPixelRuleVsAiConflict(
     pixelRuleFindings,
     aiPreds.filter((p) => p && typeof p.prob === "number" && p.code).map((p) => ({ code: String(p.code), label: p.label, prob: p.prob }))
   );
-
   return {
     rulesResult,
     finalUrgency: topActive?.urgency || rulesResult.overall_urgency,
-    primaryFindings: combined,
+    primaryFindings: gatedFindings,
+    unverifiedSignals,
     contextAdjustments: adjustments,
     conditionalChecks,
     matchedCases,

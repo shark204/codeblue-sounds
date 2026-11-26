@@ -33,7 +33,7 @@ export function evaluateVitalsContext(
     "COMPLETE_HEART_BLOCK"
   );
   const hasIschemia =
-    hasCode("STEMI", "POSTERIOR_STEMI", "RV_STEMI", "LMCA_OCCLUSION", "NSTEMI_ISCHEMIA", "WELLENS_SYNDROME", "SGARBOSSA_POSITIVE") ||
+    hasCode("STEMI", "ANTERIOR_SEPTAL_MI", "INFERIOR_POSTERIOR_MI", "LATERAL_MI", "STEMI_ANTERIOR", "STEMI_INFERIOR", "DE_WINTER_STEMI", "DE_WINTER_T_WAVES", "POSTERIOR_STEMI", "RV_STEMI", "LMCA_OCCLUSION", "NSTEMI_ISCHEMIA", "WELLENS_SYNDROME", "SGARBOSSA_POSITIVE") ||
     f.st_elevation_leads.length >= 2 ||
     f.st_depression_leads.length >= 2;
   const hasLongQt = hasCode("LONG_QT", "LONG_QT_CRITICAL", "TORSADES_DE_POINTES") || f.prolonged_qt_visual;
@@ -131,16 +131,48 @@ export function evaluateVitalsContext(
     }
     if (hasIschemia) {
       matchedLowBpSpecific = true;
-      add({
-        code: "CARDIOGENIC_SHOCK_OR_RV_MI",
-        urgency: "CRITICAL",
-        title_en: "Suspected Cardiogenic Shock or Right Ventricular MI",
-        title_ar: "اشتباه صدمة قلبية أو جلطة بالبطين الأيمن (RV MI)",
-        reason_en: "Hypotension with acute ischemia/STEMI indicates cardiogenic shock or preload-dependent RV infarction.",
-        reason_ar: "هبوط الضغط مع الجلطة الحادة قد يعني صدمة قلبية أو جلطة بالبطين الأيمن تعتمد على السوائل.",
-        action_en: "Obtain right-sided V4R lead, AVOID nitrates/morphine if RV MI suspected, give cautious fluid bolus if lungs clear, and activate cath lab immediately.",
-        action_ar: "اعمل وصلة V4R، تجنب النيترات والمورفين تماماً عند اشتباه RV MI، وفعّل القسطرة الطارئة فوراً.",
-      });
+      // Strict territory split: V4R / preload guidance applies ONLY to Inferior STEMI (NOT isolated Posterior STD, NOT Anterior/De Winter, NOT unspecified territory)
+      const hasInferiorStemi =
+        hasCode("INFERIOR_POSTERIOR_MI", "STEMI_INFERIOR", "RV_STEMI") ||
+        f.st_elevation_leads.some((l) => l === "II" || l === "III" || l === "aVF");
+      const hasAnteriorOrDeWinter =
+        hasCode("ANTERIOR_SEPTAL_MI", "STEMI_ANTERIOR", "LATERAL_MI", "STEMI_LATERAL", "DE_WINTER_STEMI", "DE_WINTER_T_WAVES", "LMCA_OCCLUSION") ||
+        f.st_elevation_leads.some((l) => ["V1", "V2", "V3", "V4", "V5", "V6", "I", "aVL"].includes(l));
+
+      if (hasInferiorStemi && !hasAnteriorOrDeWinter) {
+        add({
+          code: "CARDIOGENIC_SHOCK_OR_RV_MI",
+          urgency: "CRITICAL",
+          title_en: "Suspected Right Ventricular MI / Cardiogenic Shock (Inferior STEMI + Hypotension)",
+          title_ar: "اشتباه جلطة بالبطين الأيمن أو صدمة قلبية (جلطة سفلية + هبوط ضغط)",
+          reason_en: "Hypotension with inferior STEMI strongly suggests preload-dependent right ventricular infarction or cardiogenic shock (for education & decision support).",
+          reason_ar: "هبوط الضغط مع جلطة سفلية يرجّح جلطة بالبطين الأيمن أو صدمة قلبية (للتعليم الطبي ودعم القرار).",
+          action_en: "Educational reference: obtain right-sided V4R lead, avoid nitrates/morphine if RV MI is confirmed, assess lungs before cautious preload support, and escalate for urgent reperfusion.",
+          action_ar: "مرجع تعليمي: اطلب وصلة V4R، تجنب النيترات والمورفين عند تأكيد RV MI، قيّم الصدر قبل أي سوائل، وصعّد للقسطرة الطارئة.",
+        });
+      } else if (hasAnteriorOrDeWinter) {
+        add({
+          code: "CARDIOGENIC_SHOCK_LV_ISCHEMIA",
+          urgency: "CRITICAL",
+          title_en: "Suspected Cardiogenic Shock (Anterior / LAD / LV Pump Failure)",
+          title_ar: "اشتباه صدمة قلبية (إسكيميا أمامية / فشل ضخ البطين الأيسر)",
+          reason_en: "Hypotension with anterior/lateral/De Winter ischemia indicates LV pump-failure cardiogenic shock — do NOT assume RV infarction (for education & decision support).",
+          reason_ar: "هبوط الضغط مع إسكيميا أمامية أو نمط De Winter يشير لصدمة قلبية من فشل البطين الأيسر وليس RV MI (للتعليم الطبي ودعم القرار).",
+          action_en: "Educational reference: immediate senior/Cath Lab escalation, assess lungs/POCUS for pulmonary edema (avoid indiscriminate fluid boluses), and consider early vasopressor support per local protocol.",
+          action_ar: "مرجع تعليمي: تصعيد فوري للقسطرة والعناية، فحص الرئة/الإيكو لاستبعاد الارتشاح الرئوي (تجنب السوائل العشوائية)، وتقييم رافع ضغط حسب البروتوكول.",
+        });
+      } else {
+        add({
+          code: "CARDIOGENIC_SHOCK_UNSPECIFIED",
+          urgency: "CRITICAL",
+          title_en: "Suspected Shock with Acute Ischemia (Territory Unspecified) — Escalate Immediately",
+          title_ar: "اشتباه صدمة مع إسكيميا حادة (منطقة غير محددة) — تصعيد فوري",
+          reason_en: "Hypotension with acute ischemia of unspecified territory requires immediate bedside clinician verification before territory-specific therapy.",
+          reason_ar: "هبوط الضغط مع إسكيميا غير محددة المنطقة يتطلب تقييماً سريرياً فورياً للـ 12 مسرى قبل أي توصية علاجية مخصصة.",
+          action_en: "Escalate immediately to senior clinician/resuscitation team and verify exact 12-lead ischemic territory and pulmonary exam directly.",
+          action_ar: "صعّد الحالة فوراً للطبيب المختص/فريق الطوارئ وتحقق يدوياً من منطقة الإسكيميا وفحص الصدر.",
+        });
+      }
     }
     if (hasPericarditisOrLowVolt) {
       matchedLowBpSpecific = true;

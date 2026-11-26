@@ -122,7 +122,10 @@ export function EcgDiagnosticStudio() {
             const detSpeed: 25 | 50 = j.detected_speed_mm_s === 50 ? 50 : 25;
             const detGain: 10 | 5 = j.detected_gain_mm_mv === 5 ? 5 : 10;
             const aiList: { label: string; code: string | null; prob: number; uncertainty?: number }[] = Array.isArray(j.ai_diagnoses)
-              ? j.ai_diagnoses
+              ? j.ai_diagnoses.map((d: { label: string; code: string | null; prob: number; uncertainty?: number; uncertainty_std?: number }) => ({
+                  ...d,
+                  uncertainty: typeof d.uncertainty === "number" ? d.uncertainty : typeof d.uncertainty_std === "number" ? Math.min(0.9, d.uncertainty_std * 2.5) : undefined,
+                }))
               : [];
             if (typeof j.gradcam_data_url === "string" && j.gradcam_data_url.startsWith("data:image/")) {
               setGradcamUrl(j.gradcam_data_url);
@@ -163,10 +166,12 @@ export function EcgDiagnosticStudio() {
                 // ignore local fallback error
               }
             }
+            // Clinical safety: pixel P95 errors for PR (±80ms), QRS (±135ms), QT (±173ms) make pixel interval
+            // estimation clinically unusable. Populate PR/QRS/QT ONLY from printed device OCR or manual entry.
             const nextHr = bm.hr_bpm ?? fallbackM.hr_bpm ?? null;
-            const nextPr = bm.pr_ms ?? fallbackM.pr_ms ?? null;
-            const nextQrs = bm.qrs_ms ?? fallbackM.qrs_ms ?? null;
-            const nextQt = bm.qt_ms ?? fallbackM.qt_ms ?? null;
+            const nextPr = bm.pr_ms ?? null;
+            const nextQrs = bm.qrs_ms ?? null;
+            const nextQt = bm.qt_ms ?? null;
             const nextAx = bm.axis_deg ?? null;
             setFeatures((prev) => ({
               ...prev,
@@ -184,7 +189,7 @@ export function EcgDiagnosticStudio() {
                 qt_ms: makeProvenanced(nextQt, bm.qt_ms != null ? "device_ocr" : "pixel_estimate", "qt_ms"),
                 axis_deg: makeProvenanced(nextAx, bm.axis_deg != null ? "device_ocr" : "pixel_estimate", "axis_deg"),
               },
-              ai_predictions: j.low_confidence ? [] : aiList,
+              ai_predictions: aiList,
             }));
             const hasOcrNum = bm.hr_bpm != null || bm.pr_ms != null || bm.qrs_ms != null || bm.qt_ms != null || bm.axis_deg != null;
             const hasFallbackNum = fallbackM.hr_bpm != null || fallbackM.qrs_ms != null || fallbackM.qt_ms != null;
@@ -205,10 +210,11 @@ export function EcgDiagnosticStudio() {
       const m = res.interpretation.measurements;
       const morph = res.extracted_morphology;
       const rrPat = res.extracted_input.rr_pattern;
+      // Only HR may use approximate visual estimate; PR/QRS/QT require printed header or manual entry
       const offHr = m.hr_bpm != null ? Math.round(m.hr_bpm) : null;
-      const offPr = m.pr_ms != null ? Math.round(m.pr_ms) : null;
-      const offQrs = m.qrs_ms != null ? Math.round(m.qrs_ms) : null;
-      const offQt = m.qt_ms != null ? Math.round(m.qt_ms) : null;
+      const offPr = null;
+      const offQrs = null;
+      const offQt = null;
       setFeatures((prev) => ({
         ...prev,
         paper_speed_mm_s: 25,
@@ -310,16 +316,18 @@ export function EcgDiagnosticStudio() {
   }, [showResults, features]);
 
   const cardCls = isLight
-    ? "bg-white/72 backdrop-blur-xl border-slate-200/80 text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.10)]"
-    : "bg-[#0b1326]/68 backdrop-blur-xl border-white/14 text-slate-100 shadow-[0_14px_34px_rgba(0,0,0,0.45)]";
+    ? "cb-glass-card text-slate-900"
+    : "cb-glass-card text-slate-100";
 
   const btnOptionCls = (active?: boolean) =>
-    `w-full text-start px-4 py-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+    `w-full min-h-[44px] text-start px-4 py-3.5 rounded-2xl border cb-hover-lift cursor-pointer flex items-center justify-between gap-3 ${
       active
-        ? "bg-rose-500/20 border-rose-400 text-rose-100 shadow-[0_0_18px_rgba(244,63,94,0.2)]"
+        ? isLight
+          ? "bg-rose-500/15 border-[#9f1239] text-[#881337] shadow-[0_0_18px_rgba(159,18,57,0.16)]"
+          : "bg-[#9f1239]/28 border-rose-400/75 text-rose-50 shadow-[0_0_20px_rgba(159,18,57,0.28)]"
         : isLight
-          ? "bg-white/70 hover:bg-rose-50/90 border-slate-200/90 hover:border-rose-300 text-slate-800 backdrop-blur-md"
-          : "bg-[#0f1930]/65 hover:bg-[#162442]/80 border-white/12 hover:border-rose-400/50 text-slate-100 backdrop-blur-md"
+          ? "cb-glass-nested hover:bg-teal-50/80 hover:border-teal-400/70 text-slate-800"
+          : "cb-glass-nested hover:bg-white/10 hover:border-teal-400/50 text-slate-100"
     }`;
 
   const activeImage = images[activeImgIdx] || null;
@@ -332,10 +340,10 @@ export function EcgDiagnosticStudio() {
       }`}
     >
       <div className="max-w-[1440px] mx-auto space-y-2.5 pb-6">
-        {/* Top Engine Strip */}
-        <div className={`rounded-2xl border px-4 py-2 flex flex-wrap items-center justify-between gap-3 ${cardCls}`}>
+        {/* Top Engine Floating Glass Pill */}
+        <div className="cb-glass-pill px-4 sm:px-5 py-2 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-rose-500/15 border border-rose-400/40 flex items-center justify-center text-rose-400">
+            <div className="w-9 h-9 rounded-full bg-[#9f1239]/25 border border-rose-400/45 flex items-center justify-center text-rose-300">
               <Activity className="w-5 h-5" />
             </div>
             <div>
@@ -350,7 +358,7 @@ export function EcgDiagnosticStudio() {
             <button
               type="button"
               onClick={resetAll}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/70 hover:bg-slate-700 text-slate-200 cursor-pointer"
+              className={`inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold border cb-hover-lift cursor-pointer ${isLight ? "bg-white/70 border-slate-300/80 text-slate-800 hover:bg-white" : "cb-glass-nested text-slate-100 hover:border-teal-400/40"}`}
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>{isAr ? "حالة جديدة" : "New Case"}</span>
@@ -359,7 +367,7 @@ export function EcgDiagnosticStudio() {
               <button
                 type="button"
                 onClick={() => setShowResults(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-rose-600 hover:bg-rose-500 text-white cursor-pointer"
+                className="cb-btn-primary inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 rounded-full text-xs font-extrabold cursor-pointer"
               >
                 <Zap className="w-3.5 h-3.5" />
                 <span>{isAr ? "اعرض التشخيص الآن" : "Diagnose Now"}</span>
@@ -415,7 +423,7 @@ export function EcgDiagnosticStudio() {
                         }}
                       >
                         <img src={img.dataUrl} alt={img.name} className="w-12 h-9 object-cover" />
-                        <button type="button" onClick={(e) => { e.stopPropagation(); removeImage(idx); }} className="absolute top-0.5 right-0.5 p-0.5 rounded bg-black/70 text-rose-300 hover:text-rose-100">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); removeImage(idx); }} className="absolute top-0.5 end-0.5 p-0.5 rounded bg-black/70 text-rose-300 hover:text-rose-100">
                           <Trash2 className="w-2.5 h-2.5" />
                         </button>
                       </div>
@@ -431,9 +439,9 @@ export function EcgDiagnosticStudio() {
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={(e) => { e.preventDefault(); setIsDragging(false); addFiles(e.dataTransfer.files); }}
-                  className={`flex flex-col items-center justify-center gap-1.5 py-4 px-3 rounded-xl border-2 border-dashed cursor-pointer transition ${isDragging ? "border-cyan-400 bg-cyan-500/10" : "border-slate-700/80 hover:border-rose-400/60 bg-slate-900/40"}`}
+                  className={`flex flex-col items-center justify-center gap-2 min-h-[112px] py-5 px-4 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 ${isDragging ? "cb-dropzone-active" : isLight ? "border-slate-300 hover:border-teal-500/70 bg-white/45" : "border-white/20 hover:border-teal-400/60 bg-white/[0.03]"}`}
                 >
-                  <ImagePlus className="w-7 h-7 text-rose-400" />
+                  <ImagePlus className="cb-drop-icon w-7 h-7 text-rose-400" />
                   <div className="text-xs font-bold text-center">{isAr ? "اسحب صورة الـ ECG هنا أو اضغط للرفع" : "Drop ECG image(s) here or click to upload"}</div>
                   
                   <input type="file" accept="image/*,application/pdf" multiple className="hidden" onChange={(e) => addFiles(e.target.files)} />
@@ -487,32 +495,40 @@ export function EcgDiagnosticStudio() {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 {[
-                  { key: "hr_bpm", label: "HR (bpm)", ph: "—" },
-                  { key: "pr_ms", label: "PR (ms)", ph: "—" },
-                  { key: "qrs_ms", label: "QRS (ms)", ph: "—" },
-                  { key: "qt_ms", label: "QT (ms)", ph: "—" },
-                  { key: "axis_deg", label: "Axis (°)", ph: "—" },
+                  { key: "hr_bpm", label: "HR", unit: "bpm", ph: "—" },
+                  { key: "pr_ms", label: "PR", unit: "ms", ph: "—" },
+                  { key: "qrs_ms", label: "QRS", unit: "ms", ph: "—" },
+                  { key: "qt_ms", label: "QT", unit: "ms", ph: "—" },
+                  { key: "axis_deg", label: "Axis", unit: "°", ph: "—" },
                 ].map((fld) => (
-                  <label key={fld.key} className="space-y-1">
-                    <span className="text-[11px] font-mono text-slate-400">{fld.label}</span>
-                    <input
-                      type="number"
-                      placeholder={fld.ph}
-                      value={(features[fld.key as keyof WizardFeatures] as number | null) ?? ""}
-                      onChange={(e) => {
-                          const v = parseOptNum(e.target.value);
-                          setMeasurementSource("manual");
-                          setFeatures((p) => ({
-                            ...p,
-                            [fld.key]: v,
-                            measurement_provenance: {
-                              ...(p.measurement_provenance || {}),
-                              [fld.key]: makeProvenanced(v, "manual", fld.key as "hr_bpm" | "pr_ms" | "qrs_ms" | "qt_ms" | "axis_deg"),
-                            },
-                          }));
-                        }}
-                      className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-mono focus:outline-none focus:border-cyan-400 ${isLight ? "bg-white/85 border-slate-300 text-slate-900" : "bg-[#0a1224]/75 border-white/15 text-white"}`}
-                    />
+                  <label key={fld.key} className="space-y-1 block">
+                    <span className={`text-[11px] font-mono font-semibold ${isLight ? "text-slate-600" : "text-slate-300"}`}>{fld.label}</span>
+                    <div className="relative flex items-center">
+                      <input
+                        type="number"
+                        placeholder={fld.ph}
+                        value={(features[fld.key as keyof WizardFeatures] as number | null) ?? ""}
+                        onChange={(e) => {
+                            const v = parseOptNum(e.target.value);
+                            setMeasurementSource("manual");
+                            setFeatures((p) => ({
+                              ...p,
+                              [fld.key]: v,
+                              measurement_provenance: {
+                                ...(p.measurement_provenance || {}),
+                                [fld.key]: makeProvenanced(v, "manual", fld.key as "hr_bpm" | "pr_ms" | "qrs_ms" | "qt_ms" | "axis_deg"),
+                              },
+                            }));
+                          }}
+                        className={`cb-glass-input w-full min-h-[44px] ps-3 pe-10 py-2 rounded-xl text-xs font-mono ${isLight ? "text-slate-900 placeholder:text-slate-400" : "text-slate-50 placeholder:text-slate-400"}`}
+                      />
+                      <span
+                        aria-hidden="true"
+                        className={`pointer-events-none absolute end-2.5 text-[10.5px] font-mono font-semibold ${isLight ? "text-slate-500" : "text-slate-400"}`}
+                      >
+                        {fld.unit}
+                      </span>
+                    </div>
                   </label>
                 ))}
               </div>
@@ -527,7 +543,7 @@ export function EcgDiagnosticStudio() {
                 {/* 4-Step Progress Bar */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-rose-400 flex items-center gap-1.5">
+                    <span className="text-rose-300 flex items-center gap-1.5">
                       <UserCheck className="w-4 h-4" />
                       {isAr ? `حالة المريض — بطاقة ${step} من 4` : `Patient Context — Card ${step} of 4`}
                     </span>
@@ -537,12 +553,16 @@ export function EcgDiagnosticStudio() {
                           key={n}
                           type="button"
                           onClick={() => setStep(n)}
-                          className={`w-6 h-6 rounded-full text-[11px] font-bold cursor-pointer transition ${
+                          className={`w-8 h-8 rounded-full text-xs font-bold cursor-pointer transition-all duration-200 ${
                             n === step
-                              ? "bg-rose-500 text-white"
+                              ? "bg-gradient-to-br from-[#881337] to-[#be123c] text-white shadow-[0_0_16px_rgba(159,18,57,0.5)]"
                               : n < step
-                                ? "bg-emerald-500/25 text-emerald-300 border border-emerald-500/40"
-                                : "bg-slate-800 text-slate-400"
+                                ? isLight
+                                  ? "bg-teal-500/20 text-teal-800 border border-teal-500/50"
+                                  : "bg-teal-500/20 text-teal-200 border border-teal-400/45"
+                                : isLight
+                                  ? "bg-slate-200/80 text-slate-600"
+                                  : "bg-white/10 text-slate-300 border border-white/10"
                           }`}
                         >
                           {n}
@@ -550,8 +570,8 @@ export function EcgDiagnosticStudio() {
                       ))}
                     </div>
                   </div>
-                  <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-rose-500 to-emerald-400 transition-all duration-300" style={{ width: `${(step / 4) * 100}%` }} />
+                  <div className={`h-2 w-full rounded-full overflow-hidden border ${isLight ? "bg-slate-200/70 border-slate-300/60" : "bg-white/10 border-white/10"}`}>
+                    <div className="h-full rounded-full bg-gradient-to-r from-[#9f1239] via-[#e11d48] to-teal-400 transition-all duration-250 ease-out" style={{ width: `${(step / 4) * 100}%` }} />
                   </div>
                 </div>
 
@@ -562,120 +582,102 @@ export function EcgDiagnosticStudio() {
                       <HeartPulse className="w-5 h-5 text-cyan-400" />
                       <span>{isAr ? "1. العلامات الحيوية والاستقرار (Vitals)" : "1. Vitals & Hemodynamic Stability"}</span>
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <div className="rounded-xl border border-white/10 bg-slate-900/50 p-2.5 space-y-1.5">
-                        <div className="text-[11px] font-bold text-slate-300">{isAr ? "ضغط الدم (BP)" : "Blood Pressure"}</div>
-                        <div className="grid grid-cols-3 gap-1">
-                          {([
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {([
+                        {
+                          label: isAr ? "ضغط الدم (BP)" : "Blood Pressure",
+                          current: features.bp_status,
+                          opts: [
                             { v: "normal", ar: "طبيعي", en: "Normal" },
                             { v: "high", ar: "مرتفع", en: "High" },
                             { v: "low", ar: "منخفض", en: "Low" },
-                          ] as const).map((o) => (
-                            <button
-                              key={o.v}
-                              type="button"
-                              onClick={() => setFeatures((p) => ({ ...p, bp_status: o.v }))}
-                              className={`py-1.5 rounded-lg text-[11px] font-bold border cursor-pointer transition ${
-                                features.bp_status === o.v
-                                  ? o.v === "normal"
-                                    ? "bg-emerald-500/25 border-emerald-400 text-emerald-200"
-                                    : "bg-rose-500/25 border-rose-400 text-rose-100"
-                                  : "bg-slate-800/70 border-slate-700 text-slate-400 hover:border-slate-500"
-                              }`}
-                            >
-                              {isAr ? o.ar : o.en}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="rounded-xl border border-white/10 bg-slate-900/50 p-2.5 space-y-1.5">
-                        <div className="text-[11px] font-bold text-slate-300">{isAr ? "سكر الدم (Glucose)" : "Blood Glucose"}</div>
-                        <div className="grid grid-cols-3 gap-1">
-                          {([
+                          ],
+                          onSelect: (v: string) => setFeatures((p) => ({ ...p, bp_status: v as "normal" | "high" | "low" })),
+                        },
+                        {
+                          label: isAr ? "سكر الدم (Glucose)" : "Blood Glucose",
+                          current: features.glucose_status,
+                          opts: [
                             { v: "normal", ar: "طبيعي", en: "Normal" },
                             { v: "high", ar: "مرتفع/DKA", en: "High/DKA" },
                             { v: "low", ar: "منخفض", en: "Low" },
-                          ] as const).map((o) => (
-                            <button
-                              key={o.v}
-                              type="button"
-                              onClick={() => setFeatures((p) => ({ ...p, glucose_status: o.v }))}
-                              className={`py-1.5 rounded-lg text-[11px] font-bold border cursor-pointer transition ${
-                                features.glucose_status === o.v
-                                  ? o.v === "normal"
-                                    ? "bg-emerald-500/25 border-emerald-400 text-emerald-200"
-                                    : "bg-amber-500/25 border-amber-400 text-amber-100"
-                                  : "bg-slate-800/70 border-slate-700 text-slate-400 hover:border-slate-500"
-                              }`}
-                            >
-                              {isAr ? o.ar : o.en}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="rounded-xl border border-white/10 bg-slate-900/50 p-2.5 space-y-1.5">
-                        <div className="text-[11px] font-bold text-slate-300">{isAr ? "الأكسجين (SpO₂)" : "Oxygen (SpO₂)"}</div>
-                        <div className="grid grid-cols-2 gap-1">
-                          {([
+                          ],
+                          onSelect: (v: string) => setFeatures((p) => ({ ...p, glucose_status: v as "normal" | "high" | "low" })),
+                        },
+                        {
+                          label: isAr ? "الأكسجين (SpO₂)" : "Oxygen (SpO₂)",
+                          current: features.spo2_status,
+                          opts: [
                             { v: "normal", ar: "طبيعي (≥95%)", en: "Normal (≥95%)" },
                             { v: "low", ar: "ناقص (<92%)", en: "Low (<92%)" },
-                          ] as const).map((o) => (
-                            <button
-                              key={o.v}
-                              type="button"
-                              onClick={() => setFeatures((p) => ({ ...p, spo2_status: o.v }))}
-                              className={`py-1.5 rounded-lg text-[11px] font-bold border cursor-pointer transition ${
-                                features.spo2_status === o.v
-                                  ? o.v === "normal"
-                                    ? "bg-emerald-500/25 border-emerald-400 text-emerald-200"
-                                    : "bg-rose-500/25 border-rose-400 text-rose-100"
-                                  : "bg-slate-800/70 border-slate-700 text-slate-400 hover:border-slate-500"
-                              }`}
-                            >
-                              {isAr ? o.ar : o.en}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="rounded-xl border border-white/10 bg-slate-900/50 p-2.5 space-y-1.5">
-                        <div className="text-[11px] font-bold text-slate-300">{isAr ? "الحرارة (Temp)" : "Temperature"}</div>
-                        <div className="grid grid-cols-3 gap-1">
-                          {([
+                          ],
+                          onSelect: (v: string) => setFeatures((p) => ({ ...p, spo2_status: v as "normal" | "low" })),
+                        },
+                        {
+                          label: isAr ? "الحرارة (Temp)" : "Temperature",
+                          current: features.temp_status,
+                          opts: [
                             { v: "normal", ar: "طبيعية", en: "Normal" },
                             { v: "fever", ar: "حمى ≥38°", en: "Fever" },
                             { v: "hypothermia", ar: "برد <35°", en: "Hypoth." },
-                          ] as const).map((o) => (
-                            <button
-                              key={o.v}
-                              type="button"
-                              onClick={() => setFeatures((p) => ({ ...p, temp_status: o.v }))}
-                              className={`py-1.5 rounded-lg text-[11px] font-bold border cursor-pointer transition ${
-                                features.temp_status === o.v
-                                  ? o.v === "normal"
-                                    ? "bg-emerald-500/25 border-emerald-400 text-emerald-200"
-                                    : "bg-amber-500/25 border-amber-400 text-amber-100"
-                                  : "bg-slate-800/70 border-slate-700 text-slate-400 hover:border-slate-500"
-                              }`}
+                          ],
+                          onSelect: (v: string) => setFeatures((p) => ({ ...p, temp_status: v as "normal" | "fever" | "hypothermia" })),
+                        },
+                      ]).map((group) => {
+                        const activeIdx = Math.max(0, group.opts.findIndex((o) => o.v === group.current));
+                        const pctW = 100 / group.opts.length;
+                        return (
+                          <div key={group.label} className="cb-glass-nested rounded-2xl p-3 space-y-2">
+                            <div className={`text-xs font-bold ${isLight ? "text-slate-700" : "text-slate-200"}`}>{group.label}</div>
+                            <div
+                              className="cb-segmented"
+                              style={{ gridTemplateColumns: `repeat(${group.opts.length}, minmax(0, 1fr))` }}
                             >
-                              {isAr ? o.ar : o.en}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                              <div
+                                aria-hidden="true"
+                                className="cb-segmented-thumb"
+                                style={{
+                                  width: `calc(${pctW}% - 6px)`,
+                                  insetInlineStart: `calc(${activeIdx * pctW}% + 3px)`,
+                                }}
+                              />
+                              {group.opts.map((o) => {
+                                const isSel = group.current === o.v;
+                                return (
+                                  <button
+                                    key={o.v}
+                                    type="button"
+                                    aria-pressed={isSel}
+                                    onClick={() => group.onSelect(o.v)}
+                                    className={`relative z-10 min-h-[40px] py-2 px-1 rounded-lg text-[11.5px] font-bold cursor-pointer transition-colors duration-150 ${
+                                      isSel
+                                        ? isLight
+                                          ? "text-[#881337]"
+                                          : "text-rose-50"
+                                        : isLight
+                                          ? "text-slate-600 hover:text-slate-900"
+                                          : "text-slate-300 hover:text-white"
+                                    }`}
+                                  >
+                                    {isAr ? o.ar : o.en}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
 
-                    <div className="rounded-xl border border-white/10 bg-slate-900/50 p-2.5 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[11px] font-bold text-slate-300">{isAr ? "الحالة العامة والوعي:" : "Hemodynamic Status:"}</span>
+                    <div className="cb-glass-nested rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
+                      <span className={`text-xs font-bold ${isLight ? "text-slate-700" : "text-slate-200"}`}>{isAr ? "الحالة العامة والوعي:" : "Hemodynamic Status:"}</span>
                       <div className="flex gap-1.5">
                         <button
                           type="button"
                           onClick={() => setFeatures((p) => ({ ...p, hemodynamic_unstable: false }))}
-                          className={`px-3 py-1 rounded-lg text-[11px] font-bold border cursor-pointer ${
+                          className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border cursor-pointer transition ${
                             !features.hemodynamic_unstable
-                              ? "bg-emerald-500/25 border-emerald-400 text-emerald-200"
+                              ? "bg-teal-500/25 border-teal-400 text-teal-100"
                               : "bg-slate-800/70 border-slate-700 text-slate-400"
                           }`}
                         >
@@ -684,7 +686,7 @@ export function EcgDiagnosticStudio() {
                         <button
                           type="button"
                           onClick={() => setFeatures((p) => ({ ...p, hemodynamic_unstable: true }))}
-                          className={`px-3 py-1 rounded-lg text-[11px] font-bold border cursor-pointer ${
+                          className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border cursor-pointer transition ${
                             features.hemodynamic_unstable
                               ? "bg-rose-500/30 border-rose-400 text-rose-100"
                               : "bg-slate-800/70 border-slate-700 text-slate-400"
@@ -698,7 +700,7 @@ export function EcgDiagnosticStudio() {
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs cursor-pointer"
+                      className="cb-btn-primary w-full min-h-[44px] py-2.5 rounded-2xl font-black text-xs cursor-pointer"
                     >
                       {isAr ? "التالي: الأعراض الحالية ←" : "Next: Current Symptoms →"}
                     </button>
@@ -709,7 +711,7 @@ export function EcgDiagnosticStudio() {
                 {step === 2 && (
                   <div className="space-y-2.5">
                     <h2 className="text-base font-black flex items-center gap-2">
-                      <HeartPulse className="w-5 h-5 text-rose-400" />
+                      <HeartPulse className="w-5 h-5 text-teal-400" />
                       <span>{isAr ? "2. هل المريض يعاني من أعراض حالياً؟" : "2. Does the patient have current symptoms?"}</span>
                     </h2>
                     <button
@@ -802,10 +804,14 @@ export function EcgDiagnosticStudio() {
                             key={chip.key}
                             type="button"
                             onClick={() => toggleFlag(chip.key)}
-                            className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                            className={`min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs font-bold border cb-hover-lift cursor-pointer ${
                               active
-                                ? "bg-emerald-500/20 border-emerald-400 text-emerald-200 shadow-sm"
-                                : "bg-slate-900/75 border-slate-700 text-slate-300 hover:border-slate-500"
+                                ? isLight
+                                  ? "bg-teal-500/20 border-teal-600 text-[#881337] shadow-sm"
+                                  : "bg-teal-500/22 border-teal-400 text-rose-50 shadow-sm"
+                                : isLight
+                                  ? "cb-glass-nested text-slate-700 hover:border-teal-500/50"
+                                  : "cb-glass-nested text-slate-200 hover:border-teal-400/50"
                             }`}
                           >
                             {active ? "✓ " : "+ "}
@@ -817,7 +823,7 @@ export function EcgDiagnosticStudio() {
                     <button
                       type="button"
                       onClick={() => setShowResults(true)}
-                      className="w-full py-3 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                      className="cb-btn-primary w-full min-h-[48px] py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4" />
                       <span>{isAr ? "اعرض التشخيص الهجين والفخاخ السريرية" : "Show Hybrid Diagnosis & Clinical Pitfalls"}</span>
@@ -830,7 +836,7 @@ export function EcgDiagnosticStudio() {
                     type="button"
                     disabled={step === 1}
                     onClick={() => setStep((s) => Math.max(1, s - 1))}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800/70 disabled:opacity-35 text-slate-200 cursor-pointer"
+                    className="inline-flex items-center gap-1 min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-35 text-slate-200 cursor-pointer"
                   >
                     {isAr ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
                     <span>{isAr ? "السابق" : "Back"}</span>
@@ -839,7 +845,7 @@ export function EcgDiagnosticStudio() {
                     <button
                       type="button"
                       onClick={() => setStep((s) => Math.min(4, s + 1))}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800/70 hover:bg-slate-700 text-slate-200 cursor-pointer"
+                      className="inline-flex items-center gap-1 min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 hover:bg-slate-700 text-slate-200 cursor-pointer"
                     >
                       <span>{isAr ? "تخطي" : "Skip"}</span>
                       {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
