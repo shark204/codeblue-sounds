@@ -424,7 +424,7 @@ export function EcgDiagnosticStudio() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
           {/* LEFT: Auto-Analyzing ECG Image Uploader + Auto-Filled Printed Header Numbers */}
           <div className="lg:col-span-4 space-y-2.5">
-            <div className={`rounded-2xl border p-3 space-y-2 ${cardCls}`}>
+            <div className={`${showResults ? "hidden lg:block " : ""}rounded-2xl border p-3 space-y-2 ${cardCls}`}>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-xs font-extrabold">
                   <Layers className="w-4 h-4 text-cyan-400" />

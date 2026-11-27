@@ -88,7 +88,7 @@ export function EcgResultsPanel({
       level === 3 ? "bg-teal-400" : level === 2 ? "bg-amber-400" : "bg-slate-400";
     return (
       <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold border ${
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-full text-[10.5px] font-bold border whitespace-nowrap ${
           isLight ? "bg-white/75 border-slate-300 text-slate-800" : "bg-black/30 border-white/15 text-slate-100"
         }`}
       >
@@ -180,8 +180,8 @@ export function EcgResultsPanel({
             isInsufficient
           )}`}
         >
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0 flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="flex items-start gap-2.5 sm:gap-3 min-w-0 flex-1">
               {isInsufficient ? (
                 <AlertTriangle className={`w-6 h-6 shrink-0 mt-0.5 ${isLight ? "text-amber-700" : "text-amber-300"}`} />
               ) : result.finalUrgency === "CRITICAL" ? (
@@ -191,23 +191,23 @@ export function EcgResultsPanel({
               ) : (
                 <CheckCircle2 className={`w-6 h-6 shrink-0 mt-0.5 ${isLight ? "text-teal-700" : "text-teal-300"}`} />
               )}
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 rounded bg-black/30">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 rounded bg-black/30 whitespace-nowrap">
                     {result.finalUrgency}
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/15">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/15 whitespace-nowrap">
                     {sourceLabel(primary.source)}
                   </span>
                   {!isInsufficient && renderEvidenceMeter(primary)}
                 </div>
-                <div className="font-black text-base sm:text-lg leading-snug mt-1">
+                <div className="font-black text-base sm:text-lg leading-snug mt-1.5 break-words">
                   {isAr ? primary.name_ar : primary.name_en}
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto sm:shrink-0">
               <button
                 type="button"
                 disabled={exportingSlide}
@@ -224,19 +224,19 @@ export function EcgResultsPanel({
                     setExportingSlide(false);
                   }
                 }}
-                className="cb-btn-primary inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-extrabold cursor-pointer shrink-0 disabled:opacity-60"
+                className="cb-btn-primary inline-flex items-center justify-center gap-1.5 min-h-[40px] sm:min-h-[44px] px-3 sm:px-3.5 py-2 rounded-full text-[11px] sm:text-xs font-extrabold cursor-pointer sm:shrink-0 disabled:opacity-60"
               >
                 {exportingSlide ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
                 ) : (
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-3.5 h-3.5 shrink-0" />
                 )}
-                <span>{isAr ? "تحميل تقرير سلايد" : "Download Slide Report"}</span>
+                <span className="truncate">{isAr ? "تحميل تقرير سلايد" : "Download Slide Report"}</span>
               </button>
               <button
                 type="button"
                 onClick={onEditInputs}
-                className={`min-h-[44px] px-3.5 py-2 rounded-full border text-xs font-bold cursor-pointer shrink-0 cb-hover-lift ${isLight ? "bg-white/75 border-slate-300 text-slate-900 hover:bg-white" : "bg-black/30 hover:bg-black/45 border-white/20 text-white"}`}
+                className={`inline-flex items-center justify-center min-h-[40px] sm:min-h-[44px] px-3 sm:px-3.5 py-2 rounded-full border text-[11px] sm:text-xs font-bold cursor-pointer sm:shrink-0 cb-hover-lift ${isLight ? "bg-white/75 border-slate-300 text-slate-900 hover:bg-white" : "bg-black/30 hover:bg-black/45 border-white/20 text-white"}`}
               >
                 {isAr ? "تعديل الاختيارات" : "Edit Inputs"}
               </button>
@@ -311,16 +311,13 @@ export function EcgResultsPanel({
                         onClick={() => setExpandedCoDx((cur) => (cur === dx.code ? null : dx.code))}
                         className="w-full min-h-[44px] px-3.5 py-2 flex items-center justify-between gap-2 text-start hover:bg-white/5 transition cursor-pointer"
                       >
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
                           <span className="w-5 h-5 rounded-md bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
                             {isOpen ? <Minus className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
                           </span>
-                          <span className="font-extrabold text-xs sm:text-[13px] truncate">
+                          <span className="font-extrabold text-xs sm:text-[13px] leading-snug break-words">
                             {isAr ? dx.name_ar : dx.name_en}
                           </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          {renderEvidenceMeter(dx)}
                         </div>
                       </button>
 
