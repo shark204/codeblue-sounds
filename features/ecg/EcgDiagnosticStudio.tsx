@@ -116,6 +116,12 @@ export function EcgDiagnosticStudio() {
   const [awaitingImage, setAwaitingImage] = useState(false);
   const [smartConfirmOpen, setSmartConfirmOpen] = useState<boolean>(false);
   const cardsSectionRef = useRef<HTMLDivElement | null>(null);
+  const [cardsInView, setCardsInView] = useState(false);
+  useEffect(() => {
+    const el = cardsSectionRef.current; if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setCardsInView(e.isIntersecting), { threshold: 0.15 });
+    io.observe(el); return () => io.disconnect();
+  }, [images.length, showResults]);
   const [features, setFeatures] = useState<WizardFeatures>(INITIAL_WIZARD_FEATURES);
   const [symptomChoice, setSymptomChoice] = useState<"chest_pain" | "syncope" | "secondary_trigger" | "asymptomatic" | null>(null);
   const runImageExtraction = async (dataUrl: string, rawFile?: File) => {
@@ -496,16 +502,6 @@ export function EcgDiagnosticStudio() {
               </button>
 
               {/* Live Auto-Extraction Status Banner (100% Automatic from Image) */}
-              {activeImage && !showResults && (
-                <button
-                  type="button"
-                  onClick={() => cardsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                  className={`lg:hidden w-full min-h-[42px] px-3.5 py-2 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-2 cursor-pointer transition ${isLight ? "border-cyan-500 bg-cyan-100 hover:bg-cyan-200 text-cyan-900" : "border-cyan-400/50 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-100"}`}
-                >
-                  <ArrowDown className="w-4 h-4 animate-bounce" />
-                  <span>{isAr ? `انتقل للبطاقة ${step} (${step === 1 ? "العلامات الحيوية" : step === 2 ? "الأعراض" : "المتابعة السريرية"})` : `Go to Card ${step} (${step === 1 ? "Vitals" : step === 2 ? "Symptoms" : "Clinical Follow-up"})`}</span>
-                </button>
-              )}
               {activeImage && analyzingImg && (
                 <div className="rounded-xl bg-cyan-500/10 border border-cyan-400/30 px-3 py-2 text-xs text-cyan-200 flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin shrink-0" />
@@ -966,6 +962,12 @@ export function EcgDiagnosticStudio() {
           addFiles(dt.files);
         }}
       />
+      {activeImage && !showResults && !cardsInView && !cameraOpen && (
+        <button type="button" onClick={() => cardsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} className={`lg:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-40 min-h-[44px] px-5 py-2.5 rounded-full border text-xs font-extrabold flex items-center justify-center gap-2 whitespace-nowrap shadow-2xl backdrop-blur-xl cursor-pointer transition active:scale-95 ${isLight ? "border-cyan-600 bg-cyan-600/95 hover:bg-cyan-700 text-white shadow-cyan-900/25" : "border-cyan-400/60 bg-slate-900/90 hover:bg-slate-800/95 text-cyan-100 shadow-cyan-950/60"}`}>
+          <ArrowDown className="w-4 h-4 animate-bounce shrink-0" />
+          <span>{isAr ? `انتقل للبطاقة ${step} (${step === 1 ? "العلامات الحيوية" : step === 2 ? "الأعراض" : "المتابعة السريرية"})` : `Go to Card ${step} (${step === 1 ? "Vitals" : step === 2 ? "Symptoms" : "Clinical Follow-up"})`}</span>
+        </button>
+      )}
       {pasteHint && (
         <div className="fixed bottom-5 end-5 z-50 rounded-xl border border-amber-400/50 bg-slate-950/95 px-4 py-2.5 text-xs font-bold text-amber-200 shadow-2xl backdrop-blur-md">
           {pasteHint}
