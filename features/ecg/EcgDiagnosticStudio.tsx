@@ -33,6 +33,7 @@ import {
 } from "@/lib/ecgImageEngine";
 import { EcgResultsPanel, EcgGradCamPanel } from "@/features/ecg/EcgDiagnosisView";
 import { EcgSmartCameraModal } from "@/features/ecg/EcgSmartCameraModal";
+import { EcgSmartConfirmCard, getSmartConfirmGroup } from "@/features/ecg/EcgSmartConfirmCard";
 import { makeProvenanced } from "@/lib/ecgMeasurementUncertainty";
 import { useAtlasLocale } from "@/lib/atlasI18n";
 import { useUIStore } from "@/stores/uiStore";
@@ -151,6 +152,7 @@ export function EcgDiagnosticStudio() {
   // ONLY 3 Patient-Context Cards (Zero ECG-reading cards!)
   const [step, setStep] = useState<number>(1);
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [smartConfirmOpen, setSmartConfirmOpen] = useState<boolean>(false);
   const [features, setFeatures] = useState<WizardFeatures>(INITIAL_WIZARD_FEATURES);
   const [symptomChoice, setSymptomChoice] = useState<"chest_pain" | "syncope" | "secondary_trigger" | "asymptomatic" | null>(null);
 
@@ -343,11 +345,25 @@ export function EcgDiagnosticStudio() {
     }
   };
 
+  const smartConfirmGroup = useMemo(
+    () => getSmartConfirmGroup(remoteAnalysis?.ai_diagnoses),
+    [remoteAnalysis]
+  );
+
+  const requestShowResults = () => {
+    if (smartConfirmGroup) {
+      setSmartConfirmOpen(true);
+    } else {
+      setShowResults(true);
+    }
+  };
+
   const resetAll = () => {
     setFeatures(INITIAL_WIZARD_FEATURES);
     setSymptomChoice(null);
     setStep(1);
     setShowResults(false);
+    setSmartConfirmOpen(false);
     setImages([]);
     setImgAnalysis(null);
     setRemoteAnalysis(null);
@@ -420,7 +436,7 @@ export function EcgDiagnosticStudio() {
             {!showResults && (
               <button
                 type="button"
-                onClick={() => setShowResults(true)}
+                onClick={requestShowResults}
                 className="cb-btn-primary inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 rounded-full text-xs font-extrabold cursor-pointer"
               >
                 <Zap className="w-3.5 h-3.5" />
@@ -602,7 +618,7 @@ export function EcgDiagnosticStudio() {
 
           {/* RIGHT: ONLY 3 Patient Clinical Context Cards OR Hybrid Results */}
           <div className="lg:col-span-8 space-y-3">
-            {!showResults ? (
+            {!showResults && !smartConfirmOpen ? (
               <div className={`rounded-2xl border p-4 sm:p-5 space-y-4 ${cardCls}`}>
                 {/* 4-Step Progress Bar */}
                 <div className="space-y-2">
@@ -886,7 +902,7 @@ export function EcgDiagnosticStudio() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => setShowResults(true)}
+                      onClick={requestShowResults}
                       className="cb-btn-primary w-full min-h-[48px] py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4" />
@@ -917,6 +933,16 @@ export function EcgDiagnosticStudio() {
                   )}
                 </div>
               </div>
+            ) : smartConfirmOpen && smartConfirmGroup ? (
+              <EcgSmartConfirmCard
+                group={smartConfirmGroup}
+                features={features}
+                isAr={isAr}
+                isLight={isLight}
+                onUpdateFeatures={setFeatures}
+                onConfirm={() => { setSmartConfirmOpen(false); setShowResults(true); }}
+                onSkip={() => { setSmartConfirmOpen(false); setShowResults(true); }}
+              />
             ) : (
                             hybridResult && (
                 <EcgResultsPanel
