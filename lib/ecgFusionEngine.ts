@@ -177,6 +177,7 @@ export const CANONICAL_HIERARCHY: Record<string, CanonicalNode> = {
   // LVH / Hypertrophy family
   LVH: { parent: "LVH", specificity: 1 },
   LVH_VOLTAGE: { parent: "LVH", specificity: 2 },
+  LVH_RVH: { parent: "LVH", specificity: 2 },
   LVH_STRAIN: { parent: "LVH", specificity: 3 },
   HYPERTENSIVE_LVH_STRAIN: { parent: "LVH", specificity: 3 },
 
@@ -575,8 +576,32 @@ export function filterConfirmedDiagnoses(fused: FusedECGFinding[]): {
   const unverified = fused.filter((f) => !f.isDemoted && !f.isConfirmed && f.code !== "INSUFFICIENT_DATA");
 
   if (confirmed.length > 0) {
+    // Post-Ranking Specificity Hierarchy (applied STRICTLY AFTER RankScore sorting & Certainty Gate):
+    // Suppress redundant generic descriptors ONLY when a confirmed specific diagnosis in the same clinical
+    // family already passed the Certainty Gate (guarantees zero TPR loss if the specific diagnosis fails).
+    const confirmedCodes = new Set(confirmed.map((f) => f.code));
+    const hasSpecificTachyOrAfib = [
+      "ATRIAL_FIBRILLATION", "ATRIAL_FIBRILLATION_RVR", "ATRIAL_FLUTTER", "SVT_TACHYCARDIA",
+      "VENTRICULAR_TACHYCARDIA", "TORSADES_DE_POINTES", "PRE_EXCITED_AFIB",
+      "UNSTABLE_TACHYARRHYTHMIA", "DKA_SECONDARY_TACHYARRHYTHMIA", "SECONDARY_AFIB_RVR",
+      "SECONDARY_AFIB_OR_TACHY_FEVER", "DKA_HYPERKALEMIA_PSEUDO_STEMI",
+    ].some((c) => confirmedCodes.has(c));
+    const hasSpecificIrreg = [
+      "ATRIAL_FIBRILLATION", "ATRIAL_FIBRILLATION_RVR", "PRE_EXCITED_AFIB", "SECONDARY_AFIB_RVR",
+    ].some((c) => confirmedCodes.has(c));
+    const hasSpecificBrady = [
+      "COMPLETE_HEART_BLOCK", "HIGH_GRADE_AV_BLOCK", "UNSTABLE_BRADYARRHYTHMIA", "SINUS_BRADYCARDIA",
+    ].some((c) => confirmedCodes.has(c));
+
+    const pruned = confirmed.filter((f) => {
+      if (hasSpecificIrreg && f.code === "IRREGULAR_RHYTHM_UNSPECIFIED") return false;
+      if (hasSpecificTachyOrAfib && (f.code === "TACHYCARDIA_UNSPECIFIED" || f.code === "SINUS_TACHYCARDIA")) return false;
+      if (hasSpecificBrady && (f.code === "BRADYCARDIA" || f.code === "MARKED_BRADYCARDIA")) return false;
+      return true;
+    });
+    const finalConfirmed = pruned.length > 0 ? pruned : confirmed;
     return {
-      primaryFindings: [...confirmed.slice(0, 4), ...demoted],
+      primaryFindings: [...finalConfirmed.slice(0, 4), ...demoted],
       unverifiedSignals: unverified,
     };
   }

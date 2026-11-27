@@ -1,3 +1,4 @@
+import { mergeCompositeFindings } from "@/lib/ecgCompositeRules";
 import rawCasesKb from "@/ecg_engine/ecg_cases_kb_v2.json";
 import {
   ECGInput,
