@@ -181,7 +181,7 @@ def fastapi_app():
             PLATT_B = np.array(ckpt_ef["platt_b"], dtype=np.float32)
         if "thresholds" in ckpt_ef:
             FROZEN_THRESHOLDS = {
-                k: (max(0.35, float(v)) if k == "BRUGADA_TYPE_1" else max(0.25, float(v)) if k in LOW_N_CLASSES else float(v))
+                k: (max(0.35, float(v)) if k in ("BRUGADA_TYPE_1", "SINUS_BRADYCARDIA") else max(0.25, float(v)) if k in LOW_N_CLASSES else float(v))
                 for k, v in ckpt_ef["thresholds"].items()
             }
         MODEL_DESC = (
@@ -450,15 +450,19 @@ def fastapi_app():
             cy, cx = np.unravel_index(int(np.argmax(cam)), cam.shape)
             rx, ry = cx / float(IMG_W), cy / float(IMG_H)
             if ry > 0.74:
-                focus_region = "Rhythm Strip (Bottom Lead II) — RR regularity & P-wave zone"
+                focus_region = (
+                    "Lower-Right Zone (V6 / Rhythm Strip)"
+                    if rx >= 0.50
+                    else "Lower-Left Zone (Inferior Leads / Rhythm Strip)"
+                )
             elif rx < 0.28:
-                focus_region = "Limb Leads (I, II, III)"
+                focus_region = "Left Zone — Limb Leads (I, II, III / aVR–aVF)"
             elif rx < 0.52:
-                focus_region = "Augmented Limb Leads (aVR, aVL, aVF)"
+                focus_region = "Center-Left Zone — Limb / Augmented Leads"
             elif rx < 0.76:
-                focus_region = "Anterior / Septal Precordial Leads (V1–V3)"
+                focus_region = "Center-Right Zone — Precordial Leads (V1–V4)"
             else:
-                focus_region = "Lateral Precordial Leads (V4–V6)"
+                focus_region = "Right Zone — Precordial Leads (V4–V6)"
         finally:
             h1.remove()
             h2.remove()
@@ -570,6 +574,10 @@ def fastapi_app():
                 ai_intervals = {"hr_bpm": hr_v, "pr_ms": pr_v, "qrs_ms": qrs_v, "qt_ms": qt_v, "qtc_ms": qtc_v, "axis_deg": ax_v}
             except Exception as _ie:
                 logger.warning(f"Interval regressor skipped: {_ie}")
+
+        eff_hr = ocr_info.get("hr_bpm") or (ai_intervals.get("hr_bpm") if ai_intervals else None)
+        if eff_hr is not None and eff_hr >= 62:
+            ai_diagnoses = [d for d in ai_diagnoses if d.get("raw_class") != "SINUS_BRADYCARDIA"]
 
         return {
             "ok": True,

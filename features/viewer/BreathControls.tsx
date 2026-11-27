@@ -191,19 +191,40 @@ export function BreathControls() {
     }
   }, [enabled, clearSelection]);
 
-  // Reset elapsed timer and seek to exact `youtubeStart` (after "Let's listen") whenever pattern or sound changes
+  const ytReadyRef = useRef(false);
+  const initialVideoRef = useRef<{ id: string; start: number; end: number } | null>(null);
+  if (!initialVideoRef.current && pattern.youtubeVideoId) {
+    initialVideoRef.current = { id: pattern.youtubeVideoId, start: pattern.youtubeStart, end: pattern.youtubeEnd };
+  }
+
+  // Fast instant switching via persistent YouTube player (loadVideoById avoids reloading 1.5MB YouTube JS!)
   useEffect(() => {
     setAudioElapsed(0);
-    if (!enabled || !sound) return;
-    const initTimer = window.setTimeout(() => {
-      sendYouTubeCommand("seekTo", [pattern.youtubeStart, true]);
+    if (!enabled) return;
+    if (!sound) {
+      sendYouTubeCommand("pauseVideo", []);
+      return;
+    }
+    const triggerPlay = () => {
+      if (pattern.youtubeVideoId) {
+        sendYouTubeCommand("loadVideoById", [{
+          videoId: pattern.youtubeVideoId,
+          startSeconds: pattern.youtubeStart,
+          endSeconds: pattern.youtubeEnd,
+        }]);
+      }
       sendYouTubeCommand("setVolume", [muted ? 0 : volumePct]);
       if (muted) sendYouTubeCommand("mute", []);
       else sendYouTubeCommand("unMute", []);
       sendYouTubeCommand("playVideo", []);
-    }, 110);
+    };
+    if (ytReadyRef.current) {
+      triggerPlay();
+      return;
+    }
+    const initTimer = window.setTimeout(triggerPlay, 180);
     return () => window.clearTimeout(initTimer);
-  }, [enabled, sound, pattern.id, pattern.youtubeStart, sendYouTubeCommand]);
+  }, [enabled, sound, pattern.id, pattern.youtubeVideoId, pattern.youtubeStart, pattern.youtubeEnd, sendYouTubeCommand]);
 
   // Loop cleanly inside [youtubeStart, youtubeEnd] so "Let's listen" is never heard and track the scrollbar position
   useEffect(() => {
@@ -245,20 +266,33 @@ export function BreathControls() {
 
   const activeFormatted = formatTwoLineDiseaseLabel(pattern, isAr);
   const breathInfo = BREATH_CLINICAL_INFO[pattern.id] ?? BREATH_CLINICAL_INFO.quiet!;
-  const ytEmbedUrl = `https://www.youtube.com/embed/${pattern.youtubeVideoId}?enablejsapi=1&autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&start=${pattern.youtubeStart}&end=${pattern.youtubeEnd}`;
+  const initVid = initialVideoRef.current ?? { id: pattern.youtubeVideoId, start: pattern.youtubeStart, end: pattern.youtubeEnd };
+  const ytEmbedUrl = `https://www.youtube.com/embed/${initVid.id}?enablejsapi=1&autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&start=${initVid.start}&end=${initVid.end}`;
 
   return (
     <div dir={isAr ? "rtl" : "ltr"} className="pointer-events-auto flex flex-col items-start gap-1.5">
-      {/* Hidden 1x1 offscreen YouTube audio player (plays ONLY the pure breath sound window without showing the YouTube video screen) */}
-      {sound && pattern.youtubeVideoId && (
+      {/* Persistent hidden 1x1 YouTube audio player: stays warm so switching breath sounds is ~10x faster */}
+      {initVid.id && (
         <iframe
-          key={`${pattern.id}_${pattern.youtubeVideoId}_${pattern.youtubeStart}`}
           ref={ytIframeRef}
           src={ytEmbedUrl}
           title={pattern.label}
           allow="autoplay; encrypted-media"
           onLoad={() => {
-            sendYouTubeCommand("seekTo", [pattern.youtubeStart, true]);
+            ytReadyRef.current = true;
+            if (!sound) {
+              sendYouTubeCommand("pauseVideo", []);
+              return;
+            }
+            if (pattern.youtubeVideoId && pattern.youtubeVideoId !== initVid.id) {
+              sendYouTubeCommand("loadVideoById", [{
+                videoId: pattern.youtubeVideoId,
+                startSeconds: pattern.youtubeStart,
+                endSeconds: pattern.youtubeEnd,
+              }]);
+            } else {
+              sendYouTubeCommand("seekTo", [pattern.youtubeStart, true]);
+            }
             sendYouTubeCommand("setVolume", [muted ? 0 : volumePct]);
             if (!muted) sendYouTubeCommand("unMute", []);
             sendYouTubeCommand("playVideo", []);

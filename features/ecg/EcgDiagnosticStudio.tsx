@@ -500,7 +500,7 @@ export function EcgDiagnosticStudio() {
               <button
                 type="button"
                 onClick={() => setCameraOpen(true)}
-                className="cb-btn-primary w-full min-h-[44px] py-2.5 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 cursor-pointer"
+                className="md:hidden cb-btn-primary w-full min-h-[44px] py-2.5 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Camera className="w-4 h-4" />
                 <span>{isAr ? "مسح الـ ECG بالكاميرا الذكية (التقاط تلقائي)" : "Smart Camera ECG Scan (Auto-Capture)"}</span>
