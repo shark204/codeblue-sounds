@@ -103,33 +103,9 @@ function StandaloneAudioAndMotionDriver({ mode }: { mode: "heart" | "breath" }) 
       const now = heartRealRef.current;
 
       const beat = playerRef.current.advance(before, after);
-      HEART_TRACE.player = playerRef.current;
-      HEART_TRACE.now = now;
-      HEART_TRACE.clock.push(now, after);
-
       HEART_BEAT_NOW.atria = beat.atria;
       HEART_BEAT_NOW.ventricles = beat.ventricles;
       HEART_BEAT_NOW.rhythmId = hState.rhythm;
-
-      if (hState.sound && before > 0.02) {
-        if (hState.rhythm === "ventricular_fibrillation") {
-          stopAsystoleTone();
-          if (now - lastVfTickRef.current >= 0.13) {
-            lastVfTickRef.current = now;
-            playVentricularFibrillationTick(0.85);
-          }
-        } else if (hState.rhythm === "asystole") {
-          startAsystoleTone();
-        } else {
-          stopAsystoleTone();
-          for (const level of beat.lub) playLub(level);
-          for (const level of beat.dub) playDub(level);
-          for (const murmur of beat.murmurs) playMurmur(murmur);
-          for (const kind of beat.extras) playExtra(kind);
-        }
-      } else {
-        stopAsystoleTone();
-      }
       return;
     }
 

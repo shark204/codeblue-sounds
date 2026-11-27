@@ -368,7 +368,7 @@ export default function SoundsLabPage() {
             {isDesktop && <SoundsSpecimenCanvas mode={mode} />}
             <div className="pointer-events-none fixed inset-x-0 top-16 bottom-3 z-20 flex items-start justify-center md:justify-start px-3 lg:px-12 xl:px-20">
               <div className="pointer-events-none w-full max-w-[340px]">
-                {mode === "heart" ? <HeartControls /> : <BreathControls />}
+                {mode === "heart" ? <HeartControls onClose={() => setView("landing")} /> : <BreathControls onClose={() => setView("landing")} />}
               </div>
             </div>
           </>

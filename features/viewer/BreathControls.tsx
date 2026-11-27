@@ -149,7 +149,7 @@ const BREATH_CLINICAL_INFO: Record<string, { pitch: string; causes: string; mgmt
   },
 };
 
-export function BreathControls() {
+export function BreathControls({ onClose }: { onClose?: () => void } = {}) {
   const { isAr, at } = useAtlasLocale();
   const enabled = useBreathStore((s) => s.enabled);
   const sound = useBreathStore((s) => s.sound);
@@ -256,11 +256,13 @@ export function BreathControls() {
 
   const stopAndClose = () => {
     setSound(false);
+    sendYouTubeCommand("pauseVideo", []);
     setPanelMinimized(false);
     clearIsolation();
     clearSelection();
     hideAllSystems();
     if (enabled) toggle();
+    onClose?.();
   };
 
   if (!enabled) return null;

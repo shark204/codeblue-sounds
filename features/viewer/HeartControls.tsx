@@ -2,16 +2,25 @@
 
 import { useAtlasLocale } from "@/lib/atlasI18n";
 import { HeartPulse, Minimize2, Pause, Play, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useBreathStore } from "@/stores/breathStore";
 import { useHeartStore } from "@/stores/heartStore";
 import { useSceneStore } from "@/stores/sceneStore";
 
-import { EcgStrip } from "./EcgStrip";
-import { primeHeartSound } from "./heartSound";
+import { EcgStrip, HEART_TRACE } from "./EcgStrip";
+import {
+  playDub,
+  playExtra,
+  playLub,
+  playMurmur,
+  playVentricularFibrillationTick,
+  primeHeartSound,
+  startAsystoleTone,
+  stopAsystoleTone,
+} from "./heartSound";
 import { OVERLAY_CHIP, OVERLAY_CHIP_ACTION } from "./overlayChrome";
-import { RHYTHM_GROUPS, RHYTHMS, rhythm } from "./rhythms";
+import { RHYTHM_GROUPS, RHYTHMS, RhythmPlayer, rhythm } from "./rhythms";
 import { breathNote } from "./sinusArrhythmia";
 
 /**
@@ -156,7 +165,7 @@ const HEART_CLINICAL_INFO: Record<string, { arTitle: string; site: string; ecg: 
   },
 };
 
-export function HeartControls() {
+export function HeartControls({ onClose }: { onClose?: () => void } = {}) {
   const { isAr, at } = useAtlasLocale();
   const enabled = useHeartStore((s) => s.enabled);
   const sound = useHeartStore((s) => s.sound);
@@ -183,13 +192,80 @@ export function HeartControls() {
   const current = rhythm(rhythmId);
   const info = HEART_CLINICAL_INFO[current.id] ?? HEART_CLINICAL_INFO.normal!;
 
+  // Self-contained zero-WebGL Heart Audio + Live ECG Strip driver (works instantly on Mobile & Desktop)
+  const playerRef = useRef<RhythmPlayer | null>(null);
+  const lastRhythmRef = useRef<string>("");
+  const clockRef = useRef(0);
+  const realRef = useRef(0);
+  const lastVfRef = useRef(0);
+
+  useEffect(() => {
+    if (!enabled) {
+      stopAsystoleTone();
+      HEART_TRACE.player = null;
+      return;
+    }
+    let raf = 0;
+    let prev = performance.now();
+    const tick = (nowMs: number) => {
+      const dt = Math.min(0.05, Math.max(0.001, (nowMs - prev) / 1000));
+      prev = nowMs;
+      const hState = useHeartStore.getState();
+      if (!playerRef.current || lastRhythmRef.current !== hState.rhythm) {
+        playerRef.current = new RhythmPlayer(rhythm(hState.rhythm));
+        lastRhythmRef.current = hState.rhythm;
+        clockRef.current = 0;
+        realRef.current = 0;
+        lastVfRef.current = 0;
+        HEART_TRACE.clock.reset();
+        stopAsystoleTone();
+      }
+      const before = clockRef.current;
+      const after = before + dt;
+      clockRef.current = after;
+      realRef.current += dt;
+      const nowSec = realRef.current;
+      const beat = playerRef.current.advance(before, after);
+      HEART_TRACE.player = playerRef.current;
+      HEART_TRACE.now = nowSec;
+      HEART_TRACE.clock.push(nowSec, after);
+      if (hState.sound && before > 0.02) {
+        if (hState.rhythm === "ventricular_fibrillation") {
+          stopAsystoleTone();
+          if (nowSec - lastVfRef.current >= 0.13) {
+            lastVfRef.current = nowSec;
+            playVentricularFibrillationTick(0.85);
+          }
+        } else if (hState.rhythm === "asystole") {
+          startAsystoleTone();
+        } else {
+          stopAsystoleTone();
+          for (const level of beat.lub) playLub(level);
+          for (const level of beat.dub) playDub(level);
+          for (const murmur of beat.murmurs) playMurmur(murmur);
+          for (const kind of beat.extras) playExtra(kind);
+        }
+      } else {
+        stopAsystoleTone();
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      stopAsystoleTone();
+    };
+  }, [enabled]);
+
   const stopAndClose = () => {
     setSound(false);
+    stopAsystoleTone();
     setPanelMinimized(false);
     clearIsolation();
     clearSelection();
     hideAllSystems();
     if (enabled) toggle();
+    onClose?.();
   };
 
   if (!enabled) return null;
