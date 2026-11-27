@@ -1,49 +1,19 @@
 "use client";
-
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Activity,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  HeartPulse,
-  ImagePlus,
-  Camera,
-  ClipboardPaste,
-  Layers,
-  Loader2,
-  RotateCcw,
-  SlidersHorizontal,
-  Sparkles,
-  Trash2,
-  UserCheck,
-  Zap,
-  ZoomIn,
-  ZoomOut,
-} from "lucide-react";
-import {
-  INITIAL_WIZARD_FEATURES,
-  WizardFeatures,
-  runHybridEcgDiagnosis,
-} from "@/lib/ecgHybridEngine";
-import {
-  LocalECGAnalysisResult,
-  analyzeEcgImageLocally,
-} from "@/lib/ecgImageEngine";
+import { Activity, CheckCircle2, ChevronLeft, ChevronRight, Eye, HeartPulse, ImagePlus, Camera, ClipboardPaste, Layers, Loader2, RotateCcw, SlidersHorizontal, Sparkles, Trash2, UserCheck, Zap, ZoomIn, ZoomOut } from "lucide-react";
+import { INITIAL_WIZARD_FEATURES, WizardFeatures, runHybridEcgDiagnosis } from "@/lib/ecgHybridEngine";
+import { LocalECGAnalysisResult, analyzeEcgImageLocally } from "@/lib/ecgImageEngine";
 import { EcgResultsPanel, EcgGradCamPanel } from "@/features/ecg/EcgDiagnosisView";
 import { EcgSmartCameraModal } from "@/features/ecg/EcgSmartCameraModal";
-import { EcgSmartConfirmCard, getSmartConfirmGroup } from "@/features/ecg/EcgSmartConfirmCard";
+import { EcgSmartConfirmCard, getRelevantWizardSteps, getSmartConfirmGroup } from "@/features/ecg/EcgSmartConfirmCard";
 import { makeProvenanced } from "@/lib/ecgMeasurementUncertainty";
 import { useAtlasLocale } from "@/lib/atlasI18n";
 import { useUIStore } from "@/stores/uiStore";
-
 interface UploadedImage {
   id: string;
   name: string;
   dataUrl: string;
 }
-
 const MEDICAL_CONTEXT_CHIPS: { key: keyof WizardFeatures; labelAr: string; labelEn: string }[] = [
   { key: "dka_ckd_or_high_k", labelAr: "فشل كلوي / غيبوبة سكر (DKA) / اشتباه ارتفاع بوتاسيوم", labelEn: "CKD / DKA / Suspected High K+" },
   { key: "fever_or_cocaine_or_sodium_blocker", labelAr: "حمى شديدة / كوكايين / دواء حاصر لقنوات الصوديوم", labelEn: "High Fever / Cocaine / Na+ Blocker" },
@@ -52,7 +22,6 @@ const MEDICAL_CONTEXT_CHIPS: { key: keyof WizardFeatures; labelAr: string; label
   { key: "syncope_or_family_scd", labelAr: "تاريخ عائلي لموت مفاجئ أو إغماء متكرر", labelEn: "Recurrent Syncope / Family SCD" },
   { key: "post_emotional_stress", labelAr: "صدمة عاطفية أو ضغط نفسي/جسدي شديد", labelEn: "Severe Emotional / Physical Stress" },
 ];
-
 interface RemoteAnalysisSummary {
   hr_bpm: number | null;
   pr_ms: number | null;
@@ -69,20 +38,16 @@ interface RemoteAnalysisSummary {
   ai_diagnoses: { label: string; code: string | null; prob: number }[];
   elapsed_sec?: number;
 }
-
 const ECG_ANALYZE_ENDPOINT = "/api/ecg-analyze";
-
 async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
   const res = await fetch(dataUrl);
   return res.blob();
 }
-
 export function EcgDiagnosticStudio() {
   const { locale } = useAtlasLocale();
   const theme = useUIStore((s) => s.theme);
   const isAr = locale === "ar";
   const isLight = theme === "light";
-
   // Multi-image & auto-analysis state
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [activeImgIdx, setActiveImgIdx] = useState<number>(0);
@@ -91,12 +56,10 @@ export function EcgDiagnosticStudio() {
   const [gradcamUrl, setGradcamUrl] = useState<string | null>(null);
   const [gradcamFocusRegion, setGradcamFocusRegion] = useState<string | null>(null);
   const [measurementSource, setMeasurementSource] = useState<"device_ocr" | "auto_waveform" | "manual" | null>(null);
-
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [pasteMenu, setPasteMenu] = useState<{ x: number; y: number } | null>(null);
   const [pasteHint, setPasteHint] = useState<string | null>(null);
   const [cameraOpen, setCameraOpen] = useState<boolean>(false);
-
   const handlePasteFromClipboard = async () => {
     setPasteMenu(null);
     setPasteHint(null);
@@ -126,7 +89,6 @@ export function EcgDiagnosticStudio() {
       setPasteHint(isAr ? "اسمح بالوصول للحافظة أو اضغط Ctrl+V للصق الصورة." : "Allow clipboard access or press Ctrl+V to paste.");
     }
   };
-
   useEffect(() => {
     if (!pasteMenu) return;
     const close = () => setPasteMenu(null);
@@ -138,7 +100,6 @@ export function EcgDiagnosticStudio() {
       window.removeEventListener("keydown", onKey);
     };
   }, [pasteMenu]);
-
   useEffect(() => {
     if (!pasteHint) return;
     const t = setTimeout(() => setPasteHint(null), 4000);
@@ -148,14 +109,13 @@ export function EcgDiagnosticStudio() {
   const [imgAnalysis, setImgAnalysis] = useState<LocalECGAnalysisResult | null>(null);
   const [backendSource, setBackendSource] = useState<"modal-ai" | "local" | null>(null);
   const [remoteAnalysis, setRemoteAnalysis] = useState<RemoteAnalysisSummary | null>(null);
-
   // ONLY 3 Patient-Context Cards (Zero ECG-reading cards!)
   const [step, setStep] = useState<number>(1);
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [awaitingImage, setAwaitingImage] = useState(false);
   const [smartConfirmOpen, setSmartConfirmOpen] = useState<boolean>(false);
   const [features, setFeatures] = useState<WizardFeatures>(INITIAL_WIZARD_FEATURES);
   const [symptomChoice, setSymptomChoice] = useState<"chest_pain" | "syncope" | "secondary_trigger" | "asymptomatic" | null>(null);
-
   const runImageExtraction = async (dataUrl: string, rawFile?: File) => {
     setAnalyzingImg(true);
     setRemoteAnalysis(null);
@@ -177,6 +137,11 @@ export function EcgDiagnosticStudio() {
             const bm = j.measurements || {};
             const detSpeed: 25 | 50 = j.detected_speed_mm_s === 50 ? 50 : 25;
             const detGain: 10 | 5 = j.detected_gain_mm_mv === 5 ? 5 : 10;
+            if (j.invalid_ecg_image) {
+              setImgAnalysis(isAr ? "⚠️ الصورة لا تبدو تخطيط ECG واضحاً (ورقة فارغة أو ضوضاء أو طمس شديد) — أعد التصوير بوضوح." : "⚠️ Image does not appear to be a readable ECG (blank, noisy, or too blurry) — please retake clearly.");
+              setFeatures((prev) => ({ ...prev, ai_predictions: [], lead_reversal_alert: false }));
+              return;
+            }
             const aiList: { label: string; code: string | null; prob: number; uncertainty?: number }[] = Array.isArray(j.ai_diagnoses)
               ? j.ai_diagnoses.map((d: { label: string; code: string | null; prob: number; uncertainty?: number; uncertainty_std?: number }) => ({
                   ...d,
@@ -224,11 +189,12 @@ export function EcgDiagnosticStudio() {
             }
             // Clinical safety: pixel P95 errors for PR (±80ms), QRS (±135ms), QT (±173ms) make pixel interval
             // estimation clinically unusable. Populate PR/QRS/QT ONLY from printed device OCR or manual entry.
-            const nextHr = bm.hr_bpm ?? fallbackM.hr_bpm ?? null;
-            const nextPr = bm.pr_ms ?? null;
-            const nextQrs = bm.qrs_ms ?? null;
-            const nextQt = bm.qt_ms ?? null;
-            const nextAx = bm.axis_deg ?? null;
+            const aiIv = j.ai_intervals ?? {};
+            const nextHr = bm.hr_bpm ?? aiIv.hr_bpm ?? fallbackM.hr_bpm ?? null;
+            const nextPr = bm.pr_ms ?? aiIv.pr_ms ?? null;
+            const nextQrs = bm.qrs_ms ?? aiIv.qrs_ms ?? null;
+            const nextQt = bm.qt_ms ?? aiIv.qt_ms ?? null;
+            const nextAx = bm.axis_deg ?? aiIv.axis_deg ?? null;
             setFeatures((prev) => ({
               ...prev,
               paper_speed_mm_s: detSpeed,
@@ -245,10 +211,10 @@ export function EcgDiagnosticStudio() {
                 qt_ms: makeProvenanced(nextQt, bm.qt_ms != null ? "device_ocr" : "pixel_estimate", "qt_ms"),
                 axis_deg: makeProvenanced(nextAx, bm.axis_deg != null ? "device_ocr" : "pixel_estimate", "axis_deg"),
               },
-              ai_predictions: aiList,
+              ai_predictions: aiList, lead_reversal_alert: Boolean(j.lead_reversal_alert),
             }));
             const hasOcrNum = bm.hr_bpm != null || bm.pr_ms != null || bm.qrs_ms != null || bm.qt_ms != null || bm.axis_deg != null;
-            const hasFallbackNum = fallbackM.hr_bpm != null || fallbackM.qrs_ms != null || fallbackM.qt_ms != null;
+            const hasFallbackNum = aiIv.hr_bpm != null || aiIv.qrs_ms != null || aiIv.qt_ms != null || fallbackM.hr_bpm != null;
             setMeasurementSource(hasOcrNum ? "device_ocr" : hasFallbackNum ? "auto_waveform" : null);
             setImgAnalysis(null);
             return;
@@ -295,7 +261,7 @@ export function EcgDiagnosticStudio() {
         peaked_t_waves: morph.peaked_t_waves,
         pacing_spikes: morph.pacing_spikes,
         brugada_pattern: morph.brugada_pattern,
-        ai_predictions: [],
+        ai_predictions: [], lead_reversal_alert: false,
       }));
     } catch {
       setImgAnalysis(null);
@@ -349,21 +315,44 @@ export function EcgDiagnosticStudio() {
     () => getSmartConfirmGroup(remoteAnalysis?.ai_diagnoses),
     [remoteAnalysis]
   );
-
+  const hasAnalyzedImage = images.length > 0 && !imgAnalysis && ((features.ai_predictions?.length ?? 0) > 0 || remoteAnalysis !== null);
+  const visibleSteps = useMemo(() => (hasAnalyzedImage ? getRelevantWizardSteps(features.ai_predictions, features.hr_bpm) : [1, 2]), [hasAnalyzedImage, features.ai_predictions, features.hr_bpm]);
+  const stepIdx = Math.max(0, visibleSteps.indexOf(step));
   const requestShowResults = () => {
+    if (!hasAnalyzedImage) {
+      setAwaitingImage(true);
+      return;
+    }
     if (smartConfirmGroup) {
       setSmartConfirmOpen(true);
     } else {
       setShowResults(true);
     }
   };
+  const advanceFrom = (cur: number) => {
+    if (cur === 2) {
+      if (!hasAnalyzedImage) { setAwaitingImage(true); return; }
+      const nextAfter2 = visibleSteps.find((n) => n > 2);
+      if (nextAfter2) setStep(nextAfter2); else requestShowResults();
+      return;
+    }
+    const i = visibleSteps.indexOf(cur);
+    if (i >= 0 && i < visibleSteps.length - 1) setStep(visibleSteps[i + 1]); else requestShowResults();
+  };
+  useEffect(() => { if (!visibleSteps.includes(step)) setStep(visibleSteps[0] ?? 1); }, [visibleSteps, step]);
+  useEffect(() => {
+    if (!awaitingImage || !hasAnalyzedImage) return;
+    setAwaitingImage(false);
+    const nextAfter2 = visibleSteps.find((n) => n > 2);
+    if (nextAfter2) setStep(nextAfter2); else requestShowResults();
+  }, [awaitingImage, hasAnalyzedImage, visibleSteps]);
 
   const resetAll = () => {
     setFeatures(INITIAL_WIZARD_FEATURES);
     setSymptomChoice(null);
     setStep(1);
     setShowResults(false);
-    setSmartConfirmOpen(false);
+    setSmartConfirmOpen(false); setAwaitingImage(false);
     setImages([]);
     setImgAnalysis(null);
     setRemoteAnalysis(null);
@@ -382,7 +371,7 @@ export function EcgDiagnosticStudio() {
 
   const hybridResult = useMemo(() => {
     if (!showResults) return null;
-    return runHybridEcgDiagnosis(features);
+    try { return runHybridEcgDiagnosis(features); } catch (err) { console.error("Hybrid ECG diagnosis error:", err); return null; }
   }, [showResults, features]);
 
   const cardCls = isLight
@@ -425,24 +414,19 @@ export function EcgDiagnosticStudio() {
           </div>
 
           <div className="flex items-center gap-2">
+            <div className={`inline-flex items-center gap-1.5 min-h-[40px] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold border ${showResults ? "bg-emerald-500/15 border-emerald-400/40 text-emerald-300" : imgAnalysis ? "bg-amber-500/15 border-amber-400/40 text-amber-200" : hasAnalyzedImage ? "bg-teal-500/15 border-teal-400/40 text-teal-200" : "bg-white/5 border-white/10 text-slate-300"}`}>
+              {imgAnalysis ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
+              <span>{showResults ? (isAr ? "تم التشخيص" : "Diagnosis Ready") : imgAnalysis ? (isAr ? "جاري تحليل الصورة..." : "Analyzing ECG...") : hasAnalyzedImage ? (isAr ? "تمت القراءة — أكمل البطاقات" : "ECG Read — Complete Cards") : (isAr ? "بانتظار صورة الـ ECG" : "Awaiting ECG Image")}</span>
+            </div>
             <button
               type="button"
+              disabled={images.length === 0 && step === 1 && !showResults && !awaitingImage && !symptomChoice}
               onClick={resetAll}
-              className={`inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold border cb-hover-lift cursor-pointer ${isLight ? "bg-white/70 border-slate-300/80 text-slate-800 hover:bg-white" : "cb-glass-nested text-slate-100 hover:border-teal-400/40"}`}
+              className={`inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold border cb-hover-lift disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer ${isLight ? "bg-white/70 border-slate-300/80 text-slate-800 hover:bg-white" : "cb-glass-nested text-slate-100 hover:border-teal-400/40"}`}
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>{isAr ? "حالة جديدة" : "New Case"}</span>
             </button>
-            {!showResults && (
-              <button
-                type="button"
-                onClick={requestShowResults}
-                className="cb-btn-primary inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 rounded-full text-xs font-extrabold cursor-pointer"
-              >
-                <Zap className="w-3.5 h-3.5" />
-                <span>{isAr ? "اعرض التشخيص الآن" : "Diagnose Now"}</span>
-              </button>
-            )}
           </div>
         </div>
 
@@ -618,40 +602,53 @@ export function EcgDiagnosticStudio() {
 
           {/* RIGHT: ONLY 3 Patient Clinical Context Cards OR Hybrid Results */}
           <div className="lg:col-span-8 space-y-3">
-            {!showResults && !smartConfirmOpen ? (
+            {!showResults && !smartConfirmOpen && awaitingImage ? (
+              <div className={`rounded-2xl border p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[280px] ${cardCls}`}>
+                <Loader2 className="w-10 h-10 text-rose-400 animate-spin" />
+                <div className="space-y-1.5 max-w-md">
+                  <h3 className="text-base font-black">{images.length > 0 ? (isAr ? "جاري قراءة وتحليل صورة الـ ECG..." : "Reading & Analyzing ECG Image...") : (isAr ? "بانتظار رفع صورة الـ ECG..." : "Waiting for ECG Image Upload...")}</h3>
+                  <p className={`text-xs leading-relaxed ${isLight ? "text-slate-600" : "text-slate-300"}`}>
+                    {images.length > 0
+                      ? (isAr ? "تم تسجيل الفايتلز والأعراض. بمجرد انتهاء القراءة ستظهر البطاقات الخاصة بهذه الحالة أو صفحة التشخيص تلقائياً." : "Vitals & symptoms saved. Once analysis completes, relevant follow-up cards or the diagnosis page will open automatically.")
+                      : (isAr ? "تم حفظ الفايتلز وحالة المريض. ارفع أو الصق صورة الـ ECG أو التقطها بالكاميرا الذكية، وبمجرد قراءتها ستظهر البطاقات المناسبة أو التشخيص تلقائياً." : "Vitals & symptoms saved. Upload, paste, or scan the ECG image — relevant cards or the diagnosis will appear automatically once read.")}
+                  </p>
+                </div>
+                <button type="button" onClick={() => { setAwaitingImage(false); setStep(2); }} className="px-4 py-2 rounded-xl text-xs font-bold border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 cursor-pointer">
+                  {isAr ? "الرجوع لتعديل الأعراض" : "Back to Edit Symptoms"}
+                </button>
+              </div>
+            ) : !showResults && !smartConfirmOpen ? (
               <div className={`rounded-2xl border p-4 sm:p-5 space-y-4 ${cardCls}`}>
-                {/* 4-Step Progress Bar */}
+                {/* Adaptive Progress Bar — ONLY Vitals (Card 1) before ECG image analysis; relevant ordered cards after */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold">
+                  <div className="flex items-center justify-between gap-2 text-xs font-bold flex-wrap">
                     <span className="text-rose-300 flex items-center gap-1.5">
-                      <UserCheck className="w-4 h-4" />
-                      {isAr ? `حالة المريض — بطاقة ${step} من 4` : `Patient Context — Card ${step} of 4`}
+                      <UserCheck className="w-4 h-4 shrink-0" />
+                      {hasAnalyzedImage
+                        ? (isAr ? `حالة المريض — بطاقة ${stepIdx + 1} من ${visibleSteps.length}` : `Patient Context — Card ${stepIdx + 1} of ${visibleSteps.length}`)
+                        : (isAr ? `الفايتلز وحالة المريض (${stepIdx + 1} من 2) — باقي البطاقات تظهر بعد قراءة الصورة عند الحاجة` : `Vitals & Patient Status (${stepIdx + 1} of 2) — Extra cards unlock after ECG analysis if needed`)}
                     </span>
                     <div className="flex items-center gap-1.5">
-                      {[1, 2, 3, 4].map((n) => (
-                        <button
-                          key={n}
-                          type="button"
-                          onClick={() => setStep(n)}
-                          className={`w-8 h-8 rounded-full text-xs font-bold cursor-pointer transition-all duration-200 ${
-                            n === step
-                              ? "bg-gradient-to-br from-[#881337] to-[#be123c] text-white shadow-[0_0_16px_rgba(159,18,57,0.5)]"
-                              : n < step
-                                ? isLight
-                                  ? "bg-teal-500/20 text-teal-800 border border-teal-500/50"
-                                  : "bg-teal-500/20 text-teal-200 border border-teal-400/45"
-                                : isLight
-                                  ? "bg-slate-200/80 text-slate-600"
-                                  : "bg-white/10 text-slate-300 border border-white/10"
-                          }`}
-                        >
-                          {n}
-                        </button>
-                      ))}
+                      {visibleSteps.map((n, idx) => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => setStep(n)}
+                            className={`w-8 h-8 rounded-full text-xs font-bold cursor-pointer transition-all duration-200 ${
+                              n === step
+                                ? "bg-gradient-to-br from-[#881337] to-[#be123c] text-white shadow-[0_0_16px_rgba(159,18,57,0.5)]"
+                                : idx < stepIdx
+                                  ? isLight ? "bg-teal-500/20 text-teal-800 border border-teal-500/50" : "bg-teal-500/20 text-teal-200 border border-teal-400/45"
+                                  : isLight ? "bg-slate-200/80 text-slate-600" : "bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {idx + 1}
+                          </button>
+                        ))}
                     </div>
                   </div>
                   <div className={`h-2 w-full rounded-full overflow-hidden border ${isLight ? "bg-slate-200/70 border-slate-300/60" : "bg-white/10 border-white/10"}`}>
-                    <div className="h-full rounded-full bg-gradient-to-r from-[#9f1239] via-[#e11d48] to-teal-400 transition-all duration-250 ease-out" style={{ width: `${(step / 4) * 100}%` }} />
+                    <div className="h-full rounded-full bg-gradient-to-r from-[#9f1239] via-[#e11d48] to-teal-400 transition-all duration-250 ease-out" style={{ width: `${((stepIdx + 1) / visibleSteps.length) * 100}%` }} />
                   </div>
                 </div>
 
@@ -799,7 +796,7 @@ export function EcgDiagnosticStudio() {
                       onClick={() => {
                         setSymptomChoice("chest_pain");
                         setFeatures((p) => ({ ...p, chest_pain_or_shock: true, asymptomatic_nocturnal: false, syncope_or_family_scd: false, pleuritic_or_dehydration_or_bleed: false }));
-                        setStep(3);
+                        advanceFrom(2);
                       }}
                       className={btnOptionCls(symptomChoice === "chest_pain")}
                     >
@@ -810,7 +807,7 @@ export function EcgDiagnosticStudio() {
                       onClick={() => {
                         setSymptomChoice("syncope");
                         setFeatures((p) => ({ ...p, chest_pain_or_shock: false, asymptomatic_nocturnal: false, syncope_or_family_scd: true, pleuritic_or_dehydration_or_bleed: false }));
-                        setStep(3);
+                        advanceFrom(2);
                       }}
                       className={btnOptionCls(symptomChoice === "syncope")}
                     >
@@ -821,7 +818,7 @@ export function EcgDiagnosticStudio() {
                       onClick={() => {
                         setSymptomChoice("secondary_trigger");
                         setFeatures((p) => ({ ...p, chest_pain_or_shock: false, asymptomatic_nocturnal: false, syncope_or_family_scd: false, pleuritic_or_dehydration_or_bleed: true }));
-                        setStep(3);
+                        advanceFrom(2);
                       }}
                       className={btnOptionCls(symptomChoice === "secondary_trigger")}
                     >
@@ -832,7 +829,7 @@ export function EcgDiagnosticStudio() {
                       onClick={() => {
                         setSymptomChoice("asymptomatic");
                         setFeatures((p) => ({ ...p, chest_pain_or_shock: false, asymptomatic_nocturnal: true, syncope_or_family_scd: false, pleuritic_or_dehydration_or_bleed: false }));
-                        setStep(3);
+                        advanceFrom(2);
                       }}
                       className={btnOptionCls(symptomChoice === "asymptomatic")}
                     >
@@ -842,7 +839,7 @@ export function EcgDiagnosticStudio() {
                 )}
 
                 {/* CARD 3: Competitive Athlete */}
-                {step === 3 && (
+                {step === 3 && visibleSteps.includes(3) && (
                   <div className="space-y-2.5">
                     <h2 className="text-base font-black">
                       {isAr ? "3. هل المريض رياضي محترف (تمرين شاق يومياً)؟" : "3. Is the patient a Competitive Athlete (intense daily training)?"}
@@ -851,7 +848,7 @@ export function EcgDiagnosticStudio() {
                       type="button"
                       onClick={() => {
                         setFeatures((p) => ({ ...p, is_competitive_athlete: true }));
-                        setStep(4);
+                        advanceFrom(3);
                       }}
                       className={btnOptionCls(features.is_competitive_athlete)}
                     >
@@ -861,7 +858,7 @@ export function EcgDiagnosticStudio() {
                       type="button"
                       onClick={() => {
                         setFeatures((p) => ({ ...p, is_competitive_athlete: false }));
-                        setStep(4);
+                        advanceFrom(3);
                       }}
                       className={btnOptionCls(!features.is_competitive_athlete && step > 3)}
                     >
@@ -871,7 +868,7 @@ export function EcgDiagnosticStudio() {
                 )}
 
                 {/* CARD 4: Quick Medical Background */}
-                {step === 4 && (
+                {step === 4 && visibleSteps.includes(4) && (
                   <div className="space-y-3">
                     <h2 className="text-base font-black">
                       {isAr ? "4. هل ينطبق على المريض أي من الحالات التالية؟" : "4. Do any of these clinical backgrounds apply?"}
@@ -902,8 +899,9 @@ export function EcgDiagnosticStudio() {
                     </div>
                     <button
                       type="button"
+                      disabled={!hasAnalyzedImage}
                       onClick={requestShowResults}
-                      className="cb-btn-primary w-full min-h-[48px] py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 cursor-pointer"
+                      className="cb-btn-primary w-full min-h-[48px] py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4" />
                       <span>{isAr ? "اعرض التشخيص الهجين والفخاخ السريرية" : "Show Hybrid Diagnosis & Clinical Pitfalls"}</span>
@@ -911,27 +909,29 @@ export function EcgDiagnosticStudio() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800/70">
-                  <button
-                    type="button"
-                    disabled={step === 1}
-                    onClick={() => setStep((s) => Math.max(1, s - 1))}
-                    className="inline-flex items-center gap-1 min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-35 text-slate-200 cursor-pointer"
-                  >
-                    {isAr ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                    <span>{isAr ? "السابق" : "Back"}</span>
-                  </button>
-                  {step < 4 && (
+                {visibleSteps.length > 1 && (
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-800/70">
                     <button
                       type="button"
-                      onClick={() => setStep((s) => Math.min(4, s + 1))}
-                      className="inline-flex items-center gap-1 min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 hover:bg-slate-700 text-slate-200 cursor-pointer"
+                      disabled={stepIdx <= 0}
+                      onClick={() => setStep(visibleSteps[Math.max(0, stepIdx - 1)] ?? 1)}
+                      className="inline-flex items-center gap-1 min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-35 text-slate-200 cursor-pointer"
                     >
-                      <span>{isAr ? "تخطي" : "Skip"}</span>
-                      {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      {isAr ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                      <span>{isAr ? "السابق" : "Back"}</span>
                     </button>
-                  )}
-                </div>
+                    {stepIdx < visibleSteps.length - 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setStep(visibleSteps[Math.min(visibleSteps.length - 1, stepIdx + 1)] ?? 1)}
+                        className="inline-flex items-center gap-1 min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 cursor-pointer"
+                      >
+                        <span>{isAr ? "التالي" : "Next"}</span>
+                        {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ) : smartConfirmOpen && smartConfirmGroup ? (
               <EcgSmartConfirmCard

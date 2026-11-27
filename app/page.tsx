@@ -2,12 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  Activity,
-  Flame,
-  ShieldCheck,
   ArrowLeft,
   Heart,
-  HeartPulse,
   Home,
   Moon,
   Sparkles,
@@ -19,6 +15,7 @@ import { SoundsSpecimenCanvas } from "@/features/viewer/SoundsSpecimenCanvas";
 import { HeartControls } from "@/features/viewer/HeartControls";
 import { BreathControls } from "@/features/viewer/BreathControls";
 import { EcgDiagnosticStudio } from "@/features/ecg/EcgDiagnosticStudio";
+import { NeuralDiagnosticTree } from "@/components/NeuralDiagnosticTree";
 import { useHeartStore } from "@/stores/heartStore";
 import { useBreathStore } from "@/stores/breathStore";
 import { useUIStore } from "@/stores/uiStore";
@@ -105,7 +102,7 @@ export default function SoundsLabPage() {
         <img
           src="/icon.png"
           alt="Code Blue ECG & Sounds"
-          style={{ width: 68, height: 68, borderRadius: 16, boxShadow: "0 0 30px rgba(16,185,129,0.35)" }}
+          style={{ width: 68, height: 68, borderRadius: 16, boxShadow: "0 0 30px rgba(159,18,57,0.4)" }}
         />
         <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "0.04em" }}>CODE BLUE ECG &amp; SOUNDS</div>
       </div>
@@ -113,18 +110,14 @@ export default function SoundsLabPage() {
   }
 
   if (view === "landing") {
-    const petalBase = isLight
-      ? "cb-glass-card cb-hover-lift text-slate-900 hover:border-rose-500/55"
-      : "cb-glass-card cb-hover-lift text-slate-100 hover:border-rose-400/55";
-
     return (
       <div
         dir={isAr ? "rtl" : "ltr"}
-        className={`min-h-screen lg:h-screen lg:overflow-hidden w-full bg-transparent flex flex-col ${
+        className={`h-screen w-full overflow-y-auto overflow-x-hidden bg-transparent flex flex-col ${
           isLight ? "text-slate-900" : "text-slate-100"
         }`}
       >
-        <header className="shrink-0 mx-3 sm:mx-6 mt-2.5 cb-glass-pill min-h-[56px] px-4 sm:px-6 py-1.5 flex items-center justify-between gap-4 z-40">
+        <header className="shrink-0 mx-3 sm:mx-6 mt-2.5 cb-glass-pill min-h-[54px] px-4 sm:px-6 py-1.5 flex items-center justify-between gap-4 z-40">
           <div className="flex items-center gap-3">
             <img
               src="/icon.png"
@@ -169,7 +162,7 @@ export default function SoundsLabPage() {
             <button
               type="button"
               onClick={() => setLocale(isAr ? "en" : "ar")}
-              className={`px-3 py-1.5 rounded-xl border font-bold transition ${
+              className={`px-3 py-1.5 rounded-xl border font-bold transition cursor-pointer ${
                 isLight
                   ? "bg-rose-50/90 hover:bg-rose-100 text-[#9f1239] border-rose-300/80"
                   : "bg-rose-950/45 hover:bg-rose-900/55 text-rose-100 border-rose-400/35"
@@ -180,7 +173,7 @@ export default function SoundsLabPage() {
             <button
               type="button"
               onClick={handleToggleTheme}
-              className={`p-2 rounded-xl border transition ${
+              className={`p-2 rounded-xl border transition cursor-pointer ${
                 isLight
                   ? "bg-slate-100/80 hover:bg-slate-200/80 text-slate-800 border-slate-300/70"
                   : "bg-white/5 hover:bg-white/10 text-slate-200 border-white/10"
@@ -192,14 +185,15 @@ export default function SoundsLabPage() {
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 w-full max-w-7xl mx-auto px-5 md:px-10 py-4 lg:py-0 flex items-center">
+        <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-8 lg:px-10 py-3 flex items-center">
           <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-8">
-            <div className="lg:col-span-6 flex flex-col gap-4">
-              <div className="space-y-2.5">
-                <h1 className={`text-2xl sm:text-3xl xl:text-4xl font-black leading-[1.18] ${isLight ? "text-slate-900" : "text-white"}`}>
+            {/* Start Column: Entry / Launch Controls + Unmodified ECG Monitor Directly Below */}
+            <div className="lg:col-span-4 flex flex-col gap-4">
+              <div className="space-y-2">
+                <h1 className={`text-xl sm:text-2xl xl:text-[30px] font-black leading-[1.2] ${isLight ? "text-slate-900" : "text-white"}`}>
                   {isAr ? "منصة أصوات القلب والتنفس ومحرك تشخيص الـ ECG" : "Interactive Heart, Breath Sounds & ECG Engine"}
                 </h1>
-                <p className={`text-sm sm:text-base leading-relaxed max-w-xl ${isLight ? "text-slate-600" : "text-slate-300"}`}>
+                <p className={`text-xs sm:text-sm leading-relaxed ${isLight ? "text-slate-600" : "text-slate-300"}`}>
                   {isAr ? (
                     <>
                       محاكي تفاعلي ثلاثي الأبعاد لأصوات القلب واللغط القلبي وأصوات الصدر والتنفس، مع{" "}
@@ -216,11 +210,11 @@ export default function SoundsLabPage() {
                     </>
                   )}
                 </p>
-                <div className="pt-1 flex flex-wrap gap-2.5">
+                <div className="pt-1 flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => launchMode("heart")}
-                    className="cb-btn-primary min-h-[48px] px-6 py-3 rounded-2xl font-black text-sm sm:text-base inline-flex items-center gap-2 cursor-pointer"
+                    className="cb-btn-primary min-h-[42px] px-4 py-2 rounded-2xl font-black text-xs sm:text-sm inline-flex items-center gap-2 cursor-pointer"
                   >
                     <Stethoscope className="w-4 h-4" />
                     {isAr ? "أصوات القلب والتنفس" : "Heart & Breath Sounds"}
@@ -228,7 +222,7 @@ export default function SoundsLabPage() {
                   <button
                     type="button"
                     onClick={() => launchMode("ecg-ai")}
-                    className={`px-5 py-3 rounded-2xl border font-extrabold text-sm sm:text-base inline-flex items-center gap-2 transition transform hover:scale-[1.03] cursor-pointer ${
+                    className={`min-h-[42px] px-4 py-2 rounded-2xl border font-extrabold text-xs sm:text-sm inline-flex items-center gap-2 transition transform hover:scale-[1.02] cursor-pointer ${
                       isLight
                         ? "cb-glass-nested border-rose-400/60 text-[#9f1239] hover:bg-rose-50/90"
                         : "cb-glass-nested border-rose-400/45 text-rose-100 hover:bg-rose-950/45"
@@ -240,75 +234,23 @@ export default function SoundsLabPage() {
                 </div>
               </div>
 
-              <div className="pt-1 space-y-2.5">
-                <div className={`text-xs font-extrabold uppercase tracking-wider ${isLight ? "text-[#9f1239]" : "text-[#fb7185]"}`}>
-                  {isAr ? "ماذا تقدم المنصة؟" : "What Does the Platform Offer?"}
-                </div>
-
-                <div dir="ltr" className="grid grid-cols-2 gap-2.5 max-w-[440px]">
-                  <div
-                    dir={isAr ? "rtl" : "ltr"}
-                    className={`group select-none cursor-default rounded-tl-[64px] rounded-tr-xl rounded-bl-xl rounded-br-md border backdrop-blur-xl px-4 py-3.5 pl-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border-rose-400/60 hover:shadow-[0_18px_36px_rgba(244,63,94,0.22)] ${petalBase}`}
-                  >
-                    <div className="w-9 h-9 mb-1.5 rounded-2xl bg-rose-500/15 border border-rose-400/35 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform duration-300">
-                      <HeartPulse className="w-5 h-5" />
-                    </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "أصوات القلب والصدر" : "Heart & Breath Sounds"}</div>
-                    <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "النفخات، التنفس، والمحاكاة ثلاثية الأبعاد" : "Murmurs, Breath & 3D Sync"}
-                    </div>
-                  </div>
-
-                  <div
-                    dir={isAr ? "rtl" : "ltr"}
-                    className={`group select-none cursor-default rounded-tr-[64px] rounded-tl-xl rounded-br-xl rounded-bl-md border backdrop-blur-xl px-4 py-3.5 pr-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border-cyan-400/60 hover:shadow-[0_18px_36px_rgba(34,211,238,0.24)] ${petalBase}`}
-                  >
-                    <div className="w-9 h-9 mb-1.5 rounded-2xl bg-cyan-500/15 border border-cyan-400/35 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform duration-300">
-                      <Flame className="w-5 h-5" />
-                    </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "ذكاء ECG البصري وGrad-CAM" : "Visual ECG AI & Grad-CAM"}</div>
-                    <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "خرائط حرارة تحدد موضع الخلل بالتخطيط" : "Live heatmaps & waveform focus"}
-                    </div>
-                  </div>
-
-                  <div
-                    dir={isAr ? "rtl" : "ltr"}
-                    className={`group select-none cursor-default rounded-bl-[64px] rounded-tl-xl rounded-br-xl rounded-tr-md border backdrop-blur-xl px-4 py-3.5 pl-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:translate-y-1 hover:scale-[1.03] hover:border-emerald-400/60 hover:shadow-[0_18px_36px_rgba(16,185,129,0.22)] ${petalBase}`}
-                  >
-                    <div className="w-9 h-9 mb-1.5 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                      <Activity className="w-5 h-5" />
-                    </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "الدمج الهجين بالفايتلز والقواعد" : "Vitals × ECG Hybrid Fusion"}</div>
-                    <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "معادلة معايرة وطبقات أمان للطوارئ" : "Calibrated fusion & safety tiers"}
-                    </div>
-                  </div>
-
-                  <div
-                    dir={isAr ? "rtl" : "ltr"}
-                    className={`group select-none cursor-default rounded-br-[64px] rounded-tr-xl rounded-bl-xl rounded-tl-md border backdrop-blur-xl px-4 py-3.5 pr-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:translate-y-1 hover:scale-[1.03] hover:border-violet-400/60 hover:shadow-[0_18px_36px_rgba(139,92,246,0.22)] ${petalBase}`}
-                  >
-                    <div className="w-9 h-9 mb-1.5 rounded-2xl bg-violet-500/15 border border-violet-400/35 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform duration-300">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <div className="font-extrabold text-xs sm:text-[13px] leading-snug">{isAr ? "الفحوصات والعلاج والفخاخ" : "Bedside Inv, TTT & Pitfalls"}</div>
-                    <div className={`text-[10.5px] mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                      {isAr ? "خطة عمل فورية مع كشف الفخاخ السريرية" : "Instant workup, action & red flags"}
-                    </div>
-                  </div>
-                </div>
+              {/* Exact Unmodified ECG Monitor Directly Under Entry Section */}
+              <div className="flex justify-center lg:justify-start pt-1">
+                <img
+                  src="/hero-ecg-monitor.png"
+                  alt="Code Blue ECG Diagnostic Monitor"
+                  draggable={false}
+                  className="w-full max-w-[310px] sm:max-w-[345px] h-auto object-contain select-none pointer-events-none"
+                />
               </div>
             </div>
 
-            <div className="lg:col-span-6 flex items-center justify-center">
-              <img
-                src="/hero-sounds.png?v=3"
-                alt="Heart & ECG Simulator Preview"
-                draggable={false}
-                className={`w-full max-w-[540px] max-h-[68vh] h-auto object-contain select-none pointer-events-none ${
-                  isLight ? "drop-shadow-[0_0_28px_rgba(255,255,255,0.95)]" : "drop-shadow-[0_18px_40px_rgba(190,18,60,0.22)]"
-                }`}
+            {/* End Column: Custom Flowing Burgundy Neural Tree with Compact Boxes on Both Sides */}
+            <div className="lg:col-span-8 flex items-center justify-center">
+              <NeuralDiagnosticTree
+                isAr={isAr}
+                isLight={isLight}
+                onLaunchEcg={() => launchMode("ecg-ai")}
               />
             </div>
           </div>
@@ -398,7 +340,7 @@ export default function SoundsLabPage() {
         ) : (
           <>
             <SoundsSpecimenCanvas mode={mode} />
-            <div className="pointer-events-none fixed inset-x-0 top-16 bottom-3 z-20 flex items-start justify-start px-3">
+            <div className="pointer-events-none fixed inset-x-0 top-16 bottom-3 z-20 flex items-start justify-start px-3 lg:px-12 xl:px-20">
               <div className="pointer-events-none w-full max-w-[340px]">
                 {mode === "heart" ? <HeartControls /> : <BreathControls />}
               </div>

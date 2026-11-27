@@ -89,7 +89,7 @@ export interface WizardFeatures {
   rv_strain_twi_v1_v4?: boolean;
   lafb?: boolean;
   lpfb?: boolean;
-  ai_predictions?: { label: string; code: string | null; prob: number; uncertainty?: number }[];
+  ai_predictions?: { label: string; code: string | null; prob: number; uncertainty?: number }[]; lead_reversal_alert?: boolean;
   measurement_provenance?: Partial<MeasurementProvenanceMap>;
 }
 
@@ -977,7 +977,8 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
   }
 
   const conditionalChecks = buildConditionalChecks(f, ruleCodes);
-  const topActive = gatedFindings.find((x) => !x.isDemoted) ?? gatedFindings[0];
+  const finalFindings = mergeCompositeFindings(gatedFindings, { confirmedCodes: gatedFindings.filter((x) => !x.isDemoted && x.code !== "INSUFFICIENT_DATA").map((x) => x.code), hrBpm: rulesResult.measurements.hr_bpm, prMs: rulesResult.measurements.pr_ms, qrsMs: rulesResult.measurements.qrs_ms, qtMs: rulesResult.measurements.qt_ms, axisDeg: rulesResult.measurements.axis_deg, spo2Low: f.spo2_status === "low", pleuriticOrDyspnea: Boolean(f.pleuritic_or_dehydration_or_bleed), sodiumBlockerOrTca: Boolean(f.fever_or_cocaine_or_sodium_blocker), syncopeOrScd: Boolean(f.syncope_or_family_scd), leadReversalDetected: Boolean(f.lead_reversal_alert), wideQrsSuspected: f.qrs_width_class === "wide", measurementSource: (rulesResult.measurements.pr_ms != null || rulesResult.measurements.qrs_ms != null || rulesResult.measurements.qt_ms != null) ? "device_ocr" : null });
+  const topActive = finalFindings.find((x) => !x.isDemoted) ?? finalFindings[0];
   const sourceConflict = detectPixelRuleVsAiConflict(
     pixelRuleFindings,
     aiPreds.filter((p) => p && typeof p.prob === "number" && p.code).map((p) => ({ code: String(p.code), label: p.label, prob: p.prob }))
@@ -985,7 +986,7 @@ export function runHybridEcgDiagnosis(f: WizardFeatures): HybridDiagnosisResult 
   return {
     rulesResult,
     finalUrgency: topActive?.urgency || rulesResult.overall_urgency,
-    primaryFindings: gatedFindings,
+    primaryFindings: finalFindings,
     unverifiedSignals,
     contextAdjustments: adjustments,
     conditionalChecks,

@@ -302,3 +302,15 @@ export function EcgSmartConfirmCard({
     </div>
   );
 }
+
+export function getRelevantWizardSteps(aiDiagnoses?: AiDxItem[], hrBpm?: number | null): number[] {
+  const steps: number[] = [1, 2];
+  if (!aiDiagnoses || aiDiagnoses.length === 0) return steps;
+  const codes = new Set(aiDiagnoses.filter((d) => d.prob >= 0.12).map((d) => (d.code || d.label || "").toUpperCase()));
+  const has = (...keys: string[]) => keys.some((k) => Array.from(codes).some((c) => c.includes(k)));
+  const needsAthlete = has("LVH", "HYPERTROPHY", "PERICARDITIS", "BRADY", "FIRST_DEGREE", "EARLY_REPOL", "AV_BLOCK") || (hrBpm != null && hrBpm < 60);
+  const needsBackground = has("STEMI", "MI", "ISCHEMIA", "NSTEMI", "LBBB", "RBBB", "BRUGADA", "LONG_QT", "PACEMAKER", "ATRIAL_FIBRILLATION", "FLUTTER", "SVT", "WPW", "HIGH_GRADE", "ECTOPY");
+  if (needsAthlete) steps.push(3);
+  if (needsBackground) steps.push(4);
+  return steps;
+}

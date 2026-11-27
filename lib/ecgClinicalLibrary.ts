@@ -26,8 +26,8 @@ function mk(e: RawEntry): EcgClinicalEntry {
 
 export const ECG_CLINICAL_LIBRARY: Record<string, EcgClinicalEntry> = {
   NORMAL_SINUS_RHYTHM: mk({
-    title_en: "Normal Sinus Rhythm",
-    title_ar: "نظم جيبي طبيعي (Normal Sinus Rhythm)",
+    title_en: "No Confirmed Abnormality Detected (Apparent Sinus Pattern)",
+    title_ar: "لا توجد نتيجة غير طبيعية مؤكدة (نمط جيبي ظاهري)",
     explanation_en:
       "Regular SA-node rhythm (60–100 bpm) with upright P waves in I, II, aVF (inverted in aVR), constant PR (120–200 ms), and narrow QRS (<120 ms) without acute ischemic ST-T shifts.",
     explanation_ar:
@@ -298,8 +298,8 @@ export const ECG_CLINICAL_LIBRARY: Record<string, EcgClinicalEntry> = {
   }),
 
   PVC_BIGEMINY: mk({
-    title_en: "Premature Ventricular Contractions (PVCs / Bigeminy)",
-    title_ar: "انقباضات بطينية مبكرة (PVCs / Bigeminy)",
+    title_en: "Ventricular Ectopy (Non-Specific — Verify Rhythm Strip)",
+    title_ar: "نبضات هاجرة بطينية محتملة (Ectopy غير محدد النمط — راجع الشريط)",
     explanation_en:
       "Premature wide (>120 ms) bizarre QRS without preceding P waves and discordant ST-T, followed by a compensatory pause. Alternating normal beats and PVCs defines bigeminy.",
     explanation_ar:
@@ -349,8 +349,8 @@ export const ECG_CLINICAL_LIBRARY: Record<string, EcgClinicalEntry> = {
   }),
 
   TRIFASCICULAR_BLOCK_PATTERN: mk({
-    title_en: "Bifascicular Block + 1st-Degree AVB ('Trifascicular' Pattern)",
-    title_ar: "إحصار ثنائي الحزم + إحصار درجة أولى (نمط ثلاثي الحزم)",
+    title_en: "Bifascicular Block + 1st-Degree AVB (Suspected Trifascicular)",
+    title_ar: "إحصار ثنائي الحزم + إحصار درجة أولى (يُشتبه trifascicular)",
     explanation_en:
       "RBBB + LAFB/LPFB + 1st-Degree AV Block (PR >200 ms). Often called 'trifascicular block', though per the 2009 AHA/ACCF/HRS statement this usually reflects bifascicular block plus AV-node or common His-bundle delay rather than true anatomical trifascicular block (which requires His-bundle recording).",
     explanation_ar:
@@ -390,8 +390,8 @@ export const ECG_CLINICAL_LIBRARY: Record<string, EcgClinicalEntry> = {
     ttt_ar: "إعادة تروية فورية (قسطرة أولية) تماماً مثل الجلطة الأمامية الحادة + أسبرين 300 ملغ + مضاد صفائح + هيبارين.",
   }),
   BRUGADA_TYPE_1: mk({
-    title_en: "Brugada Pattern (Type 1 Coved ST Elevation V1–V2)",
-    title_ar: "نمط بروغادا من النوع الأول (ارتفاع ST مقبب في V1–V2)",
+    title_en: "Suspected Brugada Pattern (Type 1 / Type 2 — Verify V1–V2)",
+    title_ar: "اشتباه نمط بروغادا (النوع 1 أو 2 — تحقق يدوياً من V1–V2)",
     explanation_en:
       "Coved ST-segment elevation >=2 mm in V1–V2 followed by a negative symmetrical T-wave — sodium channelopathy carrying high risk of polymorphic VT/VF and sudden cardiac death, often unmasked by fever or Na-channel blockers (LITFL Top 150, CC BY-NC-SA 4.0).",
     explanation_ar:
@@ -462,8 +462,8 @@ export const ECG_CLINICAL_LIBRARY: Record<string, EcgClinicalEntry> = {
     ttt_ar: "مضادات التهاب بجرعة عالية (أيبوبروفين/أسبرين) + كولشيسين 3 شهور + مثبط مضخة بروتون؛ بزل تأموري عاجل لو وجد اندحاس قلبي.",
   }),
   PULMONARY_EMBOLISM_S1Q3T3: mk({
-    title_en: "Acute Right Ventricular Strain / Pulmonary Embolism Pattern",
-    title_ar: "إجهاد البطين الأيمن الحاد / نمط الجلطة الرئوية (PE)",
+    title_en: "Suspected PE — Evaluate Wells / D-dimer / CTPA",
+    title_ar: "اشتباه PE: قيّم Wells / D-dimer / CTPA",
     explanation_en:
       "Sinus tachycardia with T-wave inversions simultaneously in right precordial (V1–V4) and inferior (II, III, aVF) leads, new RBBB, RAD, or S1Q3T3 pattern (LITFL Top 150, CC BY-NC-SA 4.0).",
     explanation_ar:

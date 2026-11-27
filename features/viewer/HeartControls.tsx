@@ -223,7 +223,7 @@ export function HeartControls() {
       {!panelMinimized && (
         <div
           onWheel={(e) => e.stopPropagation()}
-          className="pointer-events-auto atlas-scrollbar w-[86vw] max-w-[340px] sm:w-[360px] md:w-[390px] sm:max-w-none max-h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain rounded-2xl border border-[#26324d] bg-[#131c31]/98 p-3.5 text-[11px] leading-snug text-[#f1f5f9] shadow-2xl backdrop-blur-md"
+          className="cb-ausc-panel pointer-events-auto atlas-scrollbar w-[86vw] max-w-[340px] sm:w-[360px] md:w-[390px] sm:max-w-none max-h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain rounded-2xl border border-[#26324d] bg-[#131c31]/98 p-3.5 text-[11px] leading-snug text-[#f1f5f9] shadow-2xl backdrop-blur-md"
         >
           <div className="mb-2 flex items-center justify-between border-b border-[#26324d] pb-2">
             <span className="font-bold text-[#d98a96]">
@@ -381,7 +381,7 @@ export function HeartControls() {
       {!panelMinimized && (
         <div
           onWheel={(e) => e.stopPropagation()}
-          className="pointer-events-auto atlas-scrollbar mt-2 w-full md:mt-0 md:fixed md:right-3 md:top-16 md:z-30 md:w-[300px] lg:w-[325px] max-h-[calc(100dvh-90px)] overflow-y-auto overscroll-contain rounded-2xl border border-[#26324d] bg-[#131c31]/96 p-3.5 text-[11px] leading-relaxed text-[#f1f5f9] shadow-2xl backdrop-blur-md"
+          className="cb-ausc-panel pointer-events-auto atlas-scrollbar mt-2 w-full md:mt-0 md:fixed md:right-4 lg:right-12 xl:right-20 md:top-16 md:z-30 md:w-[300px] lg:w-[325px] max-h-[calc(100dvh-90px)] overflow-y-auto overscroll-contain rounded-2xl border border-[#26324d] bg-[#131c31]/96 p-3.5 text-[11px] leading-relaxed text-[#f1f5f9] shadow-2xl backdrop-blur-md"
         >
           <div className="mb-2 flex items-center justify-between border-b border-[#26324d] pb-2">
             <span className="font-bold text-[#d98a96]">{at("بطاقة المعلومات السريرية", "Clinical Disease Card")}</span>

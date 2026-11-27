@@ -753,3 +753,46 @@ html[data-theme="light"] .sky .day-canvas {
     transition: none !important;
   }
 }
+
+/* Code Blue Auscultation Panels — Light Mode Frosted Glass */
+html:not(.dark) .cb-ausc-panel {
+  background: rgba(255, 255, 255, 0.84) !important;
+  border-color: rgba(148, 163, 184, 0.55) !important;
+  color: #0f172a !important;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14) !important;
+}
+html:not(.dark) .cb-ausc-panel [class*="bg-[#0d1424]"],
+html:not(.dark) .cb-ausc-panel [class*="bg-[#131c31]"],
+html:not(.dark) .cb-ausc-panel [class*="bg-[#0a101d]"],
+html:not(.dark) .cb-ausc-panel [class*="bg-slate-900"] {
+  background-color: rgba(241, 245, 249, 0.86) !important;
+  border-color: rgba(203, 213, 225, 0.85) !important;
+  color: #0f172a !important;
+}
+html:not(.dark) .cb-ausc-panel [class*="text-[#f1f5f9]"],
+html:not(.dark) .cb-ausc-panel [class*="text-slate-100"],
+html:not(.dark) .cb-ausc-panel [class*="text-slate-200"],
+html:not(.dark) .cb-ausc-panel [class*="text-white"] {
+  color: #0f172a !important;
+}
+html:not(.dark) .cb-ausc-panel [class*="text-[#94a3b8]"],
+html:not(.dark) .cb-ausc-panel [class*="text-slate-300"],
+html:not(.dark) .cb-ausc-panel [class*="text-slate-400"] {
+  color: #475569 !important;
+}
+html:not(.dark) .cb-ausc-panel [class*="text-[#d98a96]"],
+html:not(.dark) .cb-ausc-panel [class*="text-rose-300"] {
+  color: #9f1239 !important;
+}
+html:not(.dark) .cb-ausc-panel [class*="text-sky-300"],
+html:not(.dark) .cb-ausc-panel [class*="text-cyan-300"] {
+  color: #0369a1 !important;
+}
+html:not(.dark) .cb-ausc-panel [class*="text-amber-300"],
+html:not(.dark) .cb-ausc-panel [class*="text-yellow-300"] {
+  color: #b45309 !important;
+}
+html:not(.dark) .cb-ausc-panel [class*="text-emerald-300"],
+html:not(.dark) .cb-ausc-panel [class*="text-emerald-400"] {
+  color: #047857 !important;
+}

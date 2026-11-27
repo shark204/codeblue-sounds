@@ -273,14 +273,19 @@ export function EcgResultsPanel({
               </p>
             </div>
 
-            <div className="rounded-xl bg-black/25 border border-emerald-300/35 px-3.5 py-2.5 space-y-1">
+            <div className="rounded-xl bg-black/25 border border-emerald-300/35 px-3.5 py-2.5 space-y-1.5">
               <div className="text-[11px] font-black text-emerald-200 flex items-center gap-1.5">
                 <Pill className="w-3.5 h-3.5 shrink-0" />
-                <span>{isAr ? "خطة العلاج والإجراء الفوري (TTT)" : "Treatment & Immediate Action (TTT)"}</span>
+                <span>{isAr ? "دعم القرار السريري والعلاج (للتعليم — TTT)" : "Clinical Decision Support & Management (Educational)"}</span>
               </div>
               <p className="text-[12px] leading-relaxed opacity-95">
                 {isAr ? primaryInvTtt.ttt_ar : primaryInvTtt.ttt_en}
               </p>
+              <div className="rounded-lg bg-amber-500/15 border border-amber-400/35 px-2.5 py-1.5 text-[10.5px] font-bold text-amber-200">
+                {isAr
+                  ? "⚖️ للتعليم ودعم القرار السريري فقط — أي إجراء حساس (النيترات، السوائل الوريدية، V4R، حاصرات العقدة الأذينية) يتطلب مراجعة وتوقيع الطبيب المعالج قبل التنفيذ."
+                  : "⚖️ For education & clinical decision support only — high-risk actions (nitrates, IV fluids, V4R, AV-nodal blockers) require treating physician review & sign-off before execution."}
+              </div>
             </div>
           </div>
           )}
@@ -437,11 +442,18 @@ export function EcgResultsPanel({
             </div>
           ))}
         </div>
-        {measurementSource !== "device_ocr" && measurementSource !== "manual" && m.pr_ms == null && m.qrs_ms == null && m.qt_ms == null && (
-          <p className={`text-[11px] px-1 ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+        {measurementSource === "device_ocr" && (m.pr_ms != null || m.qrs_ms != null || m.qt_ms != null) && (
+          <p className="text-[11px] px-2 py-1.5 rounded-lg bg-amber-500/10 border border-amber-400/30 text-amber-200 font-semibold">
             {isAr
-              ? "فترات PR و QRS و QT غير قابلة للقياس الموثوق من الصورة — أدخل أرقام الهيدر المطبوعة أو قِسها يدوياً."
-              : "PR, QRS, and QT are not reliably measurable from raw image pixels — enter printed header values or measure manually."}
+              ? "⚠️ مصدر الفترات: قراءة الجهاز المطبوعة (OCR). تخطئ أجهزة الـ ECG غالباً في قياس PR و QRS و QT مع الرجفان الأذيني والإحصارات — تحقق يدوياً قبل اعتماد أي قاعدة معتمدة على الهيدر."
+              : "⚠️ Interval Source: Machine Printed Header (OCR). Automated ECG machines frequently mismeasure PR/QRS/QT in AFib and conduction blocks — verify manually before acting on header-derived rules."}
+          </p>
+        )}
+        {m.pr_ms == null && m.qrs_ms == null && m.qt_ms == null && (
+          <p className={`text-[11px] px-2 py-1.5 rounded-lg border ${isLight ? "bg-amber-50 border-amber-300 text-amber-900" : "bg-amber-500/10 border-amber-400/30 text-amber-200"}`}>
+            {isAr
+              ? "ℹ️ لا يوجد هيدر قياسات مطبوع على الصورة (شائع في صور الكتب والموبايل) — القواعد المعتمدة على الهيدر (PR > 200، QRS ≥ 120، QT < 340، إحصار الدرجة الأولى، قصر QT، الإحصار ثلاثي الحزم) لم تعمل تلقائياً. أدخل القياسات يدوياً عند الحاجة."
+              : "ℹ️ No printed machine header detected (common in textbook/phone photos) — header-dependent rules (PR > 200 ms, QRS ≥ 120 ms, QT < 340 ms, 1st-degree AVB, Short QT, suspected trifascicular) did NOT run automatically. Enter intervals manually if needed."}
           </p>
         )}
       </div>

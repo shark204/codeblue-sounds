@@ -201,7 +201,7 @@ export function BreathControls() {
       if (muted) sendYouTubeCommand("mute", []);
       else sendYouTubeCommand("unMute", []);
       sendYouTubeCommand("playVideo", []);
-    }, 320);
+    }, 110);
     return () => window.clearTimeout(initTimer);
   }, [enabled, sound, pattern.id, pattern.youtubeStart, sendYouTubeCommand]);
 
@@ -257,6 +257,12 @@ export function BreathControls() {
           src={ytEmbedUrl}
           title={pattern.label}
           allow="autoplay; encrypted-media"
+          onLoad={() => {
+            sendYouTubeCommand("seekTo", [pattern.youtubeStart, true]);
+            sendYouTubeCommand("setVolume", [muted ? 0 : volumePct]);
+            if (!muted) sendYouTubeCommand("unMute", []);
+            sendYouTubeCommand("playVideo", []);
+          }}
           aria-hidden="true"
           tabIndex={-1}
           className="pointer-events-none fixed -left-[9999px] -top-[9999px] h-[1px] w-[1px] border-0 opacity-0"
@@ -288,7 +294,7 @@ export function BreathControls() {
       {!panelMinimized && (
         <div
           onWheel={(e) => e.stopPropagation()}
-          className="pointer-events-auto atlas-scrollbar w-[86vw] max-w-[340px] sm:w-[360px] md:w-[390px] sm:max-w-none max-h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain rounded-2xl border border-[#26324d] bg-[#131c31]/98 p-3.5 text-[11px] leading-snug text-[#f1f5f9] shadow-2xl backdrop-blur-md"
+          className="cb-ausc-panel pointer-events-auto atlas-scrollbar w-[86vw] max-w-[340px] sm:w-[360px] md:w-[390px] sm:max-w-none max-h-[calc(100dvh-80px)] overflow-y-auto overscroll-contain rounded-2xl border border-[#26324d] bg-[#131c31]/98 p-3.5 text-[11px] leading-snug text-[#f1f5f9] shadow-2xl backdrop-blur-md"
         >
           <div className="mb-2 flex items-center justify-between border-b border-[#26324d] pb-2">
             <span className="font-bold text-[#d98a96]">
@@ -552,7 +558,7 @@ export function BreathControls() {
       {!panelMinimized && (
         <div
           onWheel={(e) => e.stopPropagation()}
-          className="pointer-events-auto atlas-scrollbar mt-2 w-full md:mt-0 md:fixed md:right-3 md:top-16 md:z-30 md:w-[300px] lg:w-[325px] max-h-[calc(100dvh-90px)] overflow-y-auto overscroll-contain rounded-2xl border border-[#26324d] bg-[#131c31]/96 p-3.5 text-[11px] leading-relaxed text-[#f1f5f9] shadow-2xl backdrop-blur-md"
+          className="cb-ausc-panel pointer-events-auto atlas-scrollbar mt-2 w-full md:mt-0 md:fixed md:right-4 lg:right-12 xl:right-20 md:top-16 md:z-30 md:w-[300px] lg:w-[325px] max-h-[calc(100dvh-90px)] overflow-y-auto overscroll-contain rounded-2xl border border-[#26324d] bg-[#131c31]/96 p-3.5 text-[11px] leading-relaxed text-[#f1f5f9] shadow-2xl backdrop-blur-md"
         >
           <div className="mb-2 flex items-center justify-between border-b border-[#26324d] pb-2">
             <span className="font-bold text-[#d98a96]">{at("بطاقة المعلومات السريرية", "Clinical Disease Card")}</span>
