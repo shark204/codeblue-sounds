@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { Activity, CheckCircle2, ChevronLeft, ChevronRight, Eye, HeartPulse, ImagePlus, Camera, ClipboardPaste, Layers, Loader2, RotateCcw, SlidersHorizontal, Sparkles, Trash2, UserCheck, Zap, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  ArrowDown, Activity, CheckCircle2, ChevronLeft, ChevronRight, Eye, HeartPulse, ImagePlus, Camera, ClipboardPaste, Layers, Loader2, RotateCcw, SlidersHorizontal, Sparkles, Trash2, UserCheck, Zap, ZoomIn, ZoomOut } from "lucide-react";
 import { INITIAL_WIZARD_FEATURES, WizardFeatures, runHybridEcgDiagnosis } from "@/lib/ecgHybridEngine";
 import { LocalECGAnalysisResult, analyzeEcgImageLocally } from "@/lib/ecgImageEngine";
 import { EcgResultsPanel, EcgGradCamPanel } from "@/features/ecg/EcgDiagnosisView";
