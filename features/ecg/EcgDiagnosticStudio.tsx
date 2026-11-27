@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { Activity, CheckCircle2, ChevronLeft, ChevronRight, Eye, HeartPulse, ImagePlus, Camera, ClipboardPaste, Layers, Loader2, RotateCcw, SlidersHorizontal, Sparkles, Trash2, UserCheck, Zap, ZoomIn, ZoomOut } from "lucide-react";
 import { INITIAL_WIZARD_FEATURES, WizardFeatures, runHybridEcgDiagnosis } from "@/lib/ecgHybridEngine";
 import { LocalECGAnalysisResult, analyzeEcgImageLocally } from "@/lib/ecgImageEngine";
@@ -114,6 +114,7 @@ export function EcgDiagnosticStudio() {
   const [showResults, setShowResults] = useState<boolean>(false);
   const [awaitingImage, setAwaitingImage] = useState(false);
   const [smartConfirmOpen, setSmartConfirmOpen] = useState<boolean>(false);
+  const cardsSectionRef = useRef<HTMLDivElement | null>(null);
   const [features, setFeatures] = useState<WizardFeatures>(INITIAL_WIZARD_FEATURES);
   const [symptomChoice, setSymptomChoice] = useState<"chest_pain" | "syncope" | "secondary_trigger" | "asymptomatic" | null>(null);
   const runImageExtraction = async (dataUrl: string, rawFile?: File) => {
@@ -386,28 +387,26 @@ export function EcgDiagnosticStudio() {
       }`}
     >
       <div className="max-w-[1440px] mx-auto space-y-2.5 pb-6">
-        {/* Top Engine Floating Glass Pill */}
-        <div className="cb-glass-pill px-4 sm:px-5 py-2 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#9f1239]/25 border border-rose-400/45 flex items-center justify-center text-rose-300">
-              <Activity className="w-5 h-5" />
+        {/* Top Engine Floating Glass Bar (Compact Single-Row on Mobile) */}
+        <div className="cb-glass-pill rounded-2xl sm:rounded-full px-3 sm:px-5 py-1.5 sm:py-2 flex items-center justify-between gap-2">
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#9f1239]/25 border border-rose-400/45 flex items-center justify-center text-rose-300">
+              <Activity className="w-4 h-4" />
             </div>
-            <div>
-              <h1 className="font-black text-base sm:text-lg leading-tight">
-                {isAr ? "محرك تشخيص الـ ECG" : "ECG Diagnostic Engine"}
-              </h1>
-            </div>
+            <h1 className="font-black text-base sm:text-lg leading-tight">
+              {isAr ? "محرك تشخيص الـ ECG" : "ECG Diagnostic Engine"}
+            </h1>
           </div>
-          <div className="flex items-center gap-2">
-            <div className={`inline-flex items-center gap-1.5 min-h-[40px] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold border ${showResults ? "bg-emerald-500/15 border-emerald-400/40 text-emerald-300" : imgAnalysis ? "bg-amber-500/15 border-amber-400/40 text-amber-200" : hasAnalyzedImage ? "bg-teal-500/15 border-teal-400/40 text-teal-200" : "bg-white/5 border-white/10 text-slate-300"}`}>
-              {imgAnalysis ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
-              <span>{showResults ? (isAr ? "تم التشخيص" : "Diagnosis Ready") : imgAnalysis ? (isAr ? "جاري تحليل الصورة..." : "Analyzing ECG...") : hasAnalyzedImage ? (isAr ? "تمت القراءة — أكمل البطاقات" : "ECG Read — Complete Cards") : (isAr ? "بانتظار صورة الـ ECG" : "Awaiting ECG Image")}</span>
+          <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2">
+            <div className={`inline-flex items-center gap-1.5 min-h-[34px] sm:min-h-[38px] px-3 py-1 rounded-full text-[11px] font-extrabold border truncate ${showResults ? (isLight ? "bg-emerald-100 border-emerald-400 text-emerald-900" : "bg-emerald-500/15 border-emerald-400/40 text-emerald-300") : imgAnalysis ? (isLight ? "bg-amber-100 border-amber-400 text-amber-900" : "bg-amber-500/15 border-amber-400/40 text-amber-200") : hasAnalyzedImage ? (isLight ? "bg-teal-100 border-teal-400 text-teal-900" : "bg-teal-500/15 border-teal-400/40 text-teal-200") : (isLight ? "bg-slate-100 border-slate-300 text-slate-700" : "bg-white/5 border-white/10 text-slate-300")}`}>
+              {imgAnalysis ? <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" /> : <Activity className="w-3.5 h-3.5 shrink-0" />}
+              <span className="truncate">{showResults ? (isAr ? "تم التشخيص" : "Diagnosis Ready") : imgAnalysis ? (isAr ? "جاري التحليل..." : "Analyzing ECG...") : hasAnalyzedImage ? (isAr ? "تمت القراءة — أكمل البطاقات" : "ECG Read — Complete Cards") : (isAr ? "بانتظار صورة الـ ECG" : "Awaiting ECG Image")}</span>
             </div>
             <button
               type="button"
               disabled={images.length === 0 && step === 1 && !showResults && !awaitingImage && !symptomChoice}
               onClick={resetAll}
-              className={`inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold border cb-hover-lift disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer ${isLight ? "bg-white/70 border-slate-300/80 text-slate-800 hover:bg-white" : "cb-glass-nested text-slate-100 hover:border-teal-400/40"}`}
+              className={`shrink-0 inline-flex items-center gap-1.5 min-h-[34px] sm:min-h-[38px] px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold border cb-hover-lift disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer ${isLight ? "bg-white/70 border-slate-300/80 text-slate-800 hover:bg-white" : "cb-glass-nested text-slate-100 hover:border-teal-400/40"}`}
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>{isAr ? "حالة جديدة" : "New Case"}</span>
@@ -439,7 +438,6 @@ export function EcgDiagnosticStudio() {
                   </div>
                 )}
               </div>
-
               {activeImage ? (
                 <div className="space-y-2">
                   <div className="relative w-full overflow-auto rounded-xl border border-slate-700/70 bg-black/60">
@@ -497,11 +495,11 @@ export function EcgDiagnosticStudio() {
               </button>
 
               {/* Live Auto-Extraction Status Banner (100% Automatic from Image) */}
-              {activeImage && !diagnosisOpen && (
+              {activeImage && !showResults && (
                 <button
                   type="button"
                   onClick={() => cardsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                  className="lg:hidden w-full min-h-[42px] px-3.5 py-2 rounded-xl border border-cyan-400/50 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-100 text-xs font-extrabold flex items-center justify-center gap-2 cursor-pointer transition"
+                  className={`lg:hidden w-full min-h-[42px] px-3.5 py-2 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-2 cursor-pointer transition ${isLight ? "border-cyan-500 bg-cyan-100 hover:bg-cyan-200 text-cyan-900" : "border-cyan-400/50 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-100"}`}
                 >
                   <ArrowDown className="w-4 h-4 animate-bounce" />
                   <span>{isAr ? `انتقل للبطاقة ${step} (${step === 1 ? "العلامات الحيوية" : step === 2 ? "الأعراض" : "المتابعة السريرية"})` : `Go to Card ${step} (${step === 1 ? "Vitals" : step === 2 ? "Symptoms" : "Clinical Follow-up"})`}</span>
@@ -744,7 +742,7 @@ export function EcgDiagnosticStudio() {
                       <span className={`text-xs font-bold ${isLight ? "text-slate-700" : "text-slate-200"}`}>{isAr ? "مدة الأعراض / الحالة:" : "Clinical Course:"}</span>
                       <div className="flex flex-wrap gap-1.5">
                         {([{ v: "acute", ar: "حاد (<48س)", en: "Acute (<48h)" }, { v: "subacute", ar: "تحت حاد", en: "Subacute (2d–2w)" }, { v: "chronic", ar: "مزمن (>2أسبوع)", en: "Chronic (>2w)" }] as const).map((o) => (
-                          <button key={o.v} type="button" onClick={() => setFeatures((p) => ({ ...p, symptom_onset: o.v }))} className={`min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold border cursor-pointer transition ${(features.symptom_onset ?? "acute") === o.v ? "bg-rose-600/30 border-rose-400 text-rose-100" : isLight ? "bg-white/75 border-slate-300 text-slate-700" : "bg-slate-800/70 border-slate-700 text-slate-300"}`}>{isAr ? o.ar : o.en}</button>
+                          <button key={o.v} type="button" onClick={() => setFeatures((p) => ({ ...p, symptom_onset: o.v }))} className={`min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold border cursor-pointer transition ${(features.symptom_onset ?? "acute") === o.v ? (isLight ? "bg-rose-100 border-rose-500 text-[#881337]" : "bg-rose-600/30 border-rose-400 text-rose-100") : isLight ? "bg-white/85 border-slate-300 text-slate-700" : "bg-slate-800/70 border-slate-700 text-slate-300"}`}>{isAr ? o.ar : o.en}</button>
                         ))}
                       </div>
                     </div>
@@ -756,8 +754,8 @@ export function EcgDiagnosticStudio() {
                           onClick={() => setFeatures((p) => ({ ...p, hemodynamic_unstable: false }))}
                           className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border cursor-pointer transition ${
                             !features.hemodynamic_unstable
-                              ? "bg-teal-500/25 border-teal-400 text-teal-100"
-                              : "bg-slate-800/70 border-slate-700 text-slate-400"
+                              ? isLight ? "bg-teal-100 border-teal-500 text-teal-900" : "bg-teal-500/25 border-teal-400 text-teal-100"
+                              : isLight ? "bg-white/85 border-slate-300 text-slate-700 hover:bg-slate-50" : "bg-slate-800/70 border-slate-700 text-slate-400"
                           }`}
                         >
                           {isAr ? "مستقر وواعٍ" : "Stable / Alert"}
@@ -767,8 +765,8 @@ export function EcgDiagnosticStudio() {
                           onClick={() => setFeatures((p) => ({ ...p, hemodynamic_unstable: true }))}
                           className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border cursor-pointer transition ${
                             features.hemodynamic_unstable
-                              ? "bg-rose-500/30 border-rose-400 text-rose-100"
-                              : "bg-slate-800/70 border-slate-700 text-slate-400"
+                              ? isLight ? "bg-rose-100 border-rose-500 text-[#881337]" : "bg-rose-500/30 border-rose-400 text-rose-100"
+                              : isLight ? "bg-white/85 border-slate-300 text-slate-700 hover:bg-slate-50" : "bg-slate-800/70 border-slate-700 text-slate-400"
                           }`}
                         >
                           {isAr ? "غير مستقر (صدمة / اضطراب وعي)" : "Unstable (Shock / Altered)"}
@@ -776,13 +774,7 @@ export function EcgDiagnosticStudio() {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setStep(2)}
-                      className="cb-btn-primary w-full min-h-[44px] py-2.5 rounded-2xl font-black text-xs cursor-pointer"
-                    >
-                      {isAr ? "التالي: الأعراض الحالية ←" : "Next: Current Symptoms →"}
-                    </button>
+
                   </div>
                 )}
 
@@ -926,9 +918,9 @@ export function EcgDiagnosticStudio() {
                       <button
                         type="button"
                         onClick={() => setStep(visibleSteps[Math.min(visibleSteps.length - 1, stepIdx + 1)] ?? 1)}
-                        className="inline-flex items-center gap-1 min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 cursor-pointer"
+                        className="cb-btn-primary flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 min-h-[44px] px-4 py-2 rounded-xl text-xs font-black cursor-pointer"
                       >
-                        <span>{isAr ? "التالي" : "Next"}</span>
+                        <span>{step === 1 ? (isAr ? "التالي: الأعراض الحالية" : "Next: Current Symptoms") : (isAr ? "التالي" : "Next")}</span>
                         {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                       </button>
                     )}

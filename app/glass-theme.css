@@ -756,18 +756,37 @@ html[data-theme="light"] .sky .day-canvas {
 
 /* Code Blue Auscultation Panels — Light Mode Frosted Glass */
 html:not(.dark) .cb-ausc-panel {
-  background: rgba(255, 255, 255, 0.84) !important;
+  background: rgba(255, 255, 255, 0.90) !important;
   border-color: rgba(148, 163, 184, 0.55) !important;
   color: #0f172a !important;
   box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14) !important;
 }
-html:not(.dark) .cb-ausc-panel [class*="bg-[#0d1424]"],
-html:not(.dark) .cb-ausc-panel [class*="bg-[#131c31]"],
-html:not(.dark) .cb-ausc-panel [class*="bg-[#0a101d]"],
-html:not(.dark) .cb-ausc-panel [class*="bg-slate-900"] {
-  background-color: rgba(241, 245, 249, 0.86) !important;
-  border-color: rgba(203, 213, 225, 0.85) !important;
+html:not(.dark) .cb-ausc-panel [class*="bg-[#0"],
+html:not(.dark) .cb-ausc-panel [class*="bg-[#1"],
+html:not(.dark) .cb-ausc-panel [class*="bg-[#2"],
+html:not(.dark) .cb-ausc-panel [class*="bg-slate-8"],
+html:not(.dark) .cb-ausc-panel [class*="bg-slate-9"],
+html:not(.dark) .cb-ausc-panel [class*="bg-zinc-9"],
+html:not(.dark) .cb-ausc-panel [class*="bg-neutral-9"],
+html:not(.dark) .cb-ausc-panel [class*="bg-black"],
+html:not(.dark) .cb-ausc-panel div[style*="background"],
+html:not(.dark) .cb-ausc-panel section[style*="background"],
+html:not(.dark) .cb-ausc-panel button:not(.cb-btn-primary) {
+  background: rgba(241, 245, 249, 0.92) !important;
+  background-color: rgba(241, 245, 249, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.55) !important;
   color: #0f172a !important;
+}
+html:not(.dark) .cb-ausc-panel button[aria-pressed="true"]:not(.cb-btn-primary),
+html:not(.dark) .cb-ausc-panel button[data-active="true"]:not(.cb-btn-primary) {
+  background: rgba(255, 228, 230, 0.95) !important;
+  background-color: rgba(255, 228, 230, 0.95) !important;
+  border-color: rgba(190, 18, 60, 0.55) !important;
+  color: #881337 !important;
+}
+html:not(.dark) .cb-ausc-panel canvas {
+  background: #0b1120 !important;
+  border-radius: 10px;
 }
 html:not(.dark) .cb-ausc-panel [class*="text-[#f1f5f9]"],
 html:not(.dark) .cb-ausc-panel [class*="text-slate-100"],
@@ -781,15 +800,18 @@ html:not(.dark) .cb-ausc-panel [class*="text-slate-400"] {
   color: #475569 !important;
 }
 html:not(.dark) .cb-ausc-panel [class*="text-[#d98a96]"],
+html:not(.dark) .cb-ausc-panel [class*="text-rose-200"],
 html:not(.dark) .cb-ausc-panel [class*="text-rose-300"] {
   color: #9f1239 !important;
 }
+html:not(.dark) .cb-ausc-panel [class*="text-sky-200"],
 html:not(.dark) .cb-ausc-panel [class*="text-sky-300"],
+html:not(.dark) .cb-ausc-panel [class*="text-cyan-200"],
 html:not(.dark) .cb-ausc-panel [class*="text-cyan-300"] {
   color: #0369a1 !important;
 }
-html:not(.dark) .cb-ausc-panel [class*="text-amber-300"],
-html:not(.dark) .cb-ausc-panel [class*="text-yellow-300"] {
+html:not(.dark) .cb-ausc-panel [class*="text-amber-200"],
+html:not(.dark) .cb-ausc-panel [class*="text-amber-300"] {
   color: #b45309 !important;
 }
 html:not(.dark) .cb-ausc-panel [class*="text-emerald-300"],

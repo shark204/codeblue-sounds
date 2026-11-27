@@ -293,22 +293,22 @@ export default function SoundsLabPage() {
 
   return (
     <div className={`h-screen w-screen bg-transparent flex flex-col overflow-hidden ${isLight ? "text-slate-900" : "text-slate-100"}`}>
-      <header className="shrink-0 mx-3 sm:mx-5 mt-2 cb-glass-pill min-h-[52px] px-3.5 sm:px-5 py-1.5 flex items-center justify-between gap-3 z-30">
+      <header className="shrink-0 mx-2.5 sm:mx-5 mt-1.5 sm:mt-2 cb-glass-pill min-h-[44px] sm:min-h-[52px] px-2.5 sm:px-5 py-1 sm:py-1.5 flex items-center justify-between gap-2 z-30">
         <div className="flex items-center gap-3 overflow-x-auto">
           <button
             type="button"
             onClick={() => setView("landing")}
-            className="w-8 h-8 shrink-0 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 hover:bg-emerald-500/25 transition cursor-pointer"
+            className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 hover:bg-emerald-500/25 transition cursor-pointer"
             title={isAr ? "العودة للرئيسية" : "Back to Home"}
           >
             <Home className="w-4 h-4" />
           </button>
-          <span className={`font-bold text-sm tracking-tight shrink-0 ${isLight ? "text-slate-900" : "text-white"}`}>
+          <span className={`font-bold text-xs sm:text-sm tracking-tight shrink-0 ${isLight ? "text-slate-900" : "text-white"}`}>
             Code Blue <span className="text-emerald-400">{isEcgMode ? "ECG Engine" : "Sounds Lab"}</span>
           </span>
 
           {isEcgMode ? (
-            <div className="ms-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-950/50 border border-rose-400/40 text-rose-200 text-xs font-bold shrink-0">
+            <div className="hidden md:inline-flex ms-2 items-center gap-1.5 px-3 py-1 rounded-full bg-rose-950/50 border border-rose-400/40 text-rose-200 text-xs font-bold shrink-0">
               <Sparkles className="w-3.5 h-3.5 text-rose-400" />
               <span>{isAr ? "محرك تشخيص الـ ECG الهجين" : "ECG Diagnostic Engine"}</span>
             </div>
@@ -345,8 +345,12 @@ export default function SoundsLabPage() {
               onClick={() => launchMode(mode === "heart" ? "breath" : "heart")}
               className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border font-bold cursor-pointer transition ${
                 mode === "heart"
-                  ? "bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border-cyan-400/50"
-                  : "bg-[#9f1239]/40 hover:bg-[#9f1239]/55 text-rose-100 border-rose-400/50"
+                  ? isLight
+                    ? "bg-cyan-100 hover:bg-cyan-200 text-cyan-900 border-cyan-400"
+                    : "bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border-cyan-400/50"
+                  : isLight
+                    ? "bg-rose-100 hover:bg-rose-200 text-[#881337] border-rose-400"
+                    : "bg-[#9f1239]/40 hover:bg-[#9f1239]/55 text-rose-100 border-rose-400/50"
               }`}
             >
               {mode === "heart" ? <Wind className="w-3.5 h-3.5" /> : <Heart className="w-3.5 h-3.5" />}
