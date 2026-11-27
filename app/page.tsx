@@ -27,6 +27,7 @@ const MAIN_URL = process.env.NEXT_PUBLIC_MAIN_URL || "https://mrcs-bank.vercel.a
 
 export default function SoundsLabPage() {
   const [mounted, setMounted] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
   const [view, setView] = useState<"landing" | "workspace">("landing");
   const [mode, setMode] = useState<"heart" | "breath" | "ecg-ai">("heart");
 
@@ -64,8 +65,12 @@ export default function SoundsLabPage() {
           document.head.appendChild(lk);
         }
       });
-      fetch("/anatomy/heart.glb", { cache: "force-cache" }).catch(() => {});
-      fetch("/anatomy/lungs.glb", { cache: "force-cache" }).catch(() => {});
+      const mq = window.matchMedia("(min-width: 768px)");
+      setIsDesktop(mq.matches);
+      if (mq.matches) {
+        fetch("/anatomy/heart.glb", { cache: "force-cache" }).catch(() => {});
+        fetch("/anatomy/lungs.glb", { cache: "force-cache" }).catch(() => {});
+      }
     } catch {}
     return () => { alive = false; window.clearTimeout(timer); };
   }, []);
@@ -308,7 +313,7 @@ export default function SoundsLabPage() {
               <span>{isAr ? "محرك تشخيص الـ ECG الهجين" : "ECG Diagnostic Engine"}</span>
             </div>
           ) : (
-            <div className="ms-2 flex items-center p-1 rounded-full cb-glass-nested shrink-0">
+            <div className="hidden md:flex ms-2 items-center p-1 rounded-full cb-glass-nested shrink-0">
               <button
                 type="button"
                 onClick={() => launchMode("heart")}
@@ -334,13 +339,20 @@ export default function SoundsLabPage() {
         </div>
 
         <nav className="flex items-center gap-1.5 text-xs shrink-0">
-          <a
-            href={MAIN_URL}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-700/80 text-slate-200 border border-slate-700/60 transition"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>{isAr ? "بنك الأسئلة" : "Main Bank"}</span>
-          </a>
+          {!isEcgMode && (
+            <button
+              type="button"
+              onClick={() => launchMode(mode === "heart" ? "breath" : "heart")}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border font-bold cursor-pointer transition ${
+                mode === "heart"
+                  ? "bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border-cyan-400/50"
+                  : "bg-[#9f1239]/40 hover:bg-[#9f1239]/55 text-rose-100 border-rose-400/50"
+              }`}
+            >
+              {mode === "heart" ? <Wind className="w-3.5 h-3.5" /> : <Heart className="w-3.5 h-3.5" />}
+              <span>{mode === "heart" ? (isAr ? "أصوات التنفس" : "Breath Sounds") : (isAr ? "أصوات القلب" : "Heart Sounds")}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setLocale(isAr ? "en" : "ar")}
@@ -364,8 +376,8 @@ export default function SoundsLabPage() {
           <EcgDiagnosticStudio />
         ) : (
           <>
-            <SoundsSpecimenCanvas mode={mode} />
-            <div className="pointer-events-none fixed inset-x-0 top-16 bottom-3 z-20 flex items-start justify-start px-3 lg:px-12 xl:px-20">
+            {isDesktop && <SoundsSpecimenCanvas mode={mode} />}
+            <div className="pointer-events-none fixed inset-x-0 top-16 bottom-3 z-20 flex items-start justify-center md:justify-start px-3 lg:px-12 xl:px-20">
               <div className="pointer-events-none w-full max-w-[340px]">
                 {mode === "heart" ? <HeartControls /> : <BreathControls />}
               </div>

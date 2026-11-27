@@ -340,7 +340,6 @@ export function EcgDiagnosticStudio() {
     const nextAfter2 = visibleSteps.find((n) => n > 2);
     if (nextAfter2) setStep(nextAfter2); else requestShowResults();
   }, [awaitingImage, hasAnalyzedImage, visibleSteps]);
-
   const resetAll = () => {
     setFeatures(INITIAL_WIZARD_FEATURES);
     setSymptomChoice(null);
@@ -355,23 +354,19 @@ export function EcgDiagnosticStudio() {
     setGradcamFocusRegion(null);
     setMeasurementSource(null);
   };
-
   const parseOptNum = (val: string): number | null => {
     const trimmed = val.trim();
     if (!trimmed) return null;
     const n = Number(trimmed);
     return Number.isFinite(n) ? n : null;
   };
-
   const hybridResult = useMemo(() => {
     if (!showResults) return null;
     try { return runHybridEcgDiagnosis(features); } catch (err) { console.error("Hybrid ECG diagnosis error:", err); return null; }
   }, [showResults, features]);
-
   const cardCls = isLight
     ? "cb-glass-card text-slate-900"
     : "cb-glass-card text-slate-100";
-
   const btnOptionCls = (active?: boolean) =>
     `w-full min-h-[44px] text-start px-4 py-3.5 rounded-2xl border cb-hover-lift cursor-pointer flex items-center justify-between gap-3 ${
       active
@@ -382,9 +377,7 @@ export function EcgDiagnosticStudio() {
           ? "cb-glass-nested hover:bg-teal-50/80 hover:border-teal-400/70 text-slate-800"
           : "cb-glass-nested hover:bg-white/10 hover:border-teal-400/50 text-slate-100"
     }`;
-
   const activeImage = images[activeImgIdx] || null;
-
   return (
     <div
       dir={isAr ? "rtl" : "ltr"}
@@ -403,10 +396,8 @@ export function EcgDiagnosticStudio() {
               <h1 className="font-black text-base sm:text-lg leading-tight">
                 {isAr ? "محرك تشخيص الـ ECG" : "ECG Diagnostic Engine"}
               </h1>
-
             </div>
           </div>
-
           <div className="flex items-center gap-2">
             <div className={`inline-flex items-center gap-1.5 min-h-[40px] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold border ${showResults ? "bg-emerald-500/15 border-emerald-400/40 text-emerald-300" : imgAnalysis ? "bg-amber-500/15 border-amber-400/40 text-amber-200" : hasAnalyzedImage ? "bg-teal-500/15 border-teal-400/40 text-teal-200" : "bg-white/5 border-white/10 text-slate-300"}`}>
               {imgAnalysis ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
@@ -423,7 +414,6 @@ export function EcgDiagnosticStudio() {
             </button>
           </div>
         </div>
-
         {/* Main 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
           {/* LEFT: Auto-Analyzing ECG Image Uploader + Auto-Filled Printed Header Numbers */}
@@ -507,6 +497,16 @@ export function EcgDiagnosticStudio() {
               </button>
 
               {/* Live Auto-Extraction Status Banner (100% Automatic from Image) */}
+              {activeImage && !diagnosisOpen && (
+                <button
+                  type="button"
+                  onClick={() => cardsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  className="lg:hidden w-full min-h-[42px] px-3.5 py-2 rounded-xl border border-cyan-400/50 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-100 text-xs font-extrabold flex items-center justify-center gap-2 cursor-pointer transition"
+                >
+                  <ArrowDown className="w-4 h-4 animate-bounce" />
+                  <span>{isAr ? `انتقل للبطاقة ${step} (${step === 1 ? "العلامات الحيوية" : step === 2 ? "الأعراض" : "المتابعة السريرية"})` : `Go to Card ${step} (${step === 1 ? "Vitals" : step === 2 ? "Symptoms" : "Clinical Follow-up"})`}</span>
+                </button>
+              )}
               {activeImage && analyzingImg && (
                 <div className="rounded-xl bg-cyan-500/10 border border-cyan-400/30 px-3 py-2 text-xs text-cyan-200 flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin shrink-0" />
@@ -595,7 +595,7 @@ export function EcgDiagnosticStudio() {
           </div>
 
           {/* RIGHT: ONLY 3 Patient Clinical Context Cards OR Hybrid Results */}
-          <div className="lg:col-span-8 space-y-3">
+          <div ref={cardsSectionRef} className="lg:col-span-8 space-y-3">
             {!showResults && !smartConfirmOpen && awaitingImage ? (
               <div className={`rounded-2xl border p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[280px] ${cardCls}`}>
                 <Loader2 className="w-10 h-10 text-rose-400 animate-spin" />
