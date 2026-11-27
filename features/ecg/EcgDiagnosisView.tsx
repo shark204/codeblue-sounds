@@ -420,7 +420,7 @@ export function EcgResultsPanel({
               label: "HR",
               val: m.hr_bpm
                 ? measurementSource === "auto_waveform"
-                  ? `~${Math.max(25, Math.round(m.hr_bpm) - 28)}–${Math.round(m.hr_bpm) + 28} bpm`
+                  ? `~${Math.round(m.hr_bpm)} bpm`
                   : `${m.hr_bpm} bpm`
                 : "—",
             },

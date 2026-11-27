@@ -235,9 +235,7 @@ export function EcgSmartConfirmCard({
           <div className="text-sm font-black">
             {isAr ? group.titleAr : group.titleEn}
           </div>
-          <div className={`text-xs mt-1 ${isLight ? "text-slate-600" : "text-slate-300"}`}>
-            {isAr ? group.subtitleAr : group.subtitleEn}
-          </div>
+
         </div>
       </div>
 

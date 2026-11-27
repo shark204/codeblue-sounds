@@ -162,18 +162,40 @@ export function evaluateCompositeEcgRules(inp: CompositeRuleInput): CompositeFin
     );
   }
 
-  // 4. SHORT_QT (Header/Manual QT < 340 ms — explicitly attributed to Machine Header OCR)
-  if (inp.qtMs !== null && inp.qtMs >= 240 && inp.qtMs < 340) {
+  // 4. SHORT_QT (Strictly QTc < 340 ms AND verified from Machine Header OCR or Manual input — never raw QT at high HR!)
+  const qtcEst = inp.qtMs !== null && inp.hrBpm !== null && inp.hrBpm > 25 ? Math.round(inp.qtMs / Math.cbrt(60 / inp.hrBpm)) : inp.qtMs;
+  if ((src === "device_ocr" || src === "manual") && qtcEst !== null && qtcEst >= 240 && qtcEst < 340) {
     out.push(
       fromLib(
         "SHORT_QT",
         inp.syncopeOrScd ? "CRITICAL" : "URGENT",
         "co_existing",
-        `Short QT (<340 ms) — ${src === "manual" ? "Manual" : "Machine Header"}`,
-        `قِصر فترة QT (<340 ms) — ${src === "manual" ? "إدخال يدوي" : "قراءة الجهاز"}`,
+        `Short QTc (<340 ms) — ${src === "manual" ? "Manual" : "Machine Header"}`,
+        `قِصر فترة QTc (<340 ms) — ${src === "manual" ? "إدخال يدوي" : "قراءة الجهاز"}`,
         {
-          extraExpEn: `Derived from QT ${inp.qtMs} ms${hdrTag(src, false)}.`,
-          extraExpAr: `مبني على قراءة QT = ${inp.qtMs} ms${hdrTag(src, true)}.`,
+          extraExpEn: `Derived from QTc ${qtcEst} ms (raw QT ${inp.qtMs} ms)${hdrTag(src, false)}.`,
+          extraExpAr: `مبني على QTc = ${qtcEst} ms (QT الخام ${inp.qtMs} ms)${hdrTag(src, true)}.`,
+        }
+      )
+    );
+  }
+
+  // 4b. Fast Broad / Short-PR Tachyarrhythmia Guard (FBI / Pre-Excited AFib / VT — discordant ST mimics STEMI!)
+  const isFastBroadOrShortPr =
+    inp.hrBpm !== null &&
+    inp.hrBpm >= 150 &&
+    ((inp.qrsMs !== null && inp.qrsMs >= 115) || (inp.prMs !== null && inp.prMs > 50 && inp.prMs < 110));
+  if (isFastBroadOrShortPr && !has("PRE_EXCITED_AFIB", "VENTRICULAR_TACHYCARDIA", "TORSADES_DE_POINTES")) {
+    out.push(
+      fromLib(
+        "PRE_EXCITED_AFIB",
+        "CRITICAL",
+        "primary",
+        "Suspected Pre-Excited AFib / Wide-Complex Tachycardia (Rule Out VT / WPW)",
+        "اشتباه رجفان أذيني مع WPW أو تسارع بطيني عريض (استبعد VT / FBI)",
+        {
+          extraExpEn: `Extreme tachycardia (HR ~${Math.round(inp.hrBpm!)} bpm) with ${inp.qrsMs && inp.qrsMs >= 115 ? `wide/borderline QRS (${Math.round(inp.qrsMs)} ms)` : ""}${inp.prMs && inp.prMs < 110 ? ` short PR (${Math.round(inp.prMs)} ms)` : ""}. Discordant ST shifts during rapid wide tachycardia frequently mimic STEMI — evaluate rhythm first and AVOID AV-nodal blockers if irregular.`,
+          extraExpAr: `تسارع شديد (~${Math.round(inp.hrBpm!)} نبضة/دقيقة) مع ${inp.qrsMs && inp.qrsMs >= 115 ? `QRS عريض/حدي (${Math.round(inp.qrsMs)} ms)` : ""}${inp.prMs && inp.prMs < 110 ? ` وPR قصير (${Math.round(inp.prMs)} ms)` : ""}. تغيرات ST الثانوية أثناء التسارع العريض تحاكي STEMI — قيّم النظم أولاً وتجنّب حاصرات عقدة AV إذا كان غير منتظم.`,
         }
       )
     );
