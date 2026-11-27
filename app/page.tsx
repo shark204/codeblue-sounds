@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   ArrowLeft,
   Heart,
@@ -11,30 +12,43 @@ import {
   Sun,
   Wind,
 } from "lucide-react";
-import { SoundsSpecimenCanvas } from "@/features/viewer/SoundsSpecimenCanvas";
-import { HeartControls } from "@/features/viewer/HeartControls";
-import { BreathControls } from "@/features/viewer/BreathControls";
-import { EcgDiagnosticStudio } from "@/features/ecg/EcgDiagnosticStudio";
 import { NeuralDiagnosticTree } from "@/components/NeuralDiagnosticTree";
 import { useHeartStore } from "@/stores/heartStore";
 import { useBreathStore } from "@/stores/breathStore";
 import { useUIStore } from "@/stores/uiStore";
 import { primeHeartSound } from "@/features/viewer/heartSound";
-import { primeBreathSound } from "@/features/viewer/breathing";
 import { useAtlasLocale } from "@/lib/atlasI18n";
+
+const SoundsSpecimenCanvas = dynamic(
+  () => import("@/features/viewer/SoundsSpecimenCanvas").then((m) => m.SoundsSpecimenCanvas),
+  { ssr: false }
+);
+const HeartControls = dynamic(
+  () => import("@/features/viewer/HeartControls").then((m) => m.HeartControls),
+  { ssr: false }
+);
+const BreathControls = dynamic(
+  () => import("@/features/viewer/BreathControls").then((m) => m.BreathControls),
+  { ssr: false }
+);
+const EcgDiagnosticStudio = dynamic(
+  () => import("@/features/ecg/EcgDiagnosticStudio").then((m) => m.EcgDiagnosticStudio),
+  { ssr: false }
+);
 
 const MAIN_URL = process.env.NEXT_PUBLIC_MAIN_URL || "https://mrcs-bank.vercel.app";
 
 export default function SoundsLabPage() {
-  const [mounted, setMounted] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [view, setView] = useState<"landing" | "workspace">("landing");
   const [mode, setMode] = useState<"heart" | "breath" | "ecg-ai">("heart");
 
   const heartEnabled = useHeartStore((s) => s.enabled);
   const toggleHeart = useHeartStore((s) => s.toggle);
+  const setHeartSound = useHeartStore((s) => s.setSound);
   const breathEnabled = useBreathStore((s) => s.enabled);
   const toggleBreath = useBreathStore((s) => s.toggle);
+  const setBreathSound = useBreathStore((s) => s.setSound);
   const theme = useUIStore((s) => s.theme);
   const toggleTheme = useUIStore((s) => s.toggleTheme);
   const { locale, setLocale } = useAtlasLocale();
@@ -42,37 +56,34 @@ export default function SoundsLabPage() {
   const isLight = theme === "light";
 
   useEffect(() => {
-    let alive = true;
-    const finish = () => { if (alive) setMounted(true); };
-    const preloadImg = (src: string) =>
-      new Promise<void>((resolve) => {
-        const img = new window.Image();
-        img.src = src;
-        if (typeof img.decode === "function") img.decode().then(resolve).catch(resolve);
-        else { img.onload = () => resolve(); img.onerror = () => resolve(); }
-      });
-    const timer = window.setTimeout(finish, 1100);
-    Promise.all([preloadImg("/hero-ecg-monitor.png"), preloadImg("/neural-tree-burgundy.png")]).then(() => {
-      window.clearTimeout(timer);
-      finish();
-    });
-    // Background warmup for 3D GLB models & YouTube audio host
-    try {
-      ["https://www.youtube.com", "https://i.ytimg.com"].forEach((href) => {
-        if (!document.querySelector(`link[rel="preconnect"][href="${href}"]`)) {
-          const lk = document.createElement("link");
-          lk.rel = "preconnect"; lk.href = href; lk.crossOrigin = "anonymous";
-          document.head.appendChild(lk);
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener?.("change", onChange);
+    // Defer non-critical background preconnect & desktop GLB warmup until after first paint
+    const warm = () => {
+      try {
+        ["https://www.youtube.com", "https://i.ytimg.com"].forEach((href) => {
+          if (!document.querySelector(`link[rel="preconnect"][href="${href}"]`)) {
+            const lk = document.createElement("link");
+            lk.rel = "preconnect"; lk.href = href; lk.crossOrigin = "anonymous";
+            document.head.appendChild(lk);
+          }
+        });
+        if (mq.matches) {
+          fetch("/anatomy/heart.glb", { cache: "force-cache" }).catch(() => {});
+          fetch("/anatomy/lungs.glb", { cache: "force-cache" }).catch(() => {});
         }
-      });
-      const mq = window.matchMedia("(min-width: 768px)");
-      setIsDesktop(mq.matches);
-      if (mq.matches) {
-        fetch("/anatomy/heart.glb", { cache: "force-cache" }).catch(() => {});
-        fetch("/anatomy/lungs.glb", { cache: "force-cache" }).catch(() => {});
-      }
-    } catch {}
-    return () => { alive = false; window.clearTimeout(timer); };
+      } catch {}
+    };
+    const idleId = typeof window.requestIdleCallback === "function"
+      ? window.requestIdleCallback(warm, { timeout: 1500 })
+      : window.setTimeout(warm, 900);
+    return () => {
+      mq.removeEventListener?.("change", onChange);
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idleId as number);
+      else window.clearTimeout(idleId as number);
+    };
   }, []);
 
   useEffect(() => {
@@ -96,12 +107,13 @@ export default function SoundsLabPage() {
   };
 
   const launchMode = (target: "heart" | "breath" | "ecg-ai") => {
+    setHeartSound(false);
+    setBreathSound(false);
     if (target === "heart") {
       primeHeartSound();
       if (breathEnabled) toggleBreath();
       if (!heartEnabled) toggleHeart();
     } else if (target === "breath") {
-      primeBreathSound();
       if (heartEnabled) toggleHeart();
       if (!breathEnabled) toggleBreath();
     } else {
@@ -111,33 +123,6 @@ export default function SoundsLabPage() {
     setMode(target);
     setView("workspace");
   };
-
-  if (!mounted) {
-    return (
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 9999,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "14px",
-          background: "radial-gradient(circle at 50% 35%, #0f1b38 0%, #060913 75%)",
-          color: "#e2e8f0",
-          fontFamily: "system-ui, -apple-system, sans-serif",
-        }}
-      >
-        <img
-          src="/icon.png"
-          alt="Code Blue ECG & Sounds"
-          style={{ width: 68, height: 68, borderRadius: 16, boxShadow: "0 0 30px rgba(159,18,57,0.4)" }}
-        />
-        <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "0.04em" }}>CODE BLUE ECG &amp; SOUNDS</div>
-      </div>
-    );
-  }
 
   if (view === "landing") {
     return (

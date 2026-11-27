@@ -188,8 +188,9 @@ export function BreathControls() {
       setPanelMinimized(false);
       clearSelection();
       setAudioElapsed(0);
+      setSound(false);
     }
-  }, [enabled, clearSelection]);
+  }, [enabled, clearSelection, setSound]);
 
   const ytReadyRef = useRef(false);
   const initialVideoRef = useRef<{ id: string; start: number; end: number } | null>(null);
@@ -267,7 +268,7 @@ export function BreathControls() {
   const activeFormatted = formatTwoLineDiseaseLabel(pattern, isAr);
   const breathInfo = BREATH_CLINICAL_INFO[pattern.id] ?? BREATH_CLINICAL_INFO.quiet!;
   const initVid = initialVideoRef.current ?? { id: pattern.youtubeVideoId, start: pattern.youtubeStart, end: pattern.youtubeEnd };
-  const ytEmbedUrl = `https://www.youtube.com/embed/${initVid.id}?enablejsapi=1&autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&start=${initVid.start}&end=${initVid.end}`;
+  const ytEmbedUrl = `https://www.youtube.com/embed/${initVid.id}?enablejsapi=1&autoplay=0&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&start=${initVid.start}&end=${initVid.end}`;
 
   return (
     <div dir={isAr ? "rtl" : "ltr"} className="pointer-events-auto flex flex-col items-start gap-1.5">

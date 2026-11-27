@@ -176,7 +176,7 @@ export function HeartControls() {
       setPanelMinimized(false);
       clearSelection();
       primeHeartSound();
-      setSound(true);
+      setSound(false);
     }
   }, [enabled, clearSelection, setSound]);
 
