@@ -223,7 +223,6 @@ export function EcgDiagnosticStudio() {
       } catch {
         // Fallback to local browser quality/grid analyzer if backend is offline
       }
-
       if (!dataUrl.startsWith("data:image/")) return;
       setBackendSource("local");
       const res = await analyzeEcgImageLocally(dataUrl, { paperSpeedMmS: 25, gainMmMv: 10 });
@@ -270,7 +269,6 @@ export function EcgDiagnosticStudio() {
       setAnalyzingImg(false);
     }
   };
-
   const addFiles = (fileList: FileList | null) => {
     if (!fileList) return;
     Array.from(fileList).forEach((file) => {
@@ -288,7 +286,6 @@ export function EcgDiagnosticStudio() {
       reader.readAsDataURL(file);
     });
   };
-
   const removeImage = (idx: number) => {
     setImages((prev) => {
       const next = prev.filter((_, i) => i !== idx);
@@ -298,11 +295,9 @@ export function EcgDiagnosticStudio() {
       return next;
     });
   };
-
   const toggleFlag = (key: keyof WizardFeatures) => {
     setFeatures((prev) => ({ ...prev, [key]: !prev[key] }));
   };
-
   const handleApplyCheck = (checkId: string, flagKey: keyof WizardFeatures) => {
     if (checkId === "chk_athlete_vagal") {
       setFeatures((p) => ({ ...p, is_competitive_athlete: true, asymptomatic_nocturnal: true }));
@@ -310,7 +305,6 @@ export function EcgDiagnosticStudio() {
       toggleFlag(flagKey);
     }
   };
-
   const smartConfirmGroup = useMemo(
     () => getSmartConfirmGroup(remoteAnalysis?.ai_diagnoses),
     [remoteAnalysis]
@@ -746,6 +740,14 @@ export function EcgDiagnosticStudio() {
                       })}
                     </div>
 
+                    <div className="cb-glass-nested rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
+                      <span className={`text-xs font-bold ${isLight ? "text-slate-700" : "text-slate-200"}`}>{isAr ? "مدة الأعراض / الحالة:" : "Clinical Course:"}</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {([{ v: "acute", ar: "حاد (<48س)", en: "Acute (<48h)" }, { v: "subacute", ar: "تحت حاد", en: "Subacute (2d–2w)" }, { v: "chronic", ar: "مزمن (>2أسبوع)", en: "Chronic (>2w)" }] as const).map((o) => (
+                          <button key={o.v} type="button" onClick={() => setFeatures((p) => ({ ...p, symptom_onset: o.v }))} className={`min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold border cursor-pointer transition ${(features.symptom_onset ?? "acute") === o.v ? "bg-rose-600/30 border-rose-400 text-rose-100" : isLight ? "bg-white/75 border-slate-300 text-slate-700" : "bg-slate-800/70 border-slate-700 text-slate-300"}`}>{isAr ? o.ar : o.en}</button>
+                        ))}
+                      </div>
+                    </div>
                     <div className="cb-glass-nested rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
                       <span className={`text-xs font-bold ${isLight ? "text-slate-700" : "text-slate-200"}`}>{isAr ? "الحالة العامة والوعي:" : "Hemodynamic Status:"}</span>
                       <div className="flex gap-1.5">

@@ -25,7 +25,6 @@ import {
   filterConfirmedDiagnoses,
   fuseHybridFindings,
 } from "@/lib/ecgFusionEngine";
-
 export interface WizardFeatures {
   // Step 1: Rate & Rhythm
   rhythm_class: "regular" | "irregularly_irregular" | "pauses" | null;
@@ -72,6 +71,7 @@ export interface WizardFeatures {
   glucose_status: "normal" | "high" | "low";
   spo2_status: "normal" | "low";
   temp_status: "normal" | "fever" | "hypothermia";
+  symptom_onset?: "acute" | "subacute" | "chronic";
   hemodynamic_unstable: boolean;
   pleuritic_or_dehydration_or_bleed: boolean;
   // Optional Printed Header Measurements & Paper Calibration
@@ -93,7 +93,6 @@ export interface WizardFeatures {
   ai_predictions?: { label: string; code: string | null; prob: number; uncertainty?: number }[]; lead_reversal_alert?: boolean;
   measurement_provenance?: Partial<MeasurementProvenanceMap>;
 }
-
 export const INITIAL_WIZARD_FEATURES: WizardFeatures = {
   rhythm_class: null,
   rate_class: null,
@@ -133,6 +132,7 @@ export const INITIAL_WIZARD_FEATURES: WizardFeatures = {
   glucose_status: "normal",
   spo2_status: "normal",
   temp_status: "normal",
+  symptom_onset: "acute",
   hemodynamic_unstable: false,
   pleuritic_or_dehydration_or_bleed: false,
   hr_bpm: null,

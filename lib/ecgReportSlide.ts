@@ -294,33 +294,36 @@ export async function downloadEcgReportSlide(opts: ReportSlideOptions): Promise<
   ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
   ctx.stroke();
 
-  ctx.textAlign = isAr ? "right" : "left";
-  const mTextX = isAr ? leftX + leftW - 20 : leftX + 20;
-  ctx.fillStyle = "#E2E8F0";
-  ctx.font = "700 15px system-ui, sans-serif";
-  ctx.fillText(
-    isAr ? "حالة القياسات والمصدر" : "Measurement Verification Status",
-    mTextX,
-    mBoxY + 34
-  );
-
+  const meas = result.rulesResult?.measurements;
+  const cells = [
+    { k: "HR", v: meas?.hr_bpm != null ? `${Math.round(meas.hr_bpm)} bpm` : "—" },
+    { k: "PR", v: meas?.pr_ms != null ? `${Math.round(meas.pr_ms)} ms` : "—" },
+    { k: "QRS", v: meas?.qrs_ms != null ? `${Math.round(meas.qrs_ms)} ms` : "—" },
+    { k: "QT", v: meas?.qt_ms != null ? `${Math.round(meas.qt_ms)} ms` : "—" },
+    { k: "QTc", v: meas?.qtc_ms != null ? `${Math.round(meas.qtc_ms)} ms` : "—" },
+    { k: "Axis", v: meas?.axis_deg != null ? `${Math.round(meas.axis_deg)}°` : "—" },
+  ];
+  const cellW = (leftW - 32) / 6;
+  ctx.textAlign = "center";
+  cells.forEach((c, idx) => {
+    const cx = leftX + 16 + idx * cellW + cellW / 2;
+    ctx.fillStyle = "#94A3B8";
+    ctx.font = "700 12px system-ui, sans-serif";
+    ctx.fillText(c.k, cx, mBoxY + 34);
+    ctx.fillStyle = c.v === "—" ? "#64748B" : "#38BDF8";
+    ctx.font = "800 16px system-ui, sans-serif";
+    ctx.fillText(c.v, cx, mBoxY + 62);
+  });
   const srcNote =
     measurementSource === "device_ocr"
-      ? isAr
-        ? "القياسات مستخرجة من ترويسة جهاز الـ ECG المطبوعة (OCR)."
-        : "Intervals extracted from printed ECG machine header (OCR)."
+      ? (isAr ? "المصدر: ترويسة الجهاز (OCR) — تحقق سريرياً" : "Source: Device Header (OCR) — verify clinically")
       : measurementSource === "manual"
-      ? isAr
-        ? "القياسات مُدخلة يدوياً بواسطة الطبيب."
-        : "Intervals verified and entered manually by clinician."
-      : isAr
-      ? "لا يتم عرض قياسات PR/QRS/QT التقديرية بالبكسل — راجع المربعات يدوياً."
-      : "Pixel-estimated PR/QRS/QT intervals are suppressed — verify calipers manually.";
+      ? (isAr ? "المصدر: إدخال يدوي بواسطة الطبيب" : "Source: Clinician manual entry")
+      : (isAr ? "المصدر: قياس آلي — تحقق من المربعات يدوياً" : "Source: Automated estimate — verify calipers manually");
+  ctx.textAlign = isAr ? "right" : "left";
   ctx.fillStyle = "#94A3B8";
-  ctx.font = "500 14px system-ui, sans-serif";
-  wrapText(ctx, srcNote, leftW - 40, 2).forEach((ln, idx) => {
-    ctx.fillText(ln, mTextX, mBoxY + 66 + idx * 24);
-  });
+  ctx.font = "500 12.5px system-ui, sans-serif";
+  ctx.fillText(srcNote, isAr ? leftX + leftW - 18 : leftX + 18, mBoxY + 104);
 
   // 4. Right Column: Confirmed Diagnosis + Co-existing + Inv / TTT
   const rightX = 684;
@@ -335,7 +338,7 @@ export async function downloadEcgReportSlide(opts: ReportSlideOptions): Promise<
 
   // Diagnosis Hero Card
   const heroY = 176;
-  const heroH = 188;
+  const heroH = 222;
   drawRoundedRect(ctx, rightX, heroY, rightW, heroH, 20);
   ctx.fillStyle = isInsufficient
     ? "rgba(217, 119, 6, 0.22)"
@@ -386,36 +389,35 @@ export async function downloadEcgReportSlide(opts: ReportSlideOptions): Promise<
 
   // Primary Diagnosis Name
   ctx.fillStyle = "#FFFFFF";
-  ctx.font = "800 28px system-ui, -apple-system, Segoe UI, sans-serif";
+  ctx.font = "800 22px system-ui, -apple-system, Segoe UI, sans-serif";
   const primaryTitle = primary
-    ? isAr
-      ? primary.name_ar
-      : primary.name_en
-    : isAr
-    ? "لا يوجد تشخيص مؤكد"
-    : "No Confirmed Diagnosis";
-  wrapText(ctx, primaryTitle, rightW - 48, 2).forEach((ln, idx) => {
-    ctx.fillText(ln, rTextX, heroY + 76 + idx * 36);
+    ? (isAr ? primary.name_ar : primary.name_en)
+    : (isAr ? "لا يوجد تشخيص مؤكد" : "No Confirmed Diagnosis");
+  const titleLines = wrapText(ctx, primaryTitle, rightW - 48, 2);
+  titleLines.forEach((ln, idx) => {
+    ctx.fillText(ln, rTextX, heroY + 68 + idx * 29);
   });
 
-  // Co-existing confirmed diagnoses OR mandatory insufficient safety warning
+  const afterTitleY = heroY + 68 + titleLines.length * 29 + 6;
   if (isInsufficient) {
     ctx.fillStyle = "#FEF3C7";
-    ctx.font = "700 15px system-ui, sans-serif";
+    ctx.font = "700 14px system-ui, sans-serif";
     const warn = isAr
       ? "هذا لا يستبعد وجود حالة طارئة — راجع التخطيط يدوياً أو صعّد الحالة فوراً."
       : "This does NOT rule out an emergency — verify manually / escalate immediately.";
-    ctx.fillText(warn, rTextX, heroY + 162);
+    wrapText(ctx, warn, rightW - 48, 2).forEach((ln, idx) => {
+      ctx.fillText(ln, rTextX, afterTitleY + idx * 20);
+    });
   } else if (coExisting.length > 0) {
-    const coNames = coExisting
-      .slice(0, 3)
-      .map((d) => (isAr ? d.name_ar : d.name_en))
-      .join("  •  ");
+    ctx.fillStyle = "#FDA4AF";
+    ctx.font = "700 12.5px system-ui, sans-serif";
+    ctx.fillText(isAr ? "تشخيصات مصاحبة مؤكدة:" : "Co-existing Confirmed Diagnoses:", rTextX, afterTitleY);
     ctx.fillStyle = "#E2E8F0";
-    ctx.font = "600 14px system-ui, sans-serif";
-    const prefix = isAr ? "تشخيصات مصاحبة مؤكدة: " : "Co-existing Confirmed: ";
-    wrapText(ctx, prefix + coNames, rightW - 48, 1).forEach((ln) => {
-      ctx.fillText(ln, rTextX, heroY + 162);
+    ctx.font = "600 13px system-ui, sans-serif";
+    coExisting.slice(0, 3).forEach((d, idx) => {
+      const lbl = `• ${isAr ? d.name_ar : d.name_en}`;
+      const line = wrapText(ctx, lbl, rightW - 48, 1)[0] || lbl;
+      ctx.fillText(line, rTextX, afterTitleY + 20 + idx * 20);
     });
   }
 
@@ -423,8 +425,8 @@ export async function downloadEcgReportSlide(opts: ReportSlideOptions): Promise<
   const invTtt = primary
     ? getClinicalInvTtt(primary.code, primary.immediate_action_en, primary.immediate_action_ar, primary.name_en)
     : null;
-  const splitY = 384;
-  const splitH = 328;
+  const splitY = 414;
+  const splitH = 298;
   const halfW = (rightW - 18) / 2;
 
   const drawClinicalListCard = (
@@ -450,7 +452,7 @@ export async function downloadEcgReportSlide(opts: ReportSlideOptions): Promise<
     ctx.font = "500 14px system-ui, sans-serif";
     let curY = splitY + 66;
     for (const item of items.slice(0, 5)) {
-      const wrapped = wrapText(ctx, `• ${item}`, halfW - 40, 2);
+      const wrapped = wrapText(ctx, `• ${item}`, halfW - 40, 6);
       for (const ln of wrapped) {
         if (curY > splitY + splitH - 18) break;
         ctx.fillText(ln, tx, curY);
@@ -462,7 +464,7 @@ export async function downloadEcgReportSlide(opts: ReportSlideOptions): Promise<
 
   const splitPoints = (raw: string): string[] =>
     raw
-      .split(/[\n•;]+/)
+      .split(/[\n•;]+|\.\s+/)
       .map((s) => s.trim())
       .filter(Boolean);
 

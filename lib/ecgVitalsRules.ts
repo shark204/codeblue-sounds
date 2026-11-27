@@ -108,8 +108,12 @@ export function evaluateVitalsContext(
       add({
         code: "UNSTABLE_TACHYARRHYTHMIA",
         urgency: "CRITICAL",
-        title_en: "Hemodynamically Unstable Tachyarrhythmia (Hypotension / Shock)",
-        title_ar: "تسارع قلب غير مستقر دورياً (هبوط ضغط / صدمة)",
+        title_en: hasAfibOrFlutter
+          ? (f.bp_status === "low" ? "Unstable Atrial Fibrillation / Flutter with RVR (Hypotension / Shock)" : "Unstable Atrial Fibrillation / Flutter with RVR")
+          : (f.bp_status === "low" ? "Hemodynamically Unstable Tachyarrhythmia (Hypotension / Shock)" : "Hemodynamically Unstable Tachyarrhythmia"),
+        title_ar: hasAfibOrFlutter
+          ? (f.bp_status === "low" ? "رجفان/رفرفة أذينية سريعة غير مستقرة (هبوط ضغط / صدمة)" : "رجفان/رفرفة أذينية سريعة غير مستقرة دورياً")
+          : (f.bp_status === "low" ? "تسارع قلب غير مستقر دورياً (هبوط ضغط / صدمة)" : "تسارع قلب غير مستقر دورياً"),
         reason_en: "Hypotension/instability with rapid arrhythmia requires immediate synchronized cardioversion if primary (especially pre-excited AF/WPW), while concurrently treating secondary shock causes.",
         reason_ar: "هبوط الضغط أو عدم الاستقرار مع التسارع القلبي يتطلب صدمة كهربائية متزامنة فورية إذا كان السبب أولياً (خاصة AF مع WPW) مع علاج أي سبب ثانوي للصدمة.",
         action_en: "Prepare immediate synchronized cardioversion; administer IV fluids/vasopressors if secondary shock is suspected.",
@@ -467,6 +471,57 @@ export function evaluateVitalsContext(
       reason_ar: "وفق بروتوكول طوارئ الرجفان الأذيني (AFIB Checklist)، الرجفان الثانوي أخطر بـ 3 أضعاف — عالج الجفاف أو النزيف أو الجلطة الرئوية أولاً.",
       action_en: "Treat the underlying trigger (IV fluids, CBC/coags, D-dimer/CTPA if pleuritic) and avoid aggressive AV nodal blockade until volume/cause is stabilized.",
       action_ar: "عالج السبب الأساسي أولاً (سوائل وريدية، صورة دم، فحص جلطة رئوية عند الألم الجنبي) وتجنب خفض النبض العنيف قبل الاستقرار.",
+    });
+  }
+
+  // =========================================================================
+  // H. CLINICAL ACUITY LINKAGE (Acute <48h / Subacute 2d-2w / Chronic >2w)
+  // =========================================================================
+  const onset = f.symptom_onset ?? "acute";
+  if (hasAfibOrFlutter && onset === "chronic") {
+    add({
+      code: "CHRONIC_AFIB_RATE_ANTICOAG",
+      urgency: "ABNORMAL",
+      title_en: "Chronic / Persistent AFib (>48h) — Rate Control & Anticoagulation First",
+      title_ar: "رجفان أذيني مزمن (>48 ساعة) — أولوية التحكم بالسرعة ومضادات التجلط",
+      reason_en: "Chronic or >48h AFib carries high thromboembolic stroke risk with unprepared cardioversion.",
+      reason_ar: "الرجفان الأذيني المزمن أو الممتد >48 ساعة يحمل خطر جلطة دماغية مرتفعاً عند الصدمة الكهربائية غير المحضّرة.",
+      action_en: "Prioritize rate control & CHA2DS2-VASc anticoagulation; defer elective cardioversion until >=3 weeks anticoagulation or negative TEE (unless hemodynamically unstable).",
+      action_ar: "أولوية للتحكم بالسرعة وتقييم CHA2DS2-VASc ومضادات التجلط؛ تجنب الصدمة الاختيارية قبل 3 أسابيع مضاد تجلط أو إيكو عبر المريء (إلا عند عدم الاستقرار).",
+    });
+  } else if (hasAfibOrFlutter && onset === "acute" && !isUnstableOrLowBp) {
+    add({
+      code: "ACUTE_AFIB_RHYTHM_WINDOW",
+      urgency: "URGENT",
+      title_en: "Acute-Onset AFib (<48h) — Rhythm vs Rate Control Window",
+      title_ar: "رجفان أذيني حاد البداية (<48 ساعة) — نافذة إعادة النظم",
+      reason_en: "Confirmed onset <48h opens early pharmacologic or electrical rhythm-control options after ruling out secondary causes.",
+      reason_ar: "البداية المؤكدة خلال <48 ساعة تتيح خيار إعادة النظم الدوائي أو الكهربائي بعد استبعاد الأسباب الثانوية (عدوى/PE/جفاف).",
+      action_en: "Screen for secondary triggers (sepsis, PE, hypovolemia, hyperthyroidism); evaluate early rhythm vs rate control & anticoagulation per CHA2DS2-VASc.",
+      action_ar: "استبعد الأسباب الثانوية أولاً، ثم قيّم خيار إعادة النظم أو التحكم بالسرعة مع مضاد التجلط حسب CHA2DS2-VASc.",
+    });
+  }
+  if (hasIschemia && onset === "chronic") {
+    add({
+      code: "CHRONIC_ISCHEMIA_COMPARE_PRIOR",
+      urgency: "ABNORMAL",
+      title_en: "Chronic Presentation (>2w) — Compare Prior ECG (Possible Old Infarct / LV Aneurysm)",
+      title_ar: "أعراض مزمنة (>أسبوعين) — قارن بتخطيط سابق (احتمال جلطة قديمة / أم دم)",
+      reason_en: "Persistent ST/Q/T changes in a chronic presentation may represent prior myocardial infarction or LV aneurysm rather than acute occlusion.",
+      reason_ar: "تغيرات ST/Q/T المستمرة مع أعراض مزمنة قد تمثل جلطة قلبية قديمة أو تمدداً بطينياً وليست انسداداً حاداً.",
+      action_en: "Compare immediately with baseline ECG and obtain serial hs-Troponin & bedside Echo before emergent reperfusion.",
+      action_ar: "قارن فوراً مع تخطيط سابق واطلب تروبونين متسلسل وإيكو قبل تفعيل القسطرة الطارئة.",
+    });
+  } else if ((hasIschemia || hasAfibOrFlutter) && onset === "subacute") {
+    add({
+      code: "SUBACUTE_PRESENTATION_WORKUP",
+      urgency: "ABNORMAL",
+      title_en: "Subacute Course (2d–2w) — Evolving Ischemia / Arrhythmia Workup",
+      title_ar: "مسار تحت حاد (أيام–أسبوعين) — تقييم تغيرات متطورة",
+      reason_en: "Subacute presentations require serial ECGs, troponin trend, and structural echo assessment to distinguish evolving ACS/myocarditis from chronic baseline.",
+      reason_ar: "الحالات تحت الحادة تتطلب تخطيطات متسلسلة وتروبونين وإيكو للتفريق بين تطور إقفاري/التهاب عضلة القلب والنمط المزمن.",
+      action_en: "Compare with prior ECG, check serial hs-Troponin, inflammatory markers, and schedule echocardiography.",
+      action_ar: "قارن بتخطيط سابق، افحص التروبونين المتسلسل ومؤشرات الالتهاب، ورتّب فحص إيكو.",
     });
   }
 
