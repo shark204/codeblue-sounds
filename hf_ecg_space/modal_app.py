@@ -213,6 +213,18 @@ def fastapi_app():
         REV_THR = float(ck_rev.get("threshold", 0.85))
         logger.info(f"Loaded Lead-Reversal Detector (thr={REV_THR:.2f}, test_auc={ck_rev.get('test_auc', 0):.4f})")
 
+    # --- Optional Fold-9 Isotonic Calibration for NORMAL_SINUS_RHYTHM (<0.05ms np.interp) ---
+    NSR_ISO_X, NSR_ISO_Y = None, None
+    ISO_PATH = "/vol/outputs/nsr_isotonic_v18.json"
+    if os.path.exists(ISO_PATH):
+        try:
+            iso_d = json.load(open(ISO_PATH, encoding="utf-8"))
+            NSR_ISO_X = np.array(iso_d["x_knots"], dtype=np.float32)
+            NSR_ISO_Y = np.array(iso_d["y_knots"], dtype=np.float32)
+            logger.info(f"Loaded Fold-9 Isotonic NSR Calibrator ({len(NSR_ISO_X)} knots)")
+        except Exception as e:
+            logger.warning(f"NSR Isotonic load skipped: {e}")
+
     # --- Optional Multi-Domain Deep ECG Interval Regressor (HR/PR/QRS/QT/QTc/Axis, Fold-10 QRS MAE 4.6ms) ---
     MODEL_INT = None
     INT_SCALES = [100.0, 200.0, 120.0, 400.0, 420.0]
@@ -354,7 +366,9 @@ def fastapi_app():
         if m_qrs:
             out["qrs_ms"] = _to_ms(m_qrs.group(1), 50, 240)
 
-        m_qt_pair = re.search(r"\bQT\s*/\s*QTc[BF]?[^\d]{0,14}(\d{3})\s*/\s*(\d{3})\b", joined, re.I)
+        m_qt_pair = re.search(r"\bQT\s*/\s*QTc[BF]?[^\d]{0,45}(\d{3})\s*/\s*(\d{3})\b", joined, re.I)
+        if not m_qt_pair:
+            m_qt_pair = re.search(r"\b([2-6]\d{2})\s*/\s*([3-7]\d{2})\b", joined)
         if m_qt_pair:
             out["qt_ms"] = _to_ms(m_qt_pair.group(1), 240, 700)
             out["qtc_ms"] = _to_ms(m_qt_pair.group(2), 260, 750)
@@ -366,7 +380,7 @@ def fastapi_app():
             if m_qtc:
                 out["qtc_ms"] = _to_ms(m_qtc.group(1), 260, 750)
 
-        m_prt = re.search(r"P[-/]?(?:R|QRS)[-/]?T\s*(?:axes?|axis)?[^\d-]{0,14}(?:\*|-?\d{1,3})\s*[/,\s]+(-?\d{1,3})\b", joined, re.I)
+        m_prt = re.search(r"P[-/\s]?(?:R|QRS)[-/\s]?T\s*(?:axes?|axis)?[^\d*•-]{0,45}(?:\*|•|-?\d{1,3})\s*[/,\s]+(-?\d{1,3})\b", joined, re.I)
         if m_prt and -180 <= int(m_prt.group(1)) <= 180:
             out["axis_deg"] = int(m_prt.group(1))
         else:
@@ -449,13 +463,16 @@ def fastapi_app():
             h1.remove()
             h2.remove()
 
+        if NSR_ISO_X is not None and "NORMAL_SINUS_RHYTHM" in CLASSES:
+            ni = CLASSES.index("NORMAL_SINUS_RHYTHM")
+            mean_p[ni] = float(np.interp(float(mean_p[ni]), NSR_ISO_X, NSR_ISO_Y))
         return mean_p, std_p, gradcam_url, focus_region
 
     @api.get("/health")
     def health():
         return {
             "status": "ok",
-            "version": "v17-v8rare19-v6real-leadrev2-intervals2-oodgate",
+            "version": "v18-v8rare19-v6real-leadrev3-intervals2-oodgate-isoNSR",
             "model": MODEL_DESC,
             "classes": len(CLASSES),
             "clean_auroc": 0.9741,
@@ -540,8 +557,9 @@ def fastapi_app():
         if MODEL_INT is not None:
             try:
                 import math as _math
+                x_int, _ = normalize_ecg_to_clean_ink(img_bgr)
                 with torch.no_grad():
-                    iv = MODEL_INT(x.to(DEVICE)).cpu().numpy()[0]
+                    iv = MODEL_INT(x_int.unsqueeze(0).to(DEVICE)).cpu().numpy()[0]
                 has_af_afl = any(d.get("raw_class") in ("ATRIAL_FIBRILLATION", "ATRIAL_FLUTTER") for d in ai_diagnoses)
                 hr_v = int(round(max(25.0, min(250.0, float(iv[0]) * INT_SCALES[0]))))
                 pr_v = None if has_af_afl else int(round(max(60.0, min(420.0, float(iv[1]) * INT_SCALES[1]))))

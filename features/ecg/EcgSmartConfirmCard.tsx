@@ -249,7 +249,7 @@ export function EcgSmartConfirmCard({
               key={opt.id}
               type="button"
               onClick={() => onUpdateFeatures(opt.toggle)}
-              className={`w-full text-start rounded-xl border px-3.5 py-3 transition-all cursor-pointer flex items-start gap-3 ${
+              className={`w-full text-start rounded-xl border px-3.5 py-3 transition-all cursor-pointer flex items-center gap-3 ${
                 active
                   ? "border-rose-400 bg-rose-600/20 text-white"
                   : isLight
@@ -258,7 +258,7 @@ export function EcgSmartConfirmCard({
               }`}
             >
               <span
-                className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
+                className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
                   active
                     ? "bg-rose-600 border-rose-400 text-white"
                     : "border-slate-400/60"
@@ -268,9 +268,6 @@ export function EcgSmartConfirmCard({
               </span>
               <div className="min-w-0">
                 <div className="text-xs font-extrabold">{isAr ? opt.labelAr : opt.labelEn}</div>
-                <div className={`text-[11px] mt-0.5 ${active ? "text-rose-200" : "text-slate-400"}`}>
-                  {isAr ? opt.subAr : opt.subEn}
-                </div>
               </div>
             </button>
           );

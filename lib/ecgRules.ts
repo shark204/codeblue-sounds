@@ -676,8 +676,12 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
       }
 
       const wType = (ecg.wellens_pattern || "").toLowerCase();
+      const tInvAnt = ecg.t_wave_inversion_leads || [];
+      const hasAntV2V3Twi = tInvAnt.includes("V2") && tInvAnt.includes("V3") && stEv.length === 0 && !hcmFlag;
       if (["type_a", "type_b", "biphasic", "deep_symmetric"].includes(wType)) {
         findings.push(makeFinding("WELLENS_SYNDROME", [`Wellens ${wType.toUpperCase()} T-wave pattern in V2-V3/V4`]));
+      } else if (hasAntV2V3Twi) {
+        findings.push(makeFinding("WELLENS_SYNDROME", [`Suspected Wellens pattern: anterior precordial T-wave inversion (${tInvAnt.join(", ")}) — requires clinical correlation & serial troponins`]));
       } else if (stEv.length === 0 && !hcmFlag && !findings.some((f) => ["LMCA_OCCLUSION", "POSTERIOR_STEMI"].includes(f.code))) {
         const tInv = ecg.t_wave_inversion_leads || [];
         if (depLeads.length >= 2 || tInv.length >= 2) {
@@ -716,8 +720,12 @@ export function interpretECG(ecg: ECGInput): ECGInterpretationResult {
   }
 
   const peakedT = Boolean(ecg.peaked_t_waves) || (ecg.max_t_wave_amplitude_mm ?? 0) >= arrCfg.hyperkalemia.peaked_t_wave_amplitude_precordial_mm;
-  if (ecg.sine_wave_pattern || (peakedT && ((qrsMs != null && qrsMs >= arrCfg.hyperkalemia.severe_qrs_widening_ms) || ecg.flattened_or_absent_p_hyperk))) {
+  const antDepLeads = (ecg.st_depression_leads || []).filter((l) => ["V1", "V2", "V3", "V4"].includes(l));
+  const severeHyperK = Boolean(ecg.sine_wave_pattern) || (peakedT && ((qrsMs != null && qrsMs >= arrCfg.hyperkalemia.severe_qrs_widening_ms) || Boolean(ecg.flattened_or_absent_p_hyperk)));
+  if (severeHyperK) {
     findings.push(makeFinding("HYPERKALEMIA_SEVERE", ["Peaked T waves with wide QRS / absent P / sine-wave"]));
+  } else if (peakedT && antDepLeads.length >= 2) {
+    findings.push(makeFinding("DE_WINTER_T_WAVES", [`Suspected De Winter pattern: precordial ST depression (${antDepLeads.join(", ")}) with tall/peaked T waves — LAD occlusion equivalent; verify clinically`]));
   } else if (peakedT) {
     findings.push(makeFinding("HYPERKALEMIA", ["Symmetrically peaked tented T waves"]));
   }
