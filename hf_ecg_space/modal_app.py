@@ -199,6 +199,25 @@ def fastapi_app():
                 k: (max(0.25, float(v)) if k in LOW_N_CLASSES else float(v))
                 for k, v in fz_thr.items()
             }
+    MODEL_CNX = None
+    CNX_PA, CNX_PB = None, None
+    CNX_PATH = "/vol/outputs/ecg_convnext_small_v20_512x768.pt"
+    if MODEL_EFF is not None and os.path.exists(CNX_PATH):
+        ckpt_cnx = torch.load(CNX_PATH, map_location=DEVICE, weights_only=False)
+        MODEL_CNX = timm.create_model(
+            ckpt_cnx.get("arch", "convnext_small.fb_in22k_ft_in1k_384"),
+            pretrained=False,
+            num_classes=len(CLASSES),
+            drop_rate=0.2,
+        ).to(DEVICE)
+        MODEL_CNX.load_state_dict(ckpt_cnx["state_dict"])
+        MODEL_CNX.eval()
+        CNX_PA = np.array(ckpt_cnx["platt_a"], dtype=np.float32)
+        CNX_PB = np.array(ckpt_cnx["platt_b"], dtype=np.float32)
+        MODEL_DESC = "ens3_v20_convnext50m(0.50)+effnetv2s_v18(0.35)+densenet121_v6real(0.15)"
+    DN_IDX = [DN_CLASSES.index(c) if c in DN_CLASSES else -1 for c in CLASSES]
+    DN_TEMP = max(1.0, float(ckpt.get("calib_temp", 1.1721)))
+    DN_BIAS = float(ckpt.get("calib_bias", 1.447))
     logger.info(f"Loaded ECG Engine: {MODEL_DESC} ({len(CLASSES)} classes, {IMG_H}x{IMG_W})")
 
     # --- Optional Einthoven Lead-Reversal Detector (<120ms CPU) ---
@@ -401,9 +420,27 @@ def fastapi_app():
         ps = []
         with torch.no_grad():
             logit_ef = MODEL_EFF(x).numpy()[0] if MODEL_EFF is not None else None
+            p_ef = (
+                1.0 / (1.0 + np.exp(-np.clip(logit_ef * PLATT_A + PLATT_B, -30.0, 30.0)))
+                if (logit_ef is not None and PLATT_A is not None and PLATT_B is not None)
+                else (1.0 / (1.0 + np.exp(-np.clip(logit_ef, -30.0, 30.0))) if logit_ef is not None else None)
+            )
+            p_cnx = (
+                1.0 / (1.0 + np.exp(-np.clip(MODEL_CNX(x).numpy()[0] * CNX_PA + CNX_PB, -30.0, 30.0)))
+                if MODEL_CNX is not None
+                else None
+            )
             for _ in range(n_passes):
                 logit_dn = MODEL(x).numpy()[0]
-                if logit_ef is not None:
+                if p_cnx is not None and p_ef is not None:
+                    p_dn_raw = 1.0 / (1.0 + np.exp(-np.clip((logit_dn - DN_BIAS) / DN_TEMP, -30.0, 30.0)))
+                    p_vec = np.zeros(len(CLASSES), dtype=np.float32)
+                    for j, di in enumerate(DN_IDX):
+                        if di >= 0:
+                            p_vec[j] = 0.50 * p_cnx[j] + 0.35 * p_ef[j] + 0.15 * p_dn_raw[di]
+                        else:
+                            p_vec[j] = (0.50 * p_cnx[j] + 0.35 * p_ef[j]) / 0.85
+                elif logit_ef is not None:
                     blended = logit_ef.copy()
                     n_common = min(len(logit_ef), len(logit_dn))
                     blended[:n_common] = 0.60 * logit_ef[:n_common] + 0.40 * logit_dn[:n_common]
@@ -476,7 +513,7 @@ def fastapi_app():
     def health():
         return {
             "status": "ok",
-            "version": "v18-v8rare19-v6real-leadrev3-intervals2-oodgate-isoNSR",
+            "version": "v20-3model-convnext50m-effnetv2s18-densenet121-leadrev3-intervals2-isoNSR",
             "model": MODEL_DESC,
             "classes": len(CLASSES),
             "clean_auroc": 0.9741,
