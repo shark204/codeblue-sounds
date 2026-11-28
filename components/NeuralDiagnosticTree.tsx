@@ -6,8 +6,10 @@ interface NeuralStep {
   num: string;
   titleAr: string;
   bodyAr: string;
+  highlightAr?: string;
   titleEn: string;
   bodyEn: string;
+  highlightEn?: string;
 }
 
 const LEFT_STEPS: NeuralStep[] = [
@@ -21,9 +23,11 @@ const LEFT_STEPS: NeuralStep[] = [
   {
     num: "03",
     titleAr: "التحليل العصبي الثنائي",
-    bodyAr: "شبكتان عصبيتان (EfficientNetV2-S + DenseNet121) مُدرّبتان على +72,000 تخطيط من 4 قواعد عالمية.",
+    bodyAr: "شبكتان عصبيتان (EfficientNetV2-S + DenseNet121) ",
+    highlightAr: "مُدرّبتان على +72,000 تخطيط من 4 قواعد عالمية.",
     titleEn: "Dual deep ensemble",
-    bodyEn: "Two neural networks (EfficientNetV2-S + DenseNet121) trained on 72,000+ real ECGs from 4 global databases.",
+    bodyEn: "Two neural networks (EfficientNetV2-S + DenseNet121) ",
+    highlightEn: "trained on 72,000+ real ECGs from 4 global databases.",
   },
   {
     num: "05",
@@ -78,6 +82,7 @@ export function NeuralDiagnosticTree({
 
   const renderBox = (st: NeuralStep, dotPos: "right" | "left" | "top") => {
     const isActive = activeNum === st.num;
+    const highlightText = isAr ? st.highlightAr : st.highlightEn;
     return (
       <div
         key={st.num}
@@ -127,6 +132,11 @@ export function NeuralDiagnosticTree({
         </div>
         <p className={`text-[7.2px] sm:text-[8.5px] md:text-[10.5px] leading-[1.26] md:leading-[1.38] ${isLight ? "text-slate-600" : "text-slate-300/90"}`}>
           {isAr ? st.bodyAr : st.bodyEn}
+          {highlightText && (
+            <span className={isLight ? "font-extrabold text-[#881337]" : "font-extrabold text-[#be123c]"}>
+              {highlightText}
+            </span>
+          )}
         </p>
       </div>
     );
@@ -147,10 +157,10 @@ export function NeuralDiagnosticTree({
     <div className="w-full space-y-2 select-none">
       <style>{`
         @keyframes cbTreeRootImpulse {
-          0%   { background-position: 50% 135%; opacity: 0; }
-          6%   { opacity: 0.95; }
-          56%  { background-position: 50% -25%; opacity: 0.92; }
-          64%  { background-position: 50% -45%; opacity: 0; }
+          0% { background-position: 50% 135%; opacity: 0; }
+          6% { opacity: 0.95; }
+          56% { background-position: 50% -25%; opacity: 0.92; }
+          64% { background-position: 50% -45%; opacity: 0; }
           100% { background-position: 50% -45%; opacity: 0; }
         }
         .cb-tree-impulse {
