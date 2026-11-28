@@ -1,0 +1,29 @@
+{
+  "name": "Code Blue: ECG & Sounds",
+  "short_name": "Code Blue ECG",
+  "description": "Medical education & clinical decision support for 12-lead ECG interpretation, heart murmurs, and breath sounds.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060913",
+  "theme_color": "#881337",
+  "categories": [
+    "medical",
+    "education"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
